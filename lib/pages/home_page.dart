@@ -36,7 +36,11 @@ class _HomePageState extends State<HomePage> {
   ];
 
   List<FolderModel> listFolder = [
-    FolderModel('0', 'Folder 1', 'description', []),
+    FolderModel('0', 'Folder 1', 'description', [
+      TopicModel('0', 'daicuong', '0', 'Famous', 'description', true, []),
+      TopicModel('0', 'daicuong', '0', 'Famous', 'description', true, []),
+      TopicModel('0', 'daicuong', '0', 'Famous', 'description', true, []),
+    ]),
     FolderModel('0', 'Folder 2', 'description', []),
     FolderModel('0', 'Folder 3', 'description', []),
     FolderModel('0', 'Folder 4', 'description', []),
@@ -145,6 +149,9 @@ class _HomePageState extends State<HomePage> {
               GroupList(
                 buildItem: (context, index) {
                   return ItemList(
+                    onTap: () {
+                      
+                    },
                     headText: myTopics[index].title,
                     bodyText: '${myTopics[index].listCard.length} thuật ngữ',
                     bottom: Row(
@@ -231,7 +238,9 @@ class _HomePageState extends State<HomePage> {
                     ),
                     body: Row(
                       children: [
-                        CustomText(text: '${listFolder.length} học phần'),
+                        CustomText(
+                            text:
+                                '${listFolder[index].listTopic.length} học phần'),
                         Container(
                           margin: const EdgeInsets.symmetric(horizontal: 16),
                           color: Colors.grey.shade600.withOpacity(0.5),
