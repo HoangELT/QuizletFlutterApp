@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -5,6 +6,8 @@ import 'package:quizletapp/enums/text_style_enum.dart';
 import 'package:quizletapp/models/folder.dart';
 import 'package:quizletapp/models/topic.dart';
 import 'package:quizletapp/models/user.dart';
+import 'package:quizletapp/services/firebase.dart';
+import 'package:quizletapp/services/firebase_auth.dart';
 import 'package:quizletapp/utils/app_theme.dart';
 import 'package:quizletapp/widgets/text.dart';
 import 'package:quizletapp/widgets/group_list.dart';
@@ -18,21 +21,24 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  FirebaseAuthService firebaseAuthService = FirebaseAuthService();
+  FirebaseService firebaseService = FirebaseService();
+
   UserModel currentUser = UserModel(
       '0', 'lydaicuong784', 'lydaicuong784@gmail.com', DateTime.now());
 
   List<TopicModel> myTopics = [
     TopicModel('0', 'daicuong', '0', 'Famous', 'description', true, []),
-    TopicModel('0', 'daicuong', '0', 'Famous', 'description', true, []),
-    TopicModel('0', 'daicuong', '0', 'Famous', 'description', true, []),
-    TopicModel('0', 'daicuong', '0', 'Famous', 'description', true, []),
+    TopicModel('0', 'vanhoang', '0', 'Famous', 'description', true, []),
+    TopicModel('0', 'vanbien', '0', 'Famous', 'description', true, []),
+    TopicModel('0', 'trongduc', '0', 'Famous', 'description', true, []),
   ];
 
   List<TopicModel> listTopicOfUser = [
-    TopicModel('0', 'daicuong', '0', 'Famous', 'description', true, []),
-    TopicModel('0', 'daicuong', '0', 'Famous', 'description', true, []),
-    TopicModel('0', 'daicuong', '0', 'Famous', 'description', true, []),
-    TopicModel('0', 'daicuong', '0', 'Famous', 'description', true, []),
+    TopicModel('0', 'duyben', '0', 'Famous', 'description', true, []),
+    TopicModel('0', 'hogquan', '0', 'Famous', 'description', true, []),
+    TopicModel('0', 'thanhlong', '0', 'Famous', 'description', true, []),
+    TopicModel('0', 'hoanviet', '0', 'Famous', 'description', true, []),
   ];
 
   List<FolderModel> listFolder = [
@@ -149,9 +155,7 @@ class _HomePageState extends State<HomePage> {
               GroupList(
                 buildItem: (context, index) {
                   return ItemList(
-                    onTap: () {
-                      
-                    },
+                    onTap: () {},
                     headText: myTopics[index].title,
                     bodyText: '${myTopics[index].listCard.length} thuật ngữ',
                     bottom: Row(
@@ -180,8 +184,8 @@ class _HomePageState extends State<HomePage> {
               GroupList(
                 buildItem: (context, index) {
                   return ItemList(
-                    headText: myTopics[index].title,
-                    bodyText: '${myTopics[index].listCard.length} thuật ngữ',
+                    headText: listTopicOfUser[index].title,
+                    bodyText: '${listTopicOfUser[index].listCard.length} thuật ngữ',
                     bottom: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -194,7 +198,7 @@ class _HomePageState extends State<HomePage> {
                             const SizedBox(
                               width: 8,
                             ),
-                            CustomText(text: myTopics[index].username)
+                            CustomText(text: listTopicOfUser[index].username)
                           ],
                         ),
                         IconButton(

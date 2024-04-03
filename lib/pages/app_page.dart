@@ -5,6 +5,8 @@ import 'package:quizletapp/pages/library_page.dart';
 import 'package:quizletapp/pages/multifunction_page.dart';
 import 'package:quizletapp/pages/profile_page.dart';
 import 'package:quizletapp/pages/solution_page.dart';
+import 'package:quizletapp/services/firebase.dart';
+import 'package:quizletapp/services/firebase_auth.dart';
 import 'package:quizletapp/utils/app_theme.dart';
 import 'package:quizletapp/widgets/button_listtile.dart';
 import 'package:quizletapp/widgets/text.dart';
@@ -17,6 +19,8 @@ class AppPage extends StatefulWidget {
 }
 
 class _AppPageState extends State<AppPage> {
+  FirebaseAuthService firebaseAuthService = FirebaseAuthService();
+  FirebaseService firebaseService = FirebaseService();
   int indexSelected = 0;
   @override
   Widget build(BuildContext context) {
@@ -62,7 +66,7 @@ class _AppPageState extends State<AppPage> {
                             Icons.filter,
                             color: Colors.white,
                           ),
-                          onTap: () {
+                          onTap: () async {
                             Navigator.pop(context);
                           },
                         ),
