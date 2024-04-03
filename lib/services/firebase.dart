@@ -1,0 +1,87 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+class FirebaseService {
+  // Khai báo một static biến private để lưu trữ thể hiện duy nhất của lớp FirebaseService
+  static final FirebaseService _instance = FirebaseService._internal();
+
+  // Thuộc tính private để lưu trữ tham chiếu đến Firestore instance
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  // Hàm factory để trả về thể hiện duy nhất của lớp FirebaseService
+  factory FirebaseService() {
+    return _instance;
+  }
+
+  // Constructor private
+  FirebaseService._internal();
+
+  // Phương thức để thêm một tài liệu vào Firestore
+  Future<void> addDocument(
+      String collectionName, Map<String, dynamic> data) async {
+    try {
+      // Thêm tài liệu vào Firestore và lưu trữ DocumentReference
+      DocumentReference docRef =
+          await _firestore.collection(collectionName).add(data);
+
+      // Lấy id của tài liệu mới được thêm vào
+      String docId = docRef.id;
+
+      // Thêm id vào dữ liệu trước khi lưu vào Firestore
+      Map<String, dynamic> newData = {...data, 'id': docId};
+
+      // Lưu dữ liệu mới vào Firestore với trường id đã được thêm vào
+      await docRef.update(newData);
+    } catch (error) {
+      print('Error adding document: $error');
+      throw error;
+    }
+  }
+
+  // Phương thức để cập nhật một tài liệu trong Firestore
+  Future<void> updateDocument(String collectionName, String documentId,
+      Map<String, dynamic> data) async {
+    try {
+      await _firestore.collection(collectionName).doc(documentId).update(data);
+    } catch (error) {
+      print('Error updating document: $error');
+      throw error;
+    }
+  }
+
+  // Phương thức để xóa một tài liệu từ Firestore
+  Future<void> deleteDocument(String collectionName, String documentId) async {
+    try {
+      await _firestore.collection(collectionName).doc(documentId).delete();
+    } catch (error) {
+      print('Error deleting document: $error');
+      throw error;
+    }
+  }
+
+  // Phương thức để lấy danh sách tài liệu từ một bộ sưu tập trong Firestore
+  Future<List<Map<String, dynamic>>> getDocuments(String collectionName) async {
+    try {
+      QuerySnapshot querySnapshot =
+          await _firestore.collection(collectionName).get();
+      return querySnapshot.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
+    } catch (error) {
+      print('Error getting documents: $error');
+      throw error;
+    }
+  }
+
+  // Phương thức để lấy một tài liệu cụ thể từ Firestore
+  Future<Map<String, dynamic>> getDocument(
+      String collectionName, String documentId) async {
+    try {
+      DocumentSnapshot documentSnapshot =
+          await _firestore.collection(collectionName).doc(documentId).get();
+      return documentSnapshot.data() as Map<String, dynamic>;
+    } catch (error) {
+      print('Error getting document: $error');
+      throw error;
+    }
+  }
+}
