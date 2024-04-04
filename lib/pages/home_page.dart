@@ -67,6 +67,8 @@ class _HomePageState extends State<HomePage> {
           text: 'Quizlet',
           type: TextStyleEnum.xl,
         ),
+        //không hiển thị leadding
+        automaticallyImplyLeading: false,
         foregroundColor: Colors.white,
         backgroundColor: AppTheme.primaryBackgroundColorAppbar,
         actions: [
@@ -104,7 +106,8 @@ class _HomePageState extends State<HomePage> {
                   ),
                   child: CustomText(
                     text: '2',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+                    style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.w700),
                   ),
                 ),
               ),
@@ -185,7 +188,8 @@ class _HomePageState extends State<HomePage> {
                 buildItem: (context, index) {
                   return ItemList(
                     headText: listTopicOfUser[index].title,
-                    bodyText: '${listTopicOfUser[index].listCard.length} thuật ngữ',
+                    bodyText:
+                        '${listTopicOfUser[index].listCard.length} thuật ngữ',
                     bottom: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

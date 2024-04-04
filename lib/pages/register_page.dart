@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -7,17 +6,20 @@ import 'package:quizletapp/enums/text_style_enum.dart';
 import 'package:quizletapp/services/firebase_auth.dart';
 import 'package:quizletapp/utils/app_theme.dart';
 import 'package:quizletapp/widgets/appbar_default.dart';
+import 'package:quizletapp/widgets/button.dart';
 import 'package:quizletapp/widgets/elevatedButton.dart';
 import 'package:quizletapp/widgets/text.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
+  var isChecked = true;
+  var selectedDate;
   FirebaseAuthService auth = FirebaseAuthService();
   var controllerEmail = TextEditingController();
   var controllerPw = TextEditingController();
@@ -42,15 +44,14 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 32),
                 CustomText(
-                  text: "Đăng nhập nhanh bằng",
+                  text: "Đăng ký nhanh bằng",
                   type: TextStyleEnum.large,
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
                   onPressed: () {
-                    auth.signInWithGoogle();
+                    auth.signUpWithGoogle();
                   },
                   style: ButtonStyle(
                     minimumSize:
@@ -75,15 +76,48 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 16),
                 CustomText(
-                  text: "hoặc đăng nhập bằng email hoặc tên người dùng của bạn",
+                  text: "hoặc tạo một tài khoản",
                   type: TextStyleEnum.large,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return "Vui lòng nhập ngày sinh của bạn";
+                    }
+                    return null;
+                  },
+                  decoration: InputDecoration(
+                    label: CustomText(
+                        style: const TextStyle(color: Colors.grey),
+                        text: "Nhập ngày sinh của bạn"),
+                    border: const OutlineInputBorder(),
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Colors.white), // Màu viền khi focus
+                    ),
+                    focusedErrorBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(
+                          color: Colors.red), // Màu viền khi có lỗi và focus
+                    ),
+                    errorStyle: const TextStyle(color: Colors.red),
+                    focusColor: Colors.white,
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                  style: const TextStyle(color: Colors.white),
+                  onTap: () => _selectDate(context),
+                  controller: TextEditingController(
+                    text: selectedDate != null
+                        ? '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}'
+                        : '',
+                  ),
+                ),
+                const SizedBox(height: 28),
+                TextFormField(
                   controller: controllerEmail,
                   validator: (value) {
                     if (value!.isEmpty) {
-                      return "Vui lòng nhập email hoặc tên người dùng của bạn";
+                      return "Vui lòng nhập email của bạn";
                     }
                     if (!value.contains('@')) {
                       return "Email không hợp lệ";
@@ -93,7 +127,7 @@ class _LoginPageState extends State<LoginPage> {
                   decoration: InputDecoration(
                     label: CustomText(
                         style: const TextStyle(color: Colors.grey),
-                        text: "Nhập email hoặc tên người dùng của bạn"),
+                        text: "Nhập email của bạn"),
                     border: const OutlineInputBorder(),
                     focusedBorder: const OutlineInputBorder(
                       borderSide:
@@ -114,13 +148,29 @@ class _LoginPageState extends State<LoginPage> {
                   controller: controllerPw,
                   validator: (value) {
                     if (value!.isEmpty) {
-                      return "Vui lòng mật khẩu của bạn";
+                      return "Vui lòng nhập mật khẩu";
+                    }
+                    // Kiểm tra độ dài mật khẩu
+                    if (value.length < 7) {
+                      return "Mật khẩu phải có ít nhất 7 ký tự";
+                    }
+                    // Kiểm tra xem mật khẩu có chứa ít nhất một ký tự hoa không
+                    if (!value.contains(RegExp(r'[A-Z]'))) {
+                      return "Mật khẩu phải chứa ít nhất một ký tự hoa";
+                    }
+                    // Kiểm tra xem mật khẩu có chứa ít nhất một ký tự thường không
+                    if (!value.contains(RegExp(r'[a-z]'))) {
+                      return "Mật khẩu phải chứa ít nhất một ký tự thường";
+                    }
+                    // Kiểm tra xem mật khẩu có chứa ít nhất một ký tự đặc biệt không
+                    if (!value.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>]'))) {
+                      return "Mật khẩu phải chứa ít nhất một ký tự đặc biệt";
                     }
                     return null;
                   },
                   decoration: InputDecoration(
                     label: CustomText(
-                      text: "Nhập mật khẩu của bạn",
+                      text: "Tạo mật khẩu của bạn",
                       style: const TextStyle(color: Colors.grey),
                     ),
                     border: const OutlineInputBorder(),
@@ -138,98 +188,56 @@ class _LoginPageState extends State<LoginPage> {
                   keyboardType: TextInputType.visiblePassword,
                   style: const TextStyle(color: Colors.white),
                 ),
-                const SizedBox(height: 28),
-                _createForgotNameOrPassWord(),
-                const SizedBox(height: 28),
+                const SizedBox(height: 16),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CustomText(text: "Bạn là giáo viên?"),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Checkbox(
+                            activeColor: Colors.white,
+                            checkColor: Colors.grey,
+                            side: const BorderSide(color: Colors.white),
+                            value: isChecked,
+                            onChanged: (value) {
+                              setState(() {
+                                isChecked = value!;
+                              });
+                            }),
+                        CustomText(text: "Phải"),
+                        Checkbox(
+                            activeColor: Colors.white,
+                            checkColor: Colors.grey,
+                            side: const BorderSide(color: Colors.white),
+                            value: !isChecked,
+                            onChanged: (value) {
+                              setState(() {
+                                isChecked = !value!;
+                              });
+                            }),
+                        CustomText(text: "Không"),
+                      ],
+                    )
+                  ],
+                ),
+                const SizedBox(height: 16),
                 Center(
                     child: CustomText(
                         textAlign: TextAlign.center,
                         text:
-                            "Bằng việc đăng nhập, bạn chấp nhận Điều khoản dịch vụ và Chính sách quyền riêng tư của Quizlet")),
+                            "Bằng việc đăng ký, bạn chấp nhận Điều khoản dịch vụ và Chính sách quyền riêng tư của Quizlet")),
                 const SizedBox(height: 28),
                 CustomElevatedButton(
-                    onPressed: () {
-                      _submit();
-                    },
-                    text: "Đăng nhập"),
+                  text: "Đăng ký",
+                  onPressed: () {
+                    _submit();
+                  },
+                )
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  _createForgotNameOrPassWord() {
-    return Center(
-      child: RichText(
-        text: TextSpan(
-          text: "Quên ",
-          style: const TextStyle(color: Colors.white),
-          children: [
-            TextSpan(
-              text: "tên người dùng",
-              style: const TextStyle(
-                color: Colors.blue,
-              ),
-              recognizer: TapGestureRecognizer()
-                ..onTap = () {
-                  // Hiển thị dialog khi nhấn vào "tên người dùng"
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text("Quên tên người dùng"),
-                        content: const Text("Nội dung dialog"),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text("Đóng"),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
-            ),
-            const TextSpan(
-              text: " hoặc ",
-              style: TextStyle(color: Colors.white),
-            ),
-            TextSpan(
-              text: "mật khẩu",
-              style: const TextStyle(
-                color: Colors.blue,
-              ),
-              recognizer: TapGestureRecognizer()
-                ..onTap = () {
-                  // Hiển thị dialog khi nhấn vào "mật khẩu"
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text("Quên mật khẩu"),
-                        content: const Text("Nội dung dialog"),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text("Đóng"),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
-            ),
-            const TextSpan(
-              text: "?",
-              style: TextStyle(color: Colors.white),
-            ),
-          ],
         ),
       ),
     );
@@ -239,10 +247,10 @@ class _LoginPageState extends State<LoginPage> {
     if (formKey.currentState!.validate()) {
       try {
         // Thực hiện xác thực từ Firebase
-        await auth.signInWithEmailAndPassword(
+        await auth.signUpWithEmailAndPassword(
             controllerEmail.text, controllerPw.text);
-        // Nếu xác thực thành công, thực hiện chuyển hướng đến app page
-        Navigator.pushReplacementNamed(context, "/app");
+        // Nếu đăng ký thành công, thực hiện chuyển hướng đến trang login
+        Navigator.pushReplacementNamed(context, "/login");
       } catch (error) {
         // Xử lý khi có lỗi xác thực từ Firebase
         print('Error signing in: $error');
@@ -250,10 +258,23 @@ class _LoginPageState extends State<LoginPage> {
         // Hiển thị Snackbar thông báo lỗi
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content:
-                  CustomText(text: 'Đăng nhập thất bại. Vui lòng thử lại.')),
+              content: CustomText(text: 'Đăng ký thất bại. Vui lòng thử lại.')),
         );
       }
+    }
+  }
+
+  _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+      });
     }
   }
 }

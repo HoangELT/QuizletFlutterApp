@@ -5,11 +5,13 @@ class CustomText extends StatelessWidget {
   final String text;
   TextStyleEnum type;
   TextStyle? style;
+  TextAlign? textAlign; // add them thuoc tinh textAlign
 
   CustomText({
     required this.text,
     this.style,
     this.type = TextStyleEnum.normal,
+    this.textAlign,
     super.key,
   });
 
@@ -19,6 +21,7 @@ class CustomText extends StatelessWidget {
       text,
       style: getStyle(),
       textDirection: TextDirection.ltr,
+      textAlign: textAlign, // add them thuoc tinh textAlign
     );
   }
 
@@ -43,8 +46,13 @@ class CustomText extends StatelessWidget {
         fontSize: 24,
         fontWeight: FontWeight.w600,
       );
-    }
-    else {
+    } else if (type == TextStyleEnum.xxl) {
+      myTextStyle = const TextStyle(
+        color: Colors.white,
+        fontSize: 32,
+        fontWeight: FontWeight.w600,
+      );
+    } else {
       myTextStyle = const TextStyle(
         color: Colors.white,
         fontSize: 16,

@@ -34,7 +34,7 @@ class _AppPageState extends State<AppPage> {
           onTap: (value) {
             if (value == 2) {
               showModalBottomSheet(
-                backgroundColor: Color.fromARGB(255, 44, 63, 79),
+                backgroundColor: const Color.fromARGB(255, 44, 63, 79),
                 context: context,
                 builder: (BuildContext context) {
                   return Container(
@@ -46,7 +46,7 @@ class _AppPageState extends State<AppPage> {
                           width: 44,
                           height: 6,
                           decoration: BoxDecoration(
-                            color: Color.fromARGB(160, 127, 144, 155),
+                            color: const Color.fromARGB(160, 127, 144, 155),
                             borderRadius: BorderRadius.circular(9999),
                           ),
                         ),
@@ -134,7 +134,7 @@ class _AppPageState extends State<AppPage> {
       ),
       body: IndexedStack(
         index: indexSelected,
-        children: [
+        children: const [
           HomePage(),
           SolutionPage(),
           MultifunctionPage(),

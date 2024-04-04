@@ -4,5 +4,6 @@ class AppTheme {
   static const Color primaryColor = Color.fromARGB(255, 105, 42, 205);
   static const Color primaryButtonColor = Color.fromARGB(255, 255, 199, 0);
   static const Color primaryBackgroundColor = Color.fromARGB(255, 7, 15, 43);
-  static const Color primaryBackgroundColorAppbar = Color.fromARGB(255, 57, 72, 103);
+  static const Color primaryBackgroundColorAppbar =
+      Color.fromARGB(255, 57, 72, 103);
 }
