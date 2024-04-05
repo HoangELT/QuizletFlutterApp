@@ -1,14 +1,12 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:quizletapp/enums/text_style_enum.dart';
-import 'package:quizletapp/services/firebase_auth.dart';
-import 'package:quizletapp/utils/app_theme.dart';
-import 'package:quizletapp/widgets/appbar_default.dart';
-import 'package:quizletapp/widgets/elevatedButton.dart';
-import 'package:quizletapp/widgets/text.dart';
+import '../enums/text_style_enum.dart';
+import '../services/firebase_auth.dart';
+import '../utils/app_theme.dart';
+import '../widgets/appbar_default.dart';
+import '../widgets/elevatedButton.dart';
+import '../widgets/text.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -135,7 +133,8 @@ class _LoginPageState extends State<LoginPage> {
                     errorStyle: const TextStyle(color: Colors.red),
                     focusColor: Colors.white,
                   ),
-                  keyboardType: TextInputType.visiblePassword,
+                  //keyboardType: TextInputType.visiblePassword,
+                  obscureText: true,
                   style: const TextStyle(color: Colors.white),
                 ),
                 const SizedBox(height: 28),

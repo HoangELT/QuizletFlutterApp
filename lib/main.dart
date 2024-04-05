@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:quizletapp/pages/app_page.dart';
-import 'package:quizletapp/pages/intro_page.dart';
-import 'package:quizletapp/pages/login_page.dart';
-import 'package:quizletapp/pages/not_found_page.dart';
+import 'pages/app_page.dart';
+import 'pages/intro_page.dart';
+import 'pages/login_page.dart';
+import 'pages/not_found_page.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:quizletapp/pages/register_page.dart';
+import 'pages/register_page.dart';
 import 'firebase_options.dart';
+import 'pages/settings_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,6 +41,10 @@ void main() async {
           case '/register':
             return MaterialPageRoute(
               builder: (context) => const RegisterPage(),
+            );
+          case '/settings':
+            return MaterialPageRoute(
+              builder: (context) => const SettingsPage(),
             );
           default:
             return MaterialPageRoute(
