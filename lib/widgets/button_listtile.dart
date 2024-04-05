@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class ButtonListTile extends StatelessWidget {
   final Widget? title;
   final Icon? icon;
+  final Icon? iconRight;
   final double borderRadius;
   final BoxDecoration? boxDecoration;
   final EdgeInsets? padding;
@@ -10,6 +11,7 @@ class ButtonListTile extends StatelessWidget {
   ButtonListTile({
     this.title,
     this.icon,
+    this.iconRight,
     this.boxDecoration,
     this.padding,
     this.borderRadius = 16,
@@ -34,6 +36,7 @@ class ButtonListTile extends StatelessWidget {
         child: ListTile(
           leading: icon,
           title: title,
+          trailing: iconRight,
         ),
       ),
     );

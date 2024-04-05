@@ -5,19 +5,19 @@ import 'package:quizletapp/widgets/group_list.dart';
 import 'package:quizletapp/widgets/item_list.dart';
 import 'package:quizletapp/widgets/text.dart';
 
-class FindTopicPage extends StatefulWidget {
+class SearchTopicPage extends StatefulWidget {
   final Map<String, dynamic> keyWord;
 
-  FindTopicPage({
+  SearchTopicPage({
     required this.keyWord,
     super.key,
   });
 
   @override
-  State<FindTopicPage> createState() => _FindTopicPageState();
+  State<SearchTopicPage> createState() => _SearchTopicPageState();
 }
 
-class _FindTopicPageState extends State<FindTopicPage>
+class _SearchTopicPageState extends State<SearchTopicPage>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
 
@@ -46,7 +46,7 @@ class _FindTopicPageState extends State<FindTopicPage>
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(90),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -61,12 +61,14 @@ class _FindTopicPageState extends State<FindTopicPage>
                   controller: _tabController,
                   indicatorWeight: 3,
                   dividerHeight: 3,
+                  overlayColor: const MaterialStatePropertyAll(
+                      AppTheme.primaryBackgroundColor),
                   dividerColor: Colors.grey.shade600.withOpacity(0.5),
                   indicatorColor: Colors.deepPurpleAccent.shade100,
                   unselectedLabelColor: Colors.grey,
                   labelColor: Colors.white,
                   labelStyle:
-                      TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                      const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
                   tabAlignment: TabAlignment.start,
                   isScrollable: true,
                   labelPadding: const EdgeInsets.only(right: 32),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quizletapp/pages/app_page.dart';
-import 'package:quizletapp/pages/find_topic.dart';
+import 'package:quizletapp/pages/search_topic.dart';
 import 'package:quizletapp/pages/intro_page.dart';
 import 'package:quizletapp/pages/login_page.dart';
 import 'package:quizletapp/pages/not_found_page.dart';
@@ -43,9 +43,9 @@ void main() async {
             return MaterialPageRoute(
               builder: (context) => const RegisterPage(),
             );
-          case '/find-topic':
+          case '/search-topic':
             return MaterialPageRoute(
-              builder: (context) => FindTopicPage(
+              builder: (context) => SearchTopicPage(
                 keyWord: args as Map<String, dynamic>,
               ),
             );

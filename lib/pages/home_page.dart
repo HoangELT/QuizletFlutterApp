@@ -169,7 +169,7 @@ class _HomePageState extends State<HomePage> {
             child: TextField(
               controller: _textEditingController,
               onSubmitted: (value) {
-                Navigator.pushNamed(context, '/find-topic', arguments: {'code': 0, 'key': _textEditingController.text});
+                Navigator.pushNamed(context, '/search-topic', arguments: {'code': 0, 'key': _textEditingController.text});
               },
               style: const TextStyle(
                 fontSize: 18,
@@ -400,7 +400,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ButtonListTile(
                               onTap: () {
-                                Navigator.pushNamed(context, '/find-topic',
+                                Navigator.pushNamed(context, '/search-topic',
                                     arguments: {'code': index, 'key': listTopicToFind[index]['label']});
                               },
                               title: CustomText(
