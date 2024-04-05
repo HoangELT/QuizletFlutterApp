@@ -23,7 +23,7 @@ void main() async {
       theme: ThemeData(
         primaryColor: const Color.fromARGB(255, 10, 4, 60),
       ),
-      initialRoute: '/app',
+      initialRoute: '/',
       onGenerateRoute: (settings) {
         final args = settings.arguments;
         switch (settings.name) {
@@ -42,6 +42,10 @@ void main() async {
           case '/register':
             return MaterialPageRoute(
               builder: (context) => const RegisterPage(),
+            );
+          case '/settings':
+            return MaterialPageRoute(
+              builder: (context) => const SettingsPage(),
             );
           case '/search-topic':
             return MaterialPageRoute(
