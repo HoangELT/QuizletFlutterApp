@@ -157,7 +157,7 @@ class _LibraryPageState extends State<LibraryPage>
         children: [
           const Row(),
           CircleAvatar(
-            backgroundColor: Colors.grey.shade300,
+            backgroundImage: AppTheme.defaultAvatar,
             radius: 28,
           ),
           const SizedBox(

@@ -6,4 +6,6 @@ class AppTheme {
   static const Color primaryBackgroundColor = Color.fromARGB(255, 7, 15, 43);
   static const Color primaryBackgroundColorAppbar =
       Color.fromARGB(255, 57, 72, 103);
+  static const ImageProvider defaultAvatar =
+      AssetImage('assets/images/avatar_default.png');
 }
