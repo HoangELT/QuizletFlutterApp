@@ -18,15 +18,10 @@ class _RegisterPageState extends State<RegisterPage> {
   var isChecked = true;
   var selectedDate;
   FirebaseAuthService auth = FirebaseAuthService();
-  var controllerEmail = TextEditingController();
-  var controllerPw = TextEditingController();
+  String email = '';
+  String passWord = '';
+  String birthday = '';
   final formKey = GlobalKey<FormState>();
-  @override
-  void dispose() {
-    super.dispose();
-    controllerPw.dispose();
-    controllerEmail.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,6 +73,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
+                  // onSaved: (newBirthday) {
+                  //   birthday = newBirthday!;
+                  // },
                   validator: (value) {
                     if (value!.isEmpty) {
                       return "Vui lòng nhập ngày sinh của bạn";
@@ -111,7 +109,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 const SizedBox(height: 28),
                 TextFormField(
-                  controller: controllerEmail,
+                  onSaved: (newEmail) {
+                    email = newEmail!;
+                  },
                   validator: (value) {
                     if (value!.isEmpty) {
                       return "Vui lòng nhập email của bạn";
@@ -142,7 +142,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 const SizedBox(height: 28),
                 TextFormField(
-                  controller: controllerPw,
+                  onSaved: (newPassWord) {
+                    passWord = newPassWord!;
+                  },
                   validator: (value) {
                     if (value!.isEmpty) {
                       return "Vui lòng nhập mật khẩu";
@@ -243,16 +245,16 @@ class _RegisterPageState extends State<RegisterPage> {
 
   void _submit() async {
     if (formKey.currentState!.validate()) {
+      formKey.currentState?.save();
       try {
+        //print("asdasd$selectedDate");
         // Thực hiện xác thực từ Firebase
-        await auth.signUpWithEmailAndPassword(
-            controllerEmail.text, controllerPw.text);
+        await auth.signUpWithEmailAndPassword(email, passWord);
         // Nếu đăng ký thành công, thực hiện chuyển hướng đến trang login
         Navigator.pushReplacementNamed(context, "/login");
-        
       } catch (error) {
         // Xử lý khi có lỗi xác thực từ Firebase
-        print('Error signing in: $error');
+        print('Error signing up: $error');
 
         // Hiển thị Snackbar thông báo lỗi
         ScaffoldMessenger.of(context).showSnackBar(

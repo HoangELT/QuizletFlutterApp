@@ -6,6 +6,7 @@ import 'package:quizletapp/pages/login_page.dart';
 import 'package:quizletapp/pages/not_found_page.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'pages/changepw_page.dart';
 import 'pages/register_page.dart';
 import 'firebase_options.dart';
 import 'pages/settings_page.dart';
@@ -27,11 +28,11 @@ void main() async {
       onGenerateRoute: (settings) {
         final args = settings.arguments;
         switch (settings.name) {
-          case '/':
+          case '/intro':
             return MaterialPageRoute(
               builder: (context) => const IntroPage(),
             );
-          case '/app':
+          case '/':
             return MaterialPageRoute(
               builder: (context) => const AppPage(),
             );
@@ -52,6 +53,10 @@ void main() async {
               builder: (context) => SearchTopicPage(
                 keyWord: args as Map<String, dynamic>,
               ),
+            );
+          case '/forgotPassword':
+            return MaterialPageRoute(
+              builder: (context) => const ChangePassWord(),
             );
           default:
             return MaterialPageRoute(
