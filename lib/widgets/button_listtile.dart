@@ -4,10 +4,14 @@ class ButtonListTile extends StatelessWidget {
   final Widget? title;
   final Icon? icon;
   final double borderRadius;
+  final BoxDecoration? boxDecoration;
+  final EdgeInsets? padding;
   final Function()? onTap;
   ButtonListTile({
     this.title,
     this.icon,
+    this.boxDecoration,
+    this.padding,
     this.borderRadius = 16,
     this.onTap,
     super.key,
@@ -18,14 +22,17 @@ class ButtonListTile extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(
-            Radius.circular(borderRadius),
-          ),
-          color: Color.fromARGB(160, 127, 144, 155),
-        ),
+        padding: padding,
+        decoration: (boxDecoration == null)
+            ? BoxDecoration(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(borderRadius),
+                ),
+                color: Color.fromARGB(160, 127, 144, 155),
+              )
+            : boxDecoration,
         child: ListTile(
-          leading: (icon != null) ? icon : null,
+          leading: icon,
           title: title,
         ),
       ),

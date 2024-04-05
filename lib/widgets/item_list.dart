@@ -3,12 +3,13 @@ import 'package:quizletapp/enums/text_style_enum.dart';
 import 'package:quizletapp/widgets/text.dart';
 
 class ItemList extends StatefulWidget {
-  final double width;
+  final double? width;
   final String headText;
   final String bodyText;
   final Widget? head;
   final Widget? body;
   final Widget? bottom;
+  final double? height;
   final Function()? onTap;
 
   const ItemList({
@@ -19,6 +20,7 @@ class ItemList extends StatefulWidget {
     this.head,
     this.body,
     this.bottom,
+    this.height,
     super.key,
   });
 
@@ -34,6 +36,7 @@ class _ItemListState extends State<ItemList> {
       child: Container(
         padding: const EdgeInsets.all(16),
         width: widget.width,
+        height: widget.height,
         decoration: BoxDecoration(
           border: Border.all(
             color: Colors.grey.withOpacity(0.4),

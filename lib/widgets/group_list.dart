@@ -6,17 +6,24 @@ import 'package:quizletapp/widgets/text.dart';
 import 'package:quizletapp/widgets/item_list.dart';
 
 class GroupList extends StatefulWidget {
+  final bool isList;
   final int itemCount;
-  final double itemHeight;
+  final double? itemHeight;
   final String title;
+  final Axis listViewAxis;
   final bool isShowOption;
   final Function()? onShowAll;
   final Widget Function(BuildContext context, int index)? buildItem;
+  final Widget Function(int index)? builList;
+
   const GroupList({
-    required this.buildItem,
     required this.itemCount,
     required this.title,
+    this.builList,
+    this.buildItem,
+    this.isList = false,
     this.itemHeight = 170,
+    this.listViewAxis = Axis.horizontal,
     this.isShowOption = true,
     this.onShowAll,
     super.key,
@@ -64,9 +71,14 @@ class _GroupListState extends State<GroupList> {
         ),
         Container(
           height: (widget.itemHeight),
-          child: ListView.separated(
+          child: (widget.isList) ? Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              children: List.generate(widget.itemCount, (index) => widget.builList!(index)).toList(),
+            ),
+          ) : ListView.separated(
             padding: EdgeInsets.symmetric(horizontal: 16),
-            scrollDirection: Axis.horizontal,
+            scrollDirection: widget.listViewAxis,
             itemCount: widget.itemCount,
             separatorBuilder: (context, index) => const SizedBox(
               width: 16,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quizletapp/pages/app_page.dart';
+import 'package:quizletapp/pages/find_topic.dart';
 import 'package:quizletapp/pages/intro_page.dart';
 import 'package:quizletapp/pages/login_page.dart';
 import 'package:quizletapp/pages/not_found_page.dart';
@@ -21,7 +22,7 @@ void main() async {
       theme: ThemeData(
         primaryColor: const Color.fromARGB(255, 10, 4, 60),
       ),
-      initialRoute: '/',
+      initialRoute: '/app',
       onGenerateRoute: (settings) {
         final args = settings.arguments;
         switch (settings.name) {
@@ -40,6 +41,12 @@ void main() async {
           case '/register':
             return MaterialPageRoute(
               builder: (context) => const RegisterPage(),
+            );
+          case '/find-topic':
+            return MaterialPageRoute(
+              builder: (context) => FindTopicPage(
+                keyWord: args as Map<String, dynamic>,
+              ),
             );
           default:
             return MaterialPageRoute(

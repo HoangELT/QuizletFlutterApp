@@ -251,6 +251,7 @@ class _RegisterPageState extends State<RegisterPage> {
             controllerEmail.text, controllerPw.text);
         // Nếu đăng ký thành công, thực hiện chuyển hướng đến trang login
         Navigator.pushReplacementNamed(context, "/login");
+        
       } catch (error) {
         // Xử lý khi có lỗi xác thực từ Firebase
         print('Error signing in: $error');
