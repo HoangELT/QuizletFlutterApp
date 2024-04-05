@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:quizletapp/pages/app_page.dart';
+import 'package:quizletapp/pages/create_folder.dart';
+import 'package:quizletapp/pages/create_topic_page.dart';
+import 'package:quizletapp/pages/library_page.dart';
 import 'package:quizletapp/pages/search_topic.dart';
 import 'package:quizletapp/pages/intro_page.dart';
 import 'package:quizletapp/pages/login_page.dart';
@@ -34,7 +37,7 @@ void main() async {
             );
           case '/':
             return MaterialPageRoute(
-              builder: (context) => const AppPage(),
+              builder: (context) => AppPage(),
             );
           case '/login':
             return MaterialPageRoute(
@@ -57,6 +60,22 @@ void main() async {
           case '/forgotPassword':
             return MaterialPageRoute(
               builder: (context) => const ChangePassWord(),
+            );
+          case '/topic':
+            return MaterialPageRoute(
+              builder: (context) => LibraryPage(initIndex: 0,),
+            );
+          case '/folder':
+            return MaterialPageRoute(
+              builder: (context) => LibraryPage(initIndex: 1,),
+            );
+          case '/topic/create':
+            return MaterialPageRoute(
+              builder: (context) => const CreateTopicPage(),
+            );
+          case '/folder/create':
+            return MaterialPageRoute(
+              builder: (context) => const CreateFolderPage(),
             );
           default:
             return MaterialPageRoute(

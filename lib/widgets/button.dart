@@ -3,10 +3,10 @@ import 'package:quizletapp/utils/app_theme.dart';
 
 class CustomButton extends StatelessWidget {
   final VoidCallback? onTap;
-  final Color backgroundColor;
-  final double height;
-  final double width;
-  final TextStyle textStyle;
+  final Color? backgroundColor;
+  final double? height;
+  final double? width;
+  final TextStyle? textStyle;
   final String text;
 
   const CustomButton({

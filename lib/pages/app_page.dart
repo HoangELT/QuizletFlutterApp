@@ -12,7 +12,9 @@ import 'package:quizletapp/widgets/button_listtile.dart';
 import 'package:quizletapp/widgets/text.dart';
 
 class AppPage extends StatefulWidget {
-  const AppPage({super.key});
+  const AppPage({
+    super.key,
+  });
 
   @override
   State<AppPage> createState() => _AppPageState();
@@ -134,7 +136,7 @@ class _AppPageState extends State<AppPage> {
       ),
       body: IndexedStack(
         index: indexSelected,
-        children: const [
+        children: [
           HomePage(),
           SolutionPage(),
           MultifunctionPage(),

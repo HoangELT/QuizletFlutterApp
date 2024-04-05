@@ -42,6 +42,7 @@ dependencies:
   cloud_firestore: ^4.16.0
   font_awesome_flutter: ^9.2.0
   google_sign_in: ^6.2.1
+  cupertino_interactive_keyboard: ^0.0.1
 
 
 dev_dependencies:

@@ -1,12 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
 import 'package:quizletapp/utils/app_theme.dart';
 import 'package:quizletapp/widgets/text.dart';
 
 class LibraryPage extends StatefulWidget {
-  const LibraryPage({super.key});
+  int initIndex;
+  LibraryPage({
+    this.initIndex = 0,
+    super.key,
+  });
 
   @override
   State<LibraryPage> createState() => _LibraryPageState();
@@ -19,6 +23,9 @@ class _LibraryPageState extends State<LibraryPage>
   @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
+    setState(() {
+      _tabController.index = widget.initIndex;
+    });
     super.initState();
   }
 
@@ -33,6 +40,7 @@ class _LibraryPageState extends State<LibraryPage>
     return Scaffold(
       backgroundColor: AppTheme.primaryBackgroundColor,
       appBar: AppBar(
+        foregroundColor: Colors.white,
         centerTitle: true,
         backgroundColor: AppTheme.primaryBackgroundColor,
         title: CustomText(
@@ -41,7 +49,13 @@ class _LibraryPageState extends State<LibraryPage>
         ),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              if (_tabController.index == 0) {
+                Navigator.pushNamed(context, '/topic/create');
+              } else if (_tabController.index == 1) {
+                Navigator.pushNamed(context, '/folder/create');
+              }
+            },
             icon: const Icon(
               Icons.add,
               size: 32,
@@ -88,60 +102,57 @@ class _LibraryPageState extends State<LibraryPage>
       body: TabBarView(
         controller: _tabController,
         children: [
-          SingleChildScrollView(
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 16,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    child: TextButton(
-                      onPressed: () {
-                        print('Clicked button sắp xếp');
-                      },
-                      style: const ButtonStyle(
-                          padding: MaterialStatePropertyAll(EdgeInsets.all(0))),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          border: Border.all(
-                              width: 2, color: Colors.grey.withOpacity(0.8)),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Wrap(
-                          spacing: 4,
-                          children: [
-                            CustomText(text: 'Tất cả'),
-                            const Icon(
-                              Icons.keyboard_arrow_down,
-                              color: Colors.white,
-                            ),
-                          ],
-                        ),
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 16,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Container(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton(
+                    onPressed: () {
+                      print('Clicked button sắp xếp');
+                    },
+                    style: const ButtonStyle(
+                        padding: MaterialStatePropertyAll(EdgeInsets.all(0))),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        border: Border.all(
+                            width: 2, color: Colors.grey.withOpacity(0.8)),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Wrap(
+                        spacing: 4,
+                        children: [
+                          CustomText(text: 'Tất cả'),
+                          const Icon(
+                            Icons.keyboard_arrow_down,
+                            color: Colors.white,
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                  _buildInitContent(),
-                ],
-              ),
+                ),
+                _buildInitContent(),
+              ],
             ),
           ),
           Container(
-            padding: EdgeInsets.symmetric(
+            margin: const EdgeInsets.symmetric(
+              vertical: 64,
+            ),
+            padding: const EdgeInsets.symmetric(
               horizontal: 16,
+              vertical: 16,
             ),
-            margin: const EdgeInsets.symmetric(vertical: 32),
-            child: SingleChildScrollView(
-              child: CustomText(
-                text: 'Thư mục',
-              ),
-            ),
+            child: _buildInitFolderPage(),
           ),
         ],
       ),
@@ -150,13 +161,13 @@ class _LibraryPageState extends State<LibraryPage>
 
   Widget _buildInitContent() {
     return Container(
-      margin: EdgeInsets.symmetric(
+      margin: const EdgeInsets.symmetric(
         vertical: 64,
       ),
       child: Column(
         children: [
           const Row(),
-          CircleAvatar(
+          const CircleAvatar(
             backgroundImage: AppTheme.defaultAvatar,
             radius: 28,
           ),
@@ -184,6 +195,53 @@ class _LibraryPageState extends State<LibraryPage>
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildInitFolderPage() {
+    return Column(
+      children: [
+        const Icon(
+          FontAwesomeIcons.solidFolderOpen,
+          color: Colors.blue,
+          size: 44,
+        ),
+        Container(
+          margin: const EdgeInsets.symmetric(
+            vertical: 32,
+          ),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+          ),
+          child: CustomText(
+            text: 'Sắp xếp học phần của bạn theo chủ đề.',
+            type: TextStyleEnum.xl,
+            textAlign: TextAlign.center,
+          ),
+        ),
+        Ink(
+          decoration: BoxDecoration(
+            color: AppTheme.primaryColor,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: InkWell(
+            onTap: () {
+              Navigator.pushNamed(context, '/folder/create');
+            },
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 10,
+              ),
+              child: CustomText(
+                text: 'Tạo thư mục',
+                type: TextStyleEnum.large,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
