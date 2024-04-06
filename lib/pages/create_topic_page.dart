@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
+import 'package:quizletapp/services/shared_references_service.dart';
 import 'package:quizletapp/utils/app_theme.dart';
 import 'package:quizletapp/widgets/text.dart';
 import 'package:cupertino_interactive_keyboard/cupertino_interactive_keyboard.dart';
@@ -34,7 +35,13 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
         ),
         actions: [
           TextButton(
-            onPressed: () {
+            onPressed: () async {
+              try {
+                String? uid =  await SharedPreferencesService().getUID();
+                print('uid: $uid');
+              } catch (e) {
+                print('Lỗi get uid');
+              }
               Navigator.pop(context);
             },
             child: CustomText(
@@ -111,19 +118,19 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: 44, 
-                height: 44, 
+                width: 44,
+                height: 44,
                 child: Material(
-                  elevation: 4, 
-                  shape: const CircleBorder(), 
-                  color: AppTheme.primaryColor, 
+                  elevation: 4,
+                  shape: const CircleBorder(),
+                  color: AppTheme.primaryColor,
                   child: IconButton(
                     onPressed: () {
                       print('thêm topic');
                     },
                     icon: Icon(
                       Icons.add,
-                      color: Colors.white, 
+                      color: Colors.white,
                     ),
                   ),
                 ),

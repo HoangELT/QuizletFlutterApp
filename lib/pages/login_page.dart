@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:quizletapp/pages/intro_page.dart';
+import 'package:quizletapp/services/shared_references_service.dart';
 import '../enums/text_style_enum.dart';
 import '../services/firebase_auth.dart';
 import '../utils/app_theme.dart';
@@ -35,6 +36,7 @@ class _LoginPageState extends State<LoginPage> {
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             child: Form(
               key: formKey,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -279,19 +281,24 @@ class _LoginPageState extends State<LoginPage> {
           isLoading = true;
         });
         // Thực hiện xác thực từ Firebase
-        await auth.signInWithEmailAndPassword(email, passWord);
+        var result = await auth.signInWithEmailAndPassword(email, passWord);
         setState(() {
           isLoading = false;
         });
+        print(result);
+        //lưu uid vào local sau khi đăng nhập thành công
+        SharedPreferencesService().saveUID(result.user!.uid.toString());
         //Xóa màn hình intro
-        // Nếu xác thực thành công, thực hiện chuyển hướng đến app page
+        // Nếu xác thực thành công, thực hiện chuyển hướng đến app page và xóa hết các màn hình khác
         Navigator.pushNamedAndRemoveUntil(context, '/', (route) => route.settings.name == '/');
         // Navigator.of(context)
         //     .popUntil((route) => route.settings.name != "/intro");
       } catch (error) {
         // Xử lý khi có lỗi xác thực từ Firebase
         print('Error signing in: $error');
-
+        setState(() {
+          isLoading = false;
+        });
         // Hiển thị Snackbar thông báo lỗi
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:quizletapp/models/user.dart';
 
 class FirebaseAuthService {
   // Khai báo một static biến private để lưu trữ thể hiện duy nhất của lớp FirebaseAuthService
