@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
 import 'package:quizletapp/utils/app_theme.dart';
-import 'package:quizletapp/widgets/elevatedButton.dart';
 import 'package:quizletapp/widgets/text.dart';
 
 import '../services/firebase_auth.dart';
@@ -84,10 +83,9 @@ class _SettingsPageState extends State<SettingsPage> {
               createElevatedButton("Đăng xuất", () async {
                 try {
                   await auth.signOut();
-                  Navigator.pushNamedAndRemoveUntil(context, '/intro', (route) => route.settings.name == '/intro');
-                } catch (e) {
-                  
-                }
+                  Navigator.pushNamedAndRemoveUntil(context, '/intro',
+                      (route) => route.settings.name == '/intro');
+                } catch (e) {}
               }),
               const SizedBox(height: 20),
               createElevatedButton("Xóa tài khoản", () => null)
