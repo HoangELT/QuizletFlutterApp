@@ -24,7 +24,7 @@ void main() async {
       theme: ThemeData(
         primaryColor: const Color.fromARGB(255, 10, 4, 60),
       ),
-      initialRoute: '/',
+      initialRoute: '/intro',
       onGenerateRoute: (settings) {
         final args = settings.arguments;
         switch (settings.name) {
@@ -54,7 +54,7 @@ void main() async {
                 keyWord: args as Map<String, dynamic>,
               ),
             );
-          case '/forgotPassword':
+          case '/changePassword':
             return MaterialPageRoute(
               builder: (context) => const ChangePassWord(),
             );

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../services/firebase_auth.dart';
 
 import '../enums/text_style_enum.dart';
 import '../utils/app_theme.dart';
@@ -13,162 +14,230 @@ class ChangePassWord extends StatefulWidget {
 }
 
 class _ChangePassWordState extends State<ChangePassWord> {
+  FirebaseAuthService auth = FirebaseAuthService();
   var flag = false;
   var formKey = GlobalKey<FormState>();
-  String oldPassWord = '';
+  bool isLoading = false;
+
+  String currentPassword = '';
   String newPassWord = '';
   String confirmPassWord = '';
+  String? errorMessage;
+  String? errorCfMessage;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.primaryBackgroundColor,
-      appBar: AppBar(
-        foregroundColor: Colors.white,
-        centerTitle: true,
+    return Stack(children: [
+      Scaffold(
         backgroundColor: AppTheme.primaryBackgroundColor,
-        title: CustomText(
-          text: "Đổi mật khẩu",
-          type: TextStyleEnum.large,
+        appBar: AppBar(
+          foregroundColor: Colors.white,
+          centerTitle: true,
+          backgroundColor: AppTheme.primaryBackgroundColor,
+          title: CustomText(
+            text: "Đổi mật khẩu",
+            type: TextStyleEnum.large,
+          ),
+          actions: [
+            TextButton(
+                onPressed: flag
+                    ? () {
+                        setState(() {
+                          _save();
+                        });
+                      }
+                    : null,
+                child: CustomText(
+                  text: "Lưu",
+                  type: TextStyleEnum.large,
+                  style: TextStyle(
+                    color: flag ? Colors.white : Colors.grey,
+                  ),
+                )),
+          ],
         ),
-        actions: [
-          TextButton(
-              onPressed: flag
-                  ? () {
-                      print("object");
+        body: Container(
+          padding: const EdgeInsets.fromLTRB(25, 35, 25, 0),
+          child: Form(
+            onChanged: () {
+              setState(() {
+                check();
+              });
+            },
+            key: formKey,
+            child: Column(
+              children: [
+                TextFormField(
+                  onSaved: (currentPassword) {
+                    currentPassword = currentPassword!;
+                  },
+                  onChanged: (value) {
+                    currentPassword = value;
+                  },
+                  decoration: InputDecoration(
+                    label: CustomText(
+                      text: "Nhập mật khẩu hiện tại",
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    border: const OutlineInputBorder(),
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Colors.white), // Màu viền khi focus
+                    ),
+                    focusColor: Colors.white,
+                    errorText: errorMessage,
+                  ),
+                  obscureText: true,
+                  style: const TextStyle(color: Colors.white),
+                ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  onSaved: (newPassWord) {
+                    newPassWord = newPassWord!;
+                  },
+                  onChanged: (value) {
+                    newPassWord = value;
+                  },
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return "Vui lòng nhập mật khẩu";
                     }
-                  : null,
-              child: CustomText(
-                text: "Lưu",
-                type: TextStyleEnum.large,
-                style: TextStyle(
-                  color: flag ? Colors.white : Colors.grey,
+                    // Kiểm tra độ dài mật khẩu
+                    if (value.length < 7) {
+                      return "Mật khẩu phải có ít nhất 7 ký tự";
+                    }
+                    // Kiểm tra xem mật khẩu có chứa ít nhất một ký tự hoa không
+                    if (!value.contains(RegExp(r'[A-Z]'))) {
+                      return "Mật khẩu phải chứa ít nhất một ký tự hoa";
+                    }
+                    // Kiểm tra xem mật khẩu có chứa ít nhất một ký tự thường không
+                    if (!value.contains(RegExp(r'[a-z]'))) {
+                      return "Mật khẩu phải chứa ít nhất một ký tự thường";
+                    }
+                    // Kiểm tra xem mật khẩu có chứa ít nhất một ký tự đặc biệt không
+                    if (!value.contains(RegExp(r'[!@#\$%^&*(),.?":{}|<>]'))) {
+                      return "Mật khẩu phải chứa ít nhất một ký tự đặc biệt";
+                    }
+                    return null;
+                  },
+                  decoration: InputDecoration(
+                    label: CustomText(
+                      text: "Nhập mật khẩu mới",
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    border: const OutlineInputBorder(),
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Colors.white), // Màu viền khi focus
+                    ),
+                    focusColor: Colors.white,
+                    errorText: errorCfMessage,
+                  ),
+                  obscureText: true,
+                  style: const TextStyle(color: Colors.white),
                 ),
-              )),
-        ],
-      ),
-      body: Container(
-        padding: const EdgeInsets.all(25),
-        child: Form(
-          key: formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                onSaved: (oldPassWord) {
-                  oldPassWord = oldPassWord!;
-                },
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return "Vui lòng mật khẩu của bạn";
-                  }
-                  return null;
-                },
-                decoration: InputDecoration(
-                  label: CustomText(
-                    text: "Nhập mật khẩu hiện tại",
-                    style: const TextStyle(color: Colors.white),
+                const SizedBox(height: 20),
+                TextFormField(
+                  onSaved: (cfNewPassWord) {
+                    confirmPassWord = cfNewPassWord!;
+                  },
+                  onChanged: (value) {
+                    confirmPassWord = value;
+                  },
+                  decoration: InputDecoration(
+                    label: CustomText(
+                      text: "Xác nhận mật khẩu mới",
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    border: const OutlineInputBorder(),
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Colors.white), // Màu viền khi focus
+                    ),
+                    errorText: errorCfMessage,
+                    focusColor: Colors.white,
                   ),
-                  border: const OutlineInputBorder(),
-                  focusedBorder: const OutlineInputBorder(
-                    borderSide:
-                        BorderSide(color: Colors.white), // Màu viền khi focus
-                  ),
-                  focusedErrorBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors.red), // Màu viền khi có lỗi và focus
-                  ),
-                  errorStyle: const TextStyle(color: Colors.red),
-                  focusColor: Colors.white,
+                  obscureText: true,
+                  style: const TextStyle(color: Colors.white),
                 ),
-                obscureText: true,
-                style: const TextStyle(color: Colors.white),
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                onSaved: (newPassWord) {
-                  newPassWord = newPassWord!;
-                },
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return "Vui lòng mật khẩu của bạn";
-                  }
-                  return null;
-                },
-                decoration: InputDecoration(
-                  label: CustomText(
-                    text: "Nhập mật khẩu mới",
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                  border: const OutlineInputBorder(),
-                  focusedBorder: const OutlineInputBorder(
-                    borderSide:
-                        BorderSide(color: Colors.white), // Màu viền khi focus
-                  ),
-                  focusedErrorBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors.red), // Màu viền khi có lỗi và focus
-                  ),
-                  errorStyle: const TextStyle(color: Colors.red),
-                  focusColor: Colors.white,
-                ),
-                obscureText: true,
-                style: const TextStyle(color: Colors.white),
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                onSaved: (cfNewPassWord) {
-                  confirmPassWord = cfNewPassWord!;
-                },
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return "Vui lòng mật khẩu của bạn";
-                  }
-                  return null;
-                },
-                decoration: InputDecoration(
-                  label: CustomText(
-                    text: "Xác nhận mật khẩu mới",
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                  border: const OutlineInputBorder(),
-                  focusedBorder: const OutlineInputBorder(
-                    borderSide:
-                        BorderSide(color: Colors.white), // Màu viền khi focus
-                  ),
-                  focusedErrorBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors.red), // Màu viền khi có lỗi và focus
-                  ),
-                  errorStyle: const TextStyle(color: Colors.red),
-                  focusColor: Colors.white,
-                ),
-                obscureText: true,
-                style: const TextStyle(color: Colors.white),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
-    );
+      if (isLoading)
+        Container(
+          color: Colors.transparent.withOpacity(0.5),
+          child: const Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+    ]);
   }
 
-  void _save() async {
+  check() {
+    formKey.currentState?.setState(() {
+      if (newPassWord.isNotEmpty &&
+          currentPassword.isNotEmpty &&
+          confirmPassWord.isNotEmpty) {
+        flag = true;
+      } else {
+        flag = false;
+      }
+    });
+  }
+
+  Future<void> _save() async {
     if (formKey.currentState!.validate()) {
       formKey.currentState?.save();
       try {
-        // Thực hiện xác thực từ Firebase
-        //await auth.signInWithEmailAndPassword(email, passWord);
-        // Nếu xác thực thành công, thực hiện chuyển hướng đến app page
-        Navigator.pushReplacementNamed(context, "/app");
+        if (newPassWord == confirmPassWord) {
+          setState(() {
+            isLoading = true;
+          });
+
+          // Thực hiện xác thực từ Firebase
+          errorMessage =
+              await auth.changePassword(currentPassword, newPassWord);
+          setState(() {
+            isLoading = false;
+          });
+
+          // Nếu xác thực thành công, thực hiện chuyển hướng đến app page
+          if (errorMessage == null || errorMessage!.isEmpty) {
+            // hiển thị thông báo đổi mật khẩu thành công
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  icon: const Icon(
+                    Icons.check_circle_outline_outlined,
+                    color: Colors.green,
+                    size: 45,
+                  ),
+                  title: CustomText(
+                    text: 'Đổi mật khẩu thành công',
+                    type: TextStyleEnum.large,
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                );
+              },
+            );
+
+            await Future.delayed(const Duration(seconds: 2));
+            Navigator.pop(context);
+            Navigator.pop(context);
+          } else {
+            setState(() {
+              // Hiển thị lỗi
+              errorMessage = errorMessage;
+            });
+          }
+        } else {
+          errorCfMessage = "Mật khẩu ở cả hai trường phải khớp nhau";
+        }
       } catch (error) {
         // Xử lý khi có lỗi xác thực từ Firebase
         print('Error signing in: $error');
-
-        // Hiển thị Snackbar thông báo lỗi
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content:
-                  CustomText(text: 'Đăng nhập thất bại. Vui lòng thử lại.')),
-        );
       }
     }
   }

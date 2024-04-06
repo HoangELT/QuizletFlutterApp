@@ -97,6 +97,28 @@ class FirebaseAuthService {
     }
   }
 
+// Hàm đổi mật khẩu
+  Future<String> changePassword(
+      String currentPassword, String newPassword) async {
+    try {
+      // Lấy thông tin người dùng hiện tại
+      User? user = getCurrentUser();
+
+      // Xác thực mật khẩu hiện tại của người dùng
+      final AuthCredential credential = EmailAuthProvider.credential(
+          email: user!.email!, password: currentPassword);
+      await user.reauthenticateWithCredential(credential);
+
+      // Nếu xác thực thành công, thực hiện quá trình đổi mật khẩu
+      await user.updatePassword(newPassword);
+      return '';
+    } catch (e) {
+      // Xử lý các lỗi
+      print("Đổi mật khẩu thất bại: $e");
+      return "Mật khẩu của bạn không đúng. Vui lòng thử lại!";
+    }
+  }
+
   // Phương thức để lấy thông tin người dùng hiện tại
   User? getCurrentUser() {
     try {
