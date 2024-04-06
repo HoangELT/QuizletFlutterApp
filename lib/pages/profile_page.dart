@@ -55,8 +55,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   const CircleAvatar(
                     radius: 45,
                     child: CircleAvatar(
-                      backgroundImage: NetworkImage(
-                          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSjNPXo7OdCu_a_ZC3zJ5g5InnXrOxD6phT3l6TgKBiRw&s"),
+                      backgroundImage: AppTheme.defaultAvatar,
                       radius: 45,
                     ),
                   ),

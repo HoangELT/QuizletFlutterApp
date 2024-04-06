@@ -21,6 +21,7 @@ class _IntroPageState extends State<IntroPage> {
       child: Scaffold(
         backgroundColor: AppTheme.primaryBackgroundColorAppbar,
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: CustomText(
             text: "Quizlet",
             type: TextStyleEnum.xxl,

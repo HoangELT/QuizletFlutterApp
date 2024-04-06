@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
 import 'package:quizletapp/utils/app_theme.dart';
+import 'package:quizletapp/widgets/elevatedButton.dart';
 import 'package:quizletapp/widgets/text.dart';
 
 import '../services/firebase_auth.dart';
@@ -56,28 +57,59 @@ class _SettingsPageState extends State<SettingsPage> {
                   padding: const EdgeInsets.fromLTRB(0, 20, 0, 15),
                   child: CustomText(
                     text: "Thông tin cá nhân",
+                    style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
               Container(
-                  padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
-                  decoration: createBoxDecoration(),
-                  child: Column(
-                    children: [
-                      createInkWell(userName, "Tên người dùng", () {
-                        print("object");
-                      }),
-                      const Divider(thickness: 1.0),
-                      createInkWell(userName, "Email", () {
-                        print("asdasd");
-                      }),
-                      const Divider(thickness: 1.0),
-                      createInkWell('', "Đổi mật khẩu", () {
-                        Navigator.pushNamed(context, "/forgotPassword");
-                      }),
-                    ],
-                  )),
+                padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                decoration: createBoxDecoration(),
+                child: Column(
+                  children: [
+                    createInkWell(userName, "Tên người dùng", () {
+                      print("object");
+                    }),
+                    const Divider(thickness: 1.0),
+                    createInkWell(userName, "Email", () {
+                      print("asdasd");
+                    }),
+                    const Divider(thickness: 1.0),
+                    createInkWell('', "Đổi mật khẩu", () {
+                      Navigator.pushNamed(context, "/changePassword");
+                    }),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 100),
+              createElevatedButton("Đăng xuất", () => null),
+              const SizedBox(height: 20),
+              createElevatedButton("Xóa tài khoản", () => null)
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  createElevatedButton(String text, Function()? onPressed) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ButtonStyle(
+          backgroundColor: const MaterialStatePropertyAll(Colors.transparent),
+          shape: MaterialStateProperty.all(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
+              side: const BorderSide(color: Colors.white),
+            ),
+          ),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          child: CustomText(
+            text: text,
+            type: TextStyleEnum.large,
           ),
         ),
       ),
