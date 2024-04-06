@@ -28,7 +28,7 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController _textEditingController = TextEditingController();
 
   UserModel currentUser = UserModel(
-      '0', 'lydaicuong784', 'lydaicuong784@gmail.com', DateTime.now());
+      '0', 'lydaicuong784', 'lydaicuong784@gmail.com',);
 
   List<TopicModel> myTopics = [];
 

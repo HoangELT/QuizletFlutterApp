@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
+import 'package:quizletapp/models/user.dart';
+import 'package:quizletapp/services/firebase_auth.dart';
 import 'package:quizletapp/services/shared_preferences_service.dart';
 import 'package:quizletapp/utils/app_theme.dart';
 import 'package:quizletapp/widgets/text.dart';
@@ -35,7 +37,12 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
         ),
         actions: [
           TextButton(
-            onPressed: () {
+            onPressed: () async {
+              try {
+                FirebaseAuthService firebaseAuthService = FirebaseAuthService();
+                var user = await firebaseAuthService.getCurrentUser();
+                // UserModel currentUser = UserModel(user!.uid.toString(), );
+              } catch (e) {}
               Navigator.pop(context);
             },
             child: CustomText(
