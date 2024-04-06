@@ -1,7 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:quizletapp/pages/intro_page.dart';
 import 'package:quizletapp/services/shared_references_service.dart';
 import '../enums/text_style_enum.dart';
 import '../services/firebase_auth.dart';
@@ -290,7 +289,8 @@ class _LoginPageState extends State<LoginPage> {
         SharedPreferencesService().saveUID(result.user!.uid.toString());
         //Xóa màn hình intro
         // Nếu xác thực thành công, thực hiện chuyển hướng đến app page và xóa hết các màn hình khác
-        Navigator.pushNamedAndRemoveUntil(context, '/', (route) => route.settings.name == '/');
+        Navigator.pushNamedAndRemoveUntil(
+            context, '/', (route) => route.settings.name == '/');
         // Navigator.of(context)
         //     .popUntil((route) => route.settings.name != "/intro");
       } catch (error) {
