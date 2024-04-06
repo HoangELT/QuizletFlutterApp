@@ -81,7 +81,14 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
               const SizedBox(height: 100),
-              createElevatedButton("Đăng xuất", () => null),
+              createElevatedButton("Đăng xuất", () async {
+                try {
+                  await auth.signOut();
+                  Navigator.pushNamedAndRemoveUntil(context, '/intro', (route) => route.settings.name == '/intro');
+                } catch (e) {
+                  
+                }
+              }),
               const SizedBox(height: 20),
               createElevatedButton("Xóa tài khoản", () => null)
             ],

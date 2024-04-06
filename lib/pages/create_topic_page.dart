@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
-import 'package:quizletapp/services/shared_references_service.dart';
+import 'package:quizletapp/services/shared_preferences_service.dart';
 import 'package:quizletapp/utils/app_theme.dart';
 import 'package:quizletapp/widgets/text.dart';
 import 'package:cupertino_interactive_keyboard/cupertino_interactive_keyboard.dart';
@@ -35,13 +35,7 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
         ),
         actions: [
           TextButton(
-            onPressed: () async {
-              try {
-                String? uid =  await SharedPreferencesService().getUID();
-                print('uid: $uid');
-              } catch (e) {
-                print('Lỗi get uid');
-              }
+            onPressed: () {
               Navigator.pop(context);
             },
             child: CustomText(
