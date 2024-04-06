@@ -9,6 +9,7 @@ import 'package:quizletapp/pages/login_page.dart';
 import 'package:quizletapp/pages/not_found_page.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:quizletapp/services/firebase_auth.dart';
 import 'pages/changepw_page.dart';
 import 'pages/register_page.dart';
 import 'firebase_options.dart';
@@ -21,13 +22,15 @@ void main() async {
   );
 
   usePathUrlStrategy();
+
+  FirebaseAuthService firebaseAuthService = FirebaseAuthService();
   return runApp(
     MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: const Color.fromARGB(255, 10, 4, 60),
       ),
-      initialRoute: '/intro',
+      initialRoute: (firebaseAuthService.isUserLoggedIn()) ? '/' : '/intro',
       onGenerateRoute: (settings) {
         final args = settings.arguments;
         switch (settings.name) {
