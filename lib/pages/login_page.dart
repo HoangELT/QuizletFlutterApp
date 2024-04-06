@@ -1,6 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:quizletapp/pages/intro_page.dart';
+import 'package:quizletapp/services/shared_references_service.dart';
 import '../enums/text_style_enum.dart';
 import '../services/firebase_auth.dart';
 import '../services/shared_preferences_service.dart';

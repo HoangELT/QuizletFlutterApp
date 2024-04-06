@@ -39,6 +39,7 @@ class FirebaseAuthService {
     try {
       UserCredential userCredential = await _auth
           .createUserWithEmailAndPassword(email: email, password: password);
+      await userCredential.user!.updateDisplayName(UserModel.createUsernameFormEmail(email));
       return userCredential;
     } catch (error) {
       print('Error signing up: $error');

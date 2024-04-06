@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
+import 'package:quizletapp/models/user.dart';
 import 'package:quizletapp/utils/app_theme.dart';
 import 'package:quizletapp/widgets/text.dart';
 
@@ -16,7 +17,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   FirebaseAuthService auth = FirebaseAuthService();
-  var userName = "";
+  late UserModel currentUser;
 
   @override
   void initState() {
@@ -27,7 +28,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _loadUser() async {
     var user = auth.getCurrentUser();
     setState(() {
-      userName = user!.email.toString();
+      currentUser = UserModel(user!.uid, user.email.toString(), user.displayName.toString());
     });
   }
 
@@ -65,11 +66,11 @@ class _SettingsPageState extends State<SettingsPage> {
                 decoration: createBoxDecoration(),
                 child: Column(
                   children: [
-                    createInkWell(userName, "Tên người dùng", () {
+                    createInkWell(currentUser.username, "Tên người dùng", () {
                       print("object");
                     }),
                     const Divider(thickness: 1.0),
-                    createInkWell(userName, "Email", () {
+                    createInkWell(currentUser.email, "Email", () {
                       print("asdasd");
                     }),
                     const Divider(thickness: 1.0),
