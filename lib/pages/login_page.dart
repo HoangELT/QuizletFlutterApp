@@ -283,8 +283,9 @@ class _LoginPageState extends State<LoginPage> {
         setState(() {
           isLoading = false;
         });
+        //Xóa màn hình intro
         // Nếu xác thực thành công, thực hiện chuyển hướng đến app page
-        Navigator.pushReplacementNamed(context, "/");
+        Navigator.pushNamedAndRemoveUntil(context, '/', (route) => route.settings.name == '/');
         // Navigator.of(context)
         //     .popUntil((route) => route.settings.name != "/intro");
       } catch (error) {
