@@ -105,6 +105,9 @@ class _ChangePassWordState extends State<ChangePassWord> {
                     if (value.length < 7) {
                       return "Mật khẩu phải có ít nhất 7 ký tự";
                     }
+                    if (value.length > 64) {
+                      return "Mật khẩu phải ít hơn 64 ký tự";
+                    }
                     // Kiểm tra xem mật khẩu có chứa ít nhất một ký tự hoa không
                     if (!value.contains(RegExp(r'[A-Z]'))) {
                       return "Mật khẩu phải chứa ít nhất một ký tự hoa";

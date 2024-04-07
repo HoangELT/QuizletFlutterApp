@@ -81,6 +81,8 @@ class _RegisterPageState extends State<RegisterPage> {
                     // onSaved: (newBirthday) {
                     //   birthday = newBirthday!;
                     // },
+                    textInputAction: TextInputAction.next,
+
                     validator: (value) {
                       if (value!.isEmpty) {
                         return "Vui lòng nhập ngày sinh của bạn";
@@ -104,7 +106,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       focusColor: Colors.white,
                     ),
-                    keyboardType: TextInputType.emailAddress,
+                    keyboardType: TextInputType.datetime,
                     style: const TextStyle(color: Colors.white),
                     onTap: () => _selectDate(context),
                     controller: TextEditingController(
@@ -115,6 +117,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
+                    textInputAction: TextInputAction.next,
                     onSaved: (newEmail) {
                       email = newEmail!;
                     },
@@ -149,6 +152,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
+                    textInputAction: TextInputAction.next,
                     onSaved: (newPassWord) {
                       passWord = newPassWord!;
                     },
@@ -159,6 +163,9 @@ class _RegisterPageState extends State<RegisterPage> {
                       // Kiểm tra độ dài mật khẩu
                       if (value.length < 7) {
                         return "Mật khẩu phải có ít nhất 7 ký tự";
+                      }
+                      if (value.length > 64) {
+                        return "Mật khẩu phải ít hơn 64 ký tự";
                       }
                       // Kiểm tra xem mật khẩu có chứa ít nhất một ký tự hoa không
                       if (!value.contains(RegExp(r'[A-Z]'))) {
@@ -207,6 +214,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
+                    textInputAction: TextInputAction.done,
                     onSaved: (newCfPassWord) {
                       cfPassWord = newCfPassWord!;
                     },
@@ -301,20 +309,45 @@ class _RegisterPageState extends State<RegisterPage> {
           setState(() {
             isLoading = false;
           });
-          // Nếu đăng ký thành công, thực hiện chuyển hướng đến trang login
-          Navigator.pushReplacementNamed(context, "/login");
+          _showDialog("Đăng ký thành công", Icons.check_circle_outline_outlined,
+              Colors.green);
         } catch (error) {
           // Xử lý khi có lỗi xác thực từ Firebase
           print('Error signing up: $error');
-
-          // Hiển thị Snackbar thông báo lỗi
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content:
-                    CustomText(text: 'Đăng ký thất bại. Vui lòng thử lại.')),
-          );
+          setState(() {
+            isLoading = false;
+          });
+          // Hiển thị AlertDialog thông báo lỗi
+          _showDialog('Đăng ký thất bại. Vui lòng thử lại!',
+              Icons.warning_amber_rounded, Colors.red);
         }
       }
+    }
+  }
+
+  _showDialog(String text, IconData ic, Color color) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          icon: Icon(
+            ic,
+            color: color,
+            size: 45,
+          ),
+          title: CustomText(
+            text: text,
+            type: TextStyleEnum.large,
+            style: const TextStyle(color: Colors.black),
+          ),
+        );
+      },
+    );
+    await Future.delayed(const Duration(milliseconds: 1500));
+    Navigator.pop(context);
+    if (text == "Đăng ký thành công") {
+      // Nếu đăng ký thành công, thực hiện chuyển hướng đến trang login
+      Navigator.pushReplacementNamed(context, "/login");
     }
   }
 

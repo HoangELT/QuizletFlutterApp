@@ -39,7 +39,8 @@ class FirebaseAuthService {
     try {
       UserCredential userCredential = await _auth
           .createUserWithEmailAndPassword(email: email, password: password);
-      await userCredential.user!.updateDisplayName(UserModel.createUsernameFormEmail(email));
+      await userCredential.user!
+          .updateDisplayName(UserModel.createUsernameFormEmail(email));
       return userCredential;
     } catch (error) {
       print('Error signing up: $error');
@@ -63,7 +64,6 @@ class FirebaseAuthService {
       final UserCredential authResult =
           await _auth.signInWithCredential(credential);
       final User? user = authResult.user;
-
       return user;
     } catch (error) {
       print('Error signing in with Google: $error');
@@ -143,6 +143,64 @@ class FirebaseAuthService {
     } catch (error) {
       print('Error signing out: $error');
       rethrow;
+    }
+  }
+
+// Hàm để xóa tài khoản người dùng từ Firebase Authentication bằng email
+  Future<void> deleteAccount() async {
+    try {
+      // Lấy thông tin người dùng đã xác thực
+      User? user = getCurrentUser();
+      // Xóa tài khoản người dùng
+      await user!.delete();
+    } catch (error) {
+      // Xử lý lỗi nếu có
+      print('Lỗi xóa tài khoản: $error');
+    }
+  }
+
+  // Hàm để thay đổi email của người dùng
+  Future<String> changeEmail(String newEmail) async {
+    try {
+      // Lấy thông tin người dùng đã xác thực
+      User? user = getCurrentUser();
+      // Gửi email xác minh mới đến địa chỉ email mới
+      await user!.verifyBeforeUpdateEmail(newEmail);
+
+      // In ra thông báo khi thay đổi email thành công
+      return '';
+    } catch (error) {
+      // Xử lý lỗi nếu có
+      print('Lỗi thay đổi email: $error');
+      return "Lỗi thay đổi email";
+    }
+  }
+
+// Hàm để thay đổi displayName của người dùng
+  Future<String> changeUserName(String newUserName) async {
+    try {
+      // Lấy thông tin người dùng đã xác thực
+      User? user = getCurrentUser();
+      // Gửi email xác minh mới đến địa chỉ email mới
+      await user!.updateDisplayName(newUserName);
+
+      // In ra thông báo khi thay đổi email thành công
+      return '';
+    } catch (error) {
+      // Xử lý lỗi nếu có
+      print('Lỗi thay đổi username: $error');
+      return "Lỗi thay đổi username";
+    }
+  }
+
+  // Hàm để gửi email đặt lại mật khẩu
+  Future<void> resetPassword(String email) async {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      print(
+          'Một email đặt lại mật khẩu đã được gửi đến địa chỉ của bạn. Vui lòng kiểm tra email của bạn.');
+    } catch (error) {
+      print('Lỗi khi gửi email đặt lại mật khẩu: $error');
     }
   }
 }
