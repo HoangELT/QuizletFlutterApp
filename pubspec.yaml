@@ -44,6 +44,7 @@ dependencies:
   google_sign_in: ^6.2.1
   cupertino_interactive_keyboard: ^0.0.1
   shared_preferences: ^2.2.2
+  uuid: ^4.3.3
 
 
 dev_dependencies:

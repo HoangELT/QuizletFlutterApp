@@ -19,7 +19,25 @@ class FolderModel {
       map['folderId'],
       map['title'],
       map['description'],
-      List<TopicModel>.from((map['listTopic'] ?? []).map((x) => TopicModel.fromMap(x))),
+      List<TopicModel>.from(
+          (map['listTopic'] ?? []).map((x) => TopicModel.fromMap(x))),
     );
+  }
+
+  // Phương thức tạo một Map từ đối tượng FolderModel
+  Map<String, dynamic> toMap() {
+    return {
+      'folderId': folderId,
+      'title': title,
+      'description': description,
+      'listTopic': listTopic
+          .map((topic) => topic.toMap())
+          .toList(), // Chuyển đổi listTopic thành List<Map<String, dynamic>>
+    };
+  }
+
+  // Phương thức chuyển đổi từ List<FolderModel> sang List<Map<String, dynamic>>
+  static List<Map<String, dynamic>> foldersToMapList(List<FolderModel> folders) {
+    return folders.map((folder) => folder.toMap()).toList();
   }
 }

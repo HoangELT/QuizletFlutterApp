@@ -49,9 +49,13 @@ class _LibraryPageState extends State<LibraryPage>
         ),
         actions: [
           IconButton(
-            onPressed: () {
+            onPressed: () async {
               if (_tabController.index == 0) {
-                Navigator.pushNamed(context, '/topic/create');
+                int? result =
+                    await Navigator.pushNamed(context, '/topic/create');
+                if (result == 401) {
+                  // _fetchMyTopics();
+                }
               } else if (_tabController.index == 1) {
                 Navigator.pushNamed(context, '/folder/create');
               }

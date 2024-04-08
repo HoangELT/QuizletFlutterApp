@@ -21,4 +21,16 @@ class TopicService {
       return [];
     }
   }
+
+  //Thêm một topic mới vào firestore
+  Future<void> addTopic(TopicModel topic) async {
+    try {
+      // Chuyển đổi TopicModel thành một Map<String, dynamic>
+      Map<String, dynamic> topicData = topic.toMap();
+      await firebaseService.addDocument('topics', topicData);
+    } catch (error) {
+      print('Error adding topic document: $error');
+      throw error;
+    }
+  }
 }
