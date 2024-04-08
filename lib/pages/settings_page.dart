@@ -27,8 +27,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _loadUser() async {
     var user = auth.getCurrentUser();
+
     setState(() {
-      currentUser = UserModel(user!.uid, user.email.toString(), user.displayName.toString());
+      currentUser = UserModel(
+          user!.uid, user.email.toString(), user.displayName.toString());
     });
   }
 
@@ -67,11 +69,27 @@ class _SettingsPageState extends State<SettingsPage> {
                 child: Column(
                   children: [
                     createInkWell(currentUser.username, "Tên người dùng", () {
-                      print("object");
+                      Navigator.pushNamed(context, "/changeUserName")
+                          .then((newUserName) {
+                        if (newUserName != null) {
+                          // Cập nhật lại thông tin người dùng với tên người dùng mới
+                          setState(() {
+                            currentUser.username = newUserName.toString();
+                          });
+                        }
+                      });
                     }),
                     const Divider(thickness: 1.0),
                     createInkWell(currentUser.email, "Email", () {
-                      print("asdasd");
+                      Navigator.pushNamed(context, "/changeEmail");
+                      //     .then((newEmail) {
+                      //   if (newEmail != null) {
+                      //     // Cập nhật lại thông tin người dùng với tên người dùng mới
+                      //     setState(() {
+                      //       currentUser.email = newEmail.toString();
+                      //     });
+                      //   }
+                      // });
                     }),
                     const Divider(thickness: 1.0),
                     createInkWell('', "Đổi mật khẩu", () {
@@ -82,14 +100,27 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               const SizedBox(height: 100),
               createElevatedButton("Đăng xuất", () async {
-                try {
-                  await auth.signOut();
-                  Navigator.pushNamedAndRemoveUntil(context, '/intro',
-                      (route) => route.settings.name == '/intro');
-                } catch (e) {}
+                showConfirmDialog(context, "đăng xuất", () async {
+                  try {
+                    // Đăng xuất khỏi Firebase Authentication
+                    await auth.signOut();
+                    Navigator.pushNamedAndRemoveUntil(context, '/intro',
+                        (route) => route.settings.name == '/intro');
+                  } catch (error) {}
+                });
               }),
               const SizedBox(height: 20),
-              createElevatedButton("Xóa tài khoản", () => null)
+              createElevatedButton(
+                  "Xóa tài khoản",
+                  () => {
+                        showConfirmDialog(context, "xóa tài khoản", () async {
+                          try {
+                            await auth.deleteAccount();
+                            Navigator.pushNamedAndRemoveUntil(context, '/intro',
+                                (route) => route.settings.name == '/intro');
+                          } catch (e) {}
+                        })
+                      })
             ],
           ),
         ),
@@ -172,5 +203,44 @@ class _SettingsPageState extends State<SettingsPage> {
         border: Border.all(width: 1.0, color: Colors.grey),
         shape: BoxShape.rectangle,
         borderRadius: const BorderRadius.all(Radius.elliptical(10, 10)));
+  }
+
+  showConfirmDialog(BuildContext context, String text, Function() onPressed) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: CustomText(
+            text: 'Thông báo',
+            type: TextStyleEnum.xl,
+            style: const TextStyle(color: Colors.black),
+          ),
+          content: CustomText(
+            text: 'Bạn có chắc chắn muốn $text?',
+            style: const TextStyle(color: Colors.black),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Đóng dialog
+              },
+              child: CustomText(
+                text: 'Không',
+                type: TextStyleEnum.large,
+                style: const TextStyle(color: Colors.black),
+              ),
+            ),
+            TextButton(
+              onPressed: onPressed,
+              child: CustomText(
+                text: 'Có',
+                type: TextStyleEnum.large,
+                style: const TextStyle(color: Colors.black),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

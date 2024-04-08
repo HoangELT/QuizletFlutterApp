@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../enums/text_style_enum.dart';
+import '../models/user.dart';
 import '../utils/app_theme.dart';
 import '../widgets/text.dart';
 
@@ -14,18 +15,20 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   FirebaseAuthService auth = FirebaseAuthService();
-  var userName = "";
+  late UserModel currentUser;
 
   @override
   void initState() {
     super.initState();
-    _loadUserName();
+    _loadUser();
   }
 
-  Future<void> _loadUserName() async {
+  Future<void> _loadUser() async {
     var user = auth.getCurrentUser();
+
     setState(() {
-      userName = user!.email.toString();
+      currentUser = UserModel(
+          user!.uid, user.email.toString(), user.displayName.toString());
     });
   }
 
@@ -61,7 +64,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   const SizedBox(height: 20.0),
                   CustomText(
-                    text: userName,
+                    text: currentUser.username,
                     type: TextStyleEnum.large,
                   ),
                 ],
@@ -69,9 +72,15 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             const SizedBox(height: 30.0),
             OutlinedButton(
-              onPressed: () async {
-                var user = auth.getCurrentUser();
-                Navigator.pushNamed(context, "/settings", arguments: user);
+              onPressed: () {
+                Navigator.pushNamed(context, "/settings").then((newUserName) {
+                  if (newUserName != null) {
+                    // Cập nhật lại thông tin người dùng với tên người dùng mới
+                    setState(() {
+                      currentUser.username = newUserName.toString();
+                    });
+                  }
+                });
               },
               style: ButtonStyle(
                 padding: MaterialStateProperty.all(const EdgeInsets.all(20.0)),
