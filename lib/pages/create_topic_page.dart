@@ -22,11 +22,8 @@ class CreateTopicPage extends StatefulWidget {
 class _CreateTopicPageState extends State<CreateTopicPage> {
   FirebaseAuthService firebaseAuthService = FirebaseAuthService();
   var uuid = Uuid();
-  List<CardModel> listCard = [
-    CardModel('0', '', ''),
-    CardModel('1', '', ''),
-    CardModel('2', '', ''),
-  ];
+
+  List<CardModel> listCard = [];
 
   List<FocusNode> listFocus = [];
 
@@ -37,6 +34,11 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
   @override
   void initState() {
     _scrollController = ScrollController();
+    listCard.add(CardModel(uuid.v4(), '', ''));
+    listCard.add(CardModel(uuid.v4(), '', ''));
+    listCard.add(CardModel(uuid.v4(), '', ''));
+
+
     listFocus.add(FocusNode());
     listFocus.add(FocusNode());
     listFocus.add(FocusNode());
@@ -152,7 +154,7 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
           TextButton(
             onPressed: () async {
               try {
-                FocusScope.of(context).unfocus();
+                // FocusScope.of(context).unfocus();
                 String? resultCheck = _checkValue();
                 if (resultCheck == null) {
                   //Đã check thông tin thành công

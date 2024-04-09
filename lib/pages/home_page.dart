@@ -374,7 +374,7 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ButtonListTile(
                                 onTap: () async {
-                                  int? result = await Navigator.pushNamed(
+                                  var result = await Navigator.pushNamed(
                                       context, '/topic/create');
                                   if (result == 401) {
                                     _fetchMyTopics();
