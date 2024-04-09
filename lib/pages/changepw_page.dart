@@ -67,6 +67,7 @@ class _ChangePassWordState extends State<ChangePassWord> {
             child: Column(
               children: [
                 TextFormField(
+                  textInputAction: TextInputAction.next,
                   onSaved: (currentPassword) {
                     currentPassword = currentPassword!;
                   },
@@ -91,6 +92,7 @@ class _ChangePassWordState extends State<ChangePassWord> {
                 ),
                 const SizedBox(height: 20),
                 TextFormField(
+                  textInputAction: TextInputAction.next,
                   onSaved: (newPassWord) {
                     newPassWord = newPassWord!;
                   },
@@ -140,6 +142,7 @@ class _ChangePassWordState extends State<ChangePassWord> {
                 ),
                 const SizedBox(height: 20),
                 TextFormField(
+                  textInputAction: TextInputAction.done,
                   onSaved: (cfNewPassWord) {
                     confirmPassWord = cfNewPassWord!;
                   },
@@ -171,7 +174,9 @@ class _ChangePassWordState extends State<ChangePassWord> {
         Container(
           color: Colors.transparent.withOpacity(0.5),
           child: const Center(
-            child: CircularProgressIndicator(),
+            child: CircularProgressIndicator(
+              color: Colors.white,
+            ),
           ),
         ),
     ]);

@@ -4,7 +4,6 @@ class UserModel {
   String email;
 
   UserModel(this.userId, this.email, this.username);
-
   // Phương thức tạo danh sách các đối tượng từ danh sách Map
   static List<UserModel> fromListMap(List<Map<String, dynamic>> listMap) {
     return listMap.map((map) => UserModel.fromMap(map)).toList();

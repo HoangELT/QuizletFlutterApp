@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:quizletapp/models/user.dart';
@@ -11,6 +14,9 @@ class FirebaseAuthService {
 
   //đăng nhập với GG
   final GoogleSignIn googleSignIn = GoogleSignIn();
+
+  // khởi tạo đối tượng từ firebase firestore
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // Hàm factory để trả về thể hiện duy nhất của lớp FirebaseAuthService
   factory FirebaseAuthService() {
@@ -99,7 +105,29 @@ class FirebaseAuthService {
     }
   }
 
-// Hàm đổi mật khẩu
+  // Hàm kiểm tra mật khẩu trước khi thay đổi email
+  Future<bool> checkPassword(String password) async {
+    try {
+      // Lấy thông tin người dùng hiện tại
+      User? user = getCurrentUser();
+
+      // Xác thực mật khẩu của người dùng hiện tại
+      final credential = EmailAuthProvider.credential(
+        email: user!.email!,
+        password: password,
+      );
+      await user.reauthenticateWithCredential(credential);
+
+      // Nếu xác thực thành công, trả về true
+      return true;
+    } catch (e) {
+      // Xử lý lỗi và trả về false nếu mật khẩu không đúng
+      print('Lỗi khi xác thực mật khẩu: $e');
+      return false;
+    }
+  }
+
+  // Hàm đổi mật khẩu
   Future<String> changePassword(
       String currentPassword, String newPassword) async {
     try {
@@ -167,7 +195,6 @@ class FirebaseAuthService {
       // Gửi email xác minh mới đến địa chỉ email mới
       await user!.verifyBeforeUpdateEmail(newEmail);
 
-      // In ra thông báo khi thay đổi email thành công
       return '';
     } catch (error) {
       // Xử lý lỗi nếu có
@@ -176,7 +203,7 @@ class FirebaseAuthService {
     }
   }
 
-// Hàm để thay đổi displayName của người dùng
+  // Hàm để thay đổi displayName của người dùng
   Future<String> changeUserName(String newUserName) async {
     try {
       // Lấy thông tin người dùng đã xác thực
@@ -194,13 +221,13 @@ class FirebaseAuthService {
   }
 
   // Hàm để gửi email đặt lại mật khẩu
-  Future<void> resetPassword(String email) async {
+  Future<bool> resetPassword(String email) async {
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
-      print(
-          'Một email đặt lại mật khẩu đã được gửi đến địa chỉ của bạn. Vui lòng kiểm tra email của bạn.');
+      return true;
     } catch (error) {
       print('Lỗi khi gửi email đặt lại mật khẩu: $error');
+      return false;
     }
   }
 }

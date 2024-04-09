@@ -277,7 +277,9 @@ class _RegisterPageState extends State<RegisterPage> {
           Container(
             color: Colors.transparent.withOpacity(0.5),
             child: const Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(
+                color: Colors.white,
+              ),
             ),
           ),
       ]),

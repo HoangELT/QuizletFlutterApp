@@ -7,6 +7,7 @@ import 'package:quizletapp/utils/app_theme.dart';
 import 'package:quizletapp/widgets/text.dart';
 
 import '../services/firebase_auth.dart';
+import '../widgets/elevatedButton.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -18,6 +19,8 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   FirebaseAuthService auth = FirebaseAuthService();
   late UserModel currentUser;
+  final TextEditingController passwordController = TextEditingController();
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -36,92 +39,95 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.primaryBackgroundColor,
-      appBar: AppBar(
-        foregroundColor: Colors.white,
-        centerTitle: true,
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pop(context, currentUser.username);
+        return true;
+      },
+      child: Scaffold(
         backgroundColor: AppTheme.primaryBackgroundColor,
-        title: CustomText(
-          text: "Cài đặt",
-          type: TextStyleEnum.large,
+        appBar: AppBar(
+          foregroundColor: Colors.white,
+          centerTitle: true,
+          backgroundColor: AppTheme.primaryBackgroundColor,
+          title: CustomText(
+            text: "Cài đặt",
+            type: TextStyleEnum.large,
+          ),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Container(
-          decoration: const BoxDecoration(shape: BoxShape.circle),
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  padding: const EdgeInsets.fromLTRB(0, 20, 0, 15),
-                  child: CustomText(
-                    text: "Thông tin cá nhân",
-                    style: const TextStyle(fontWeight: FontWeight.w600),
+        body: SingleChildScrollView(
+          child: Container(
+            decoration: const BoxDecoration(shape: BoxShape.circle),
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(0, 20, 0, 15),
+                    child: CustomText(
+                      text: "Thông tin cá nhân",
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
                   ),
                 ),
-              ),
-              Container(
-                padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
-                decoration: createBoxDecoration(),
-                child: Column(
-                  children: [
-                    createInkWell(currentUser.username, "Tên người dùng", () {
-                      Navigator.pushNamed(context, "/changeUserName")
-                          .then((newUserName) {
-                        if (newUserName != null) {
-                          // Cập nhật lại thông tin người dùng với tên người dùng mới
-                          setState(() {
-                            currentUser.username = newUserName.toString();
-                          });
-                        }
-                      });
-                    }),
-                    const Divider(thickness: 1.0),
-                    createInkWell(currentUser.email, "Email", () {
-                      Navigator.pushNamed(context, "/changeEmail");
-                      //     .then((newEmail) {
-                      //   if (newEmail != null) {
-                      //     // Cập nhật lại thông tin người dùng với tên người dùng mới
-                      //     setState(() {
-                      //       currentUser.email = newEmail.toString();
-                      //     });
-                      //   }
-                      // });
-                    }),
-                    const Divider(thickness: 1.0),
-                    createInkWell('', "Đổi mật khẩu", () {
-                      Navigator.pushNamed(context, "/changePassword");
-                    }),
-                  ],
+                Container(
+                  padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                  decoration: createBoxDecoration(),
+                  child: Column(
+                    children: [
+                      createInkWell(currentUser.username, "Tên người dùng", () {
+                        Navigator.pushNamed(context, "/changeUserName")
+                            .then((newUserName) {
+                          if (newUserName != null) {
+                            // Cập nhật lại thông tin người dùng với tên người dùng mới
+                            setState(() {
+                              if (currentUser.username == newUserName) {
+                                currentUser.username = newUserName.toString();
+                              }
+                            });
+                          }
+                        });
+                      }),
+                      const Divider(thickness: 1.0),
+                      createInkWell(currentUser.email, "Email", () {
+                        // thực hiện show bottom sheet check password rồi mới đổi email
+                        showPasswordCheckBottomSheet(context);
+                      }),
+                      const Divider(thickness: 1.0),
+                      createInkWell('', "Đổi mật khẩu", () {
+                        Navigator.pushNamed(context, "/changePassword");
+                      }),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 100),
-              createElevatedButton("Đăng xuất", () async {
-                showConfirmDialog(context, "đăng xuất", () async {
-                  try {
-                    // Đăng xuất khỏi Firebase Authentication
-                    await auth.signOut();
-                    Navigator.pushNamedAndRemoveUntil(context, '/intro',
-                        (route) => route.settings.name == '/intro');
-                  } catch (error) {}
-                });
-              }),
-              const SizedBox(height: 20),
-              createElevatedButton(
-                  "Xóa tài khoản",
-                  () => {
-                        showConfirmDialog(context, "xóa tài khoản", () async {
-                          try {
-                            await auth.deleteAccount();
-                            Navigator.pushNamedAndRemoveUntil(context, '/intro',
-                                (route) => route.settings.name == '/intro');
-                          } catch (e) {}
+                const SizedBox(height: 100),
+                createElevatedButton("Đăng xuất", () async {
+                  showConfirmDialog(context, "đăng xuất", () async {
+                    try {
+                      // Đăng xuất khỏi Firebase Authentication
+                      await auth.signOut();
+                      Navigator.pushNamedAndRemoveUntil(context, '/intro',
+                          (route) => route.settings.name == '/intro');
+                    } catch (error) {}
+                  });
+                }),
+                const SizedBox(height: 20),
+                createElevatedButton(
+                    "Xóa tài khoản",
+                    () => {
+                          showConfirmDialog(context, "xóa tài khoản", () async {
+                            try {
+                              await auth.deleteAccount();
+                              Navigator.pushNamedAndRemoveUntil(
+                                  context,
+                                  '/intro',
+                                  (route) => route.settings.name == '/intro');
+                            } catch (e) {}
+                          })
                         })
-                      })
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -195,6 +201,135 @@ class _SettingsPageState extends State<SettingsPage> {
           style: const TextStyle(fontSize: 18.0),
         ),
       ],
+    );
+  }
+
+  void checkPassword(void Function(void Function()) setStateBottomSheet) async {
+    try {
+      String password = passwordController.text;
+      setStateBottomSheet(() {
+        isLoading = true;
+      });
+      bool isCorrect = await auth.checkPassword(password);
+      setStateBottomSheet(() {
+        isLoading = false;
+      });
+      if (isCorrect) {
+        Navigator.pushReplacementNamed(context, "/changeEmail");
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              icon: const Icon(
+                Icons.warning_amber_rounded,
+                color: Colors.red,
+                size: 45,
+              ),
+              title: CustomText(
+                text: 'Mật khẩu sai. Vui lòng thử lại',
+                type: TextStyleEnum.large,
+                style: const TextStyle(color: Colors.black),
+              ),
+            );
+          },
+        );
+
+        await Future.delayed(const Duration(seconds: 2));
+      }
+      passwordController.clear();
+    } catch (e) {}
+  }
+
+  showPasswordCheckBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      backgroundColor: AppTheme.primaryBackgroundColor,
+      isScrollControlled: true,
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(builder: (context, setStateBottomSheet) {
+          return Stack(children: [
+            SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CustomText(
+                        text: "Vui lòng xác minh tài khoản của bạn",
+                        type: TextStyleEnum.xl,
+                      ),
+                      const SizedBox(height: 15),
+                      CustomText(
+                        text:
+                            "Để xác thực đây là bạn, vui lòng xác minh mật khẩu Quizlet của bạn.",
+                        type: TextStyleEnum.large,
+                        style: const TextStyle(fontWeight: FontWeight.w400),
+                      ),
+                      const SizedBox(height: 15),
+                      TextField(
+                        controller: passwordController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          label: CustomText(
+                            text: "Vui lòng nhập mật khẩu của bạn",
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Colors.white), // Màu viền khi focus
+                          ),
+                          border: const OutlineInputBorder(),
+                        ),
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      const SizedBox(height: 20),
+                      CustomElevatedButton(
+                        onPressed: () {
+                          checkPassword(setStateBottomSheet);
+                        },
+                        text: 'Gửi',
+                      ),
+                      const SizedBox(height: 20),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        style: ButtonStyle(
+                          fixedSize: const MaterialStatePropertyAll(
+                              Size(double.maxFinite, 50.0)),
+                          shape:
+                              MaterialStateProperty.all(RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          )),
+                        ),
+                        child: CustomText(
+                          text: "Hủy",
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            if (isLoading)
+              Container(
+                color: Colors.transparent.withOpacity(0.5),
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+          ]);
+        });
+      },
     );
   }
 

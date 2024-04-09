@@ -101,7 +101,9 @@ class _ChangeEmailState extends State<ChangeEmail> {
         Container(
           color: Colors.transparent.withOpacity(0.5),
           child: const Center(
-            child: CircularProgressIndicator(),
+            child: CircularProgressIndicator(
+              color: Colors.white,
+            ),
           ),
         ),
     ]);
@@ -142,7 +144,41 @@ class _ChangeEmailState extends State<ChangeEmail> {
                   ),
                   title: CustomText(
                     text:
-                        'Chúng tôi đã gửi email đến $newEmail. Vui lòng kiểm tra hòm thư đến của bạn để xác nhận thay đổi email',
+                        'Chúng tôi đã gửi email đến $newEmail. Vui lòng kiểm tra hòm thư đến của bạn để xác nhận thay đổi email và đăng nhập lại ứng dụng',
+                    type: TextStyleEnum.large,
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () async {
+                        // Navigator.pop(context); // Đóng dialog
+                        Navigator.pushNamedAndRemoveUntil(
+                            context, "/intro", (route) => false);
+                      },
+                      child: Center(
+                        child: CustomText(
+                          text: 'OK',
+                          type: TextStyleEnum.large,
+                          style: const TextStyle(color: Colors.blue),
+                        ),
+                      ),
+                    ),
+                  ]);
+            },
+          );
+        } else {
+          // hiển thị thông báo đổi email thành công
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                  icon: const Icon(
+                    Icons.warning_amber_rounded,
+                    color: Colors.blue,
+                    size: 45,
+                  ),
+                  title: CustomText(
+                    text: 'Email không tồn tại. Vui lòng thử lại sau!',
                     type: TextStyleEnum.large,
                     style: const TextStyle(color: Colors.black),
                   ),
@@ -150,12 +186,10 @@ class _ChangeEmailState extends State<ChangeEmail> {
                     TextButton(
                       onPressed: () async {
                         Navigator.pop(context); // Đóng dialog
-                        // Navigator.pop(context, newEmail);
-                        Navigator.pop(context);
                       },
                       child: Center(
                         child: CustomText(
-                          text: 'Xong',
+                          text: 'OK',
                           type: TextStyleEnum.large,
                           style: const TextStyle(color: Colors.blue),
                         ),

@@ -1,8 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:quizletapp/pages/intro_page.dart';
 import '../enums/text_style_enum.dart';
+import '../models/user.dart';
 import '../services/firebase_auth.dart';
 import '../services/shared_preferences_service.dart';
 import '../utils/app_theme.dart';
@@ -23,7 +26,15 @@ class _LoginPageState extends State<LoginPage> {
   String passWord = '';
   bool isObShowPassWord = true;
   final formKey = GlobalKey<FormState>();
+  var controllerForgorPw = TextEditingController();
   bool isLoading = false;
+  bool isLoadings = false;
+
+  @override
+  void dispose() {
+    super.dispose();
+    controllerForgorPw.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -195,7 +206,9 @@ class _LoginPageState extends State<LoginPage> {
         Container(
           color: Colors.transparent.withOpacity(0.5),
           child: const Center(
-            child: CircularProgressIndicator(),
+            child: CircularProgressIndicator(
+              color: Colors.white,
+            ),
           ),
         ),
     ]);
@@ -205,72 +218,154 @@ class _LoginPageState extends State<LoginPage> {
     return Center(
       child: RichText(
         text: TextSpan(
-          text: "Quên ",
+          text: "Bạn đã quên mật khẩu? ",
           style: const TextStyle(color: Colors.white),
           children: [
             TextSpan(
-              text: "tên người dùng",
+              text: "Click here",
               style: const TextStyle(
                 color: Colors.blue,
               ),
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
-                  // Hiển thị dialog khi nhấn vào "tên người dùng"
+                  // Hiển thị dialog khi nhấn vào "Click here"
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text("Quên tên người dùng"),
-                        content: const Text("Nội dung dialog"),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text("Đóng"),
+                      return StatefulBuilder(
+                          builder: (context, setStateAlertDialog) {
+                        return Stack(children: [
+                          AlertDialog(
+                            backgroundColor:
+                                AppTheme.primaryBackgroundColorDiaLog,
+                            content: SingleChildScrollView(
+                              child: Column(
+                                children: [
+                                  CustomText(
+                                    text: "Đặt lại mật khẩu",
+                                    textAlign: TextAlign.center,
+                                    type: TextStyleEnum.large,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 20),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  CustomText(
+                                    text:
+                                        "Nhập địa chỉ email của bạn đã dùng để đăng ký. Chúng tôi sẽ email cho bạn một liên kết để đăng nhập và đặt lại mật khẩu",
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 18),
+                                  TextField(
+                                    controller: controllerForgorPw,
+                                    autofocus: true,
+                                    decoration: const InputDecoration(
+                                      hintText: 'example@gmail.com',
+                                      contentPadding:
+                                          EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                      hintStyle: TextStyle(color: Colors.grey),
+                                      border: OutlineInputBorder(),
+                                      focusedBorder: OutlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: Colors.white)),
+                                    ),
+                                    keyboardType: TextInputType.emailAddress,
+                                    style: const TextStyle(color: Colors.white),
+                                    cursorColor: Colors.white,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            actionsPadding: EdgeInsets.zero,
+                            actions: [
+                              Row(
+                                children: [
+                                  _createTextButton(
+                                      "Hủy",
+                                      const BorderRadius.only(
+                                        bottomLeft: Radius.circular(28),
+                                      ),
+                                      const Border(
+                                        top: BorderSide(
+                                          color: Colors.grey,
+                                          width: 0.8,
+                                        ),
+                                        right: BorderSide(
+                                          color: Colors.grey,
+                                          width: 0.8,
+                                        ),
+                                      ), () {
+                                    Navigator.pop(context);
+                                  }),
+                                  _createTextButton(
+                                      "OK",
+                                      const BorderRadius.only(
+                                        bottomRight: Radius.circular(28),
+                                      ),
+                                      const Border(
+                                        top: BorderSide(
+                                          color: Colors.grey,
+                                          width: 0.8,
+                                        ),
+                                        left: BorderSide(
+                                          color: Colors.grey,
+                                          width: 0.8,
+                                        ),
+                                      ), () {
+                                    _submitForgotPw(setStateAlertDialog);
+                                  }),
+                                ],
+                              )
+                            ],
                           ),
-                        ],
-                      );
+                          if (isLoadings)
+                            Container(
+                              color: Colors.transparent.withOpacity(0.5),
+                              child: const Center(
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                        ]);
+                      });
                     },
                   );
                 },
-            ),
-            const TextSpan(
-              text: " hoặc ",
-              style: TextStyle(color: Colors.white),
-            ),
-            TextSpan(
-              text: "mật khẩu",
-              style: const TextStyle(
-                color: Colors.blue,
-              ),
-              recognizer: TapGestureRecognizer()
-                ..onTap = () {
-                  // Hiển thị dialog khi nhấn vào "mật khẩu"
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text("Quên mật khẩu"),
-                        content: const Text("Nội dung dialog"),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text("Đóng"),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
-            ),
-            const TextSpan(
-              text: "?",
-              style: TextStyle(color: Colors.white),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  _createTextButton(String btnText, BorderRadiusGeometry border,
+      BoxBorder boxBorder, void Function() onPressed) {
+    return Expanded(
+      child: Container(
+        decoration: BoxDecoration(
+          border: boxBorder,
+          borderRadius: border,
+        ),
+        child: TextButton(
+          onPressed: onPressed,
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(Colors.transparent),
+            shape: MaterialStateProperty.all(
+              RoundedRectangleBorder(borderRadius: border),
+            ),
+          ),
+          child: CustomText(
+            text: btnText,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 18,
+            ),
+          ),
         ),
       ),
     );
@@ -280,6 +375,114 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       isObShowPassWord = !isObShowPassWord;
     });
+  }
+
+  void _submitForgotPw(
+      void Function(void Function()) setStateAlertDialog) async {
+    try {
+      String email = controllerForgorPw.text;
+      setStateAlertDialog(() {
+        isLoadings = true;
+      });
+      bool isCorrect = await auth.resetPassword(email);
+      setStateAlertDialog(() {
+        isLoadings = false;
+      });
+      Navigator.pop(context);
+      if (isCorrect) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: AppTheme.primaryBackgroundColorDiaLog,
+              content: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    CustomText(
+                      text: "Đã gửi email",
+                      textAlign: TextAlign.center,
+                      type: TextStyleEnum.large,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w500, fontSize: 20),
+                    ),
+                    const SizedBox(height: 10),
+                    CustomText(
+                      text:
+                          "Chúng tôi đã gửi mail đến $email. Vui lòng kiểm tra hòm thư để thay đổi mật khẩu của bạn.",
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actionsPadding: EdgeInsets.zero,
+              actions: [
+                Container(
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      top: BorderSide(
+                        color: Colors.grey,
+                        width: 0.8,
+                      ),
+                    ),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(28),
+                      bottomRight: Radius.circular(28),
+                    ),
+                  ),
+                  width: double.maxFinite,
+                  height: 50.0,
+                  child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      style: const ButtonStyle(
+                          backgroundColor:
+                              MaterialStatePropertyAll(Colors.transparent),
+                          shape:
+                              MaterialStatePropertyAll(RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(28),
+                            bottomRight: Radius.circular(28),
+                          )))),
+                      child: CustomText(
+                        text: "Ok",
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 18,
+                        ),
+                      )),
+                )
+              ],
+            );
+          },
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              icon: const Icon(
+                Icons.warning_amber_rounded,
+                color: Colors.red,
+                size: 45,
+              ),
+              title: CustomText(
+                text: 'Vui lòng nhập đúng địa chỉ email',
+                type: TextStyleEnum.large,
+                style: const TextStyle(color: Colors.black),
+              ),
+            );
+          },
+        );
+
+        await Future.delayed(const Duration(seconds: 2));
+      }
+      controllerForgorPw.clear();
+    } catch (e) {}
   }
 
   void _submit() async {
