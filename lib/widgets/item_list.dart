@@ -38,6 +38,7 @@ class _ItemListState extends State<ItemList> {
         width: widget.width,
         height: widget.height,
         decoration: BoxDecoration(
+          color: Colors.transparent,
           border: Border.all(
             color: Colors.grey.withOpacity(0.4),
             width: 2,

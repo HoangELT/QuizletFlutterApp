@@ -16,7 +16,7 @@ class FolderModel {
   // Phương thức tạo đối tượng từ một Map
   static FolderModel fromMap(Map<String, dynamic> map) {
     return FolderModel(
-      map['folderId'],
+      map['id'],
       map['title'],
       map['description'],
       List<TopicModel>.from(

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
@@ -12,6 +11,7 @@ import 'package:quizletapp/widgets/button_listtile.dart';
 import 'package:quizletapp/widgets/text.dart';
 import 'package:quizletapp/widgets/group_list.dart';
 import 'package:quizletapp/widgets/item_list.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -24,7 +24,7 @@ class _HomePageState extends State<HomePage> {
   TopicService topicService = TopicService();
   FirebaseAuthService firebaseAuthService = FirebaseAuthService();
   bool isInit = false;
-  bool isLoading = true;
+  bool isLoading = false;
   final TextEditingController _textEditingController = TextEditingController();
 
   UserModel currentUser = UserModel(
@@ -94,15 +94,18 @@ class _HomePageState extends State<HomePage> {
   }
 
   _fetchMyTopics() async {
+    setState(() {
+      isLoading = true;
+    });
     try {
       List<TopicModel> fetchedTopics = await topicService.getMyListTopic();
-      setState(() {
-        myTopics = fetchedTopics;
-        isLoading = false;
-      });
+      myTopics = fetchedTopics;
     } catch (e) {
       print('Lỗi lấy danh sách chủ đề: $e');
     }
+    setState(() {
+      isLoading = false;
+    });
   }
 
   Future<void> _onRefresh() async {
@@ -218,6 +221,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body: RefreshIndicator(
+        triggerMode: RefreshIndicatorTriggerMode.anywhere,
         onRefresh: _onRefresh,
         child: SingleChildScrollView(
           child: Container(
@@ -225,131 +229,143 @@ class _HomePageState extends State<HomePage> {
             child: (myTopics.length != 0)
                 ? Column(
                     children: [
-                      GroupList(
-                        buildItem: (context, index) {
-                          return ItemList(
-                            onTap: () {},
-                            headText: myTopics[index].title,
-                            bodyText:
-                                '${myTopics[index].listCard.length} thuật ngữ',
-                            bottom: Row(
-                              children: [
-                                const CircleAvatar(
-                                  backgroundImage: AppTheme.defaultAvatar,
-                                  radius: 14,
-                                ),
-                                const SizedBox(
-                                  width: 8,
-                                ),
-                                CustomText(text: myTopics[index].username),
-                              ],
-                            ),
-                          );
-                        },
-                        itemCount: myTopics.length,
-                        title: 'Các học phần',
-                        onShowAll: () {
-                          print('show');
-                        },
-                      ),
-                      const SizedBox(
-                        height: 32,
-                      ),
-                      GroupList(
-                        buildItem: (context, index) {
-                          return ItemList(
-                            headText: listTopicOfUser[index].title,
-                            bodyText:
-                                '${listTopicOfUser[index].listCard.length} thuật ngữ',
-                            bottom: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    const CircleAvatar(
-                                      backgroundColor: Colors.grey,
-                                      radius: 14,
-                                    ),
-                                    const SizedBox(
-                                      width: 8,
-                                    ),
-                                    CustomText(
-                                        text: listTopicOfUser[index].username)
-                                  ],
-                                ),
-                                IconButton(
-                                  onPressed: () {
-                                    print(index.toString());
-                                  },
-                                  icon: const Icon(
-                                    Icons.more_vert,
-                                    color: Colors.white,
+                      Skeletonizer(
+                        containersColor: Colors.grey.shade400,
+                        enabled: isLoading,
+                        child: GroupList(
+                          itemCount: myTopics.length,
+                          title: 'Các học phần',
+                          onShowAll: () {
+                            print('show');
+                          },
+                          buildItem: (context, index) {
+                            return ItemList(
+                              onTap: () {},
+                              headText: myTopics[index].title,
+                              bodyText:
+                                  '${myTopics[index].listCard.length} thuật ngữ',
+                              bottom: Row(
+                                children: [
+                                  const CircleAvatar(
+                                    backgroundImage: AppTheme.defaultAvatar,
+                                    radius: 14,
                                   ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                        itemCount: listTopicOfUser.length,
-                        title:
-                            'Tương tự học phần của ${listTopicOfUser[0].username}',
-                        isShowOption: false,
+                                  const SizedBox(
+                                    width: 8,
+                                  ),
+                                  CustomText(text: myTopics[index].username),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
                       ),
                       const SizedBox(
                         height: 32,
                       ),
-                      GroupList(
-                        buildItem: (context, index) {
-                          return ItemList(
-                            head: Row(
-                              children: [
-                                Icon(
-                                  Icons.folder_outlined,
-                                  color: Colors.grey.withOpacity(0.6),
-                                  size: 28,
-                                ),
-                                const SizedBox(
-                                  width: 12,
-                                ),
-                                CustomText(
-                                  text: listFolder[index].title,
-                                  type: TextStyleEnum.large,
-                                ),
-                              ],
-                            ),
-                            body: Row(
-                              children: [
-                                CustomText(
-                                    text:
-                                        '${listFolder[index].listTopic.length} học phần'),
-                                Container(
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 16),
-                                  color: Colors.grey.shade600.withOpacity(0.5),
-                                  width: 1,
-                                  height: 18,
-                                ),
-                                const CircleAvatar(
-                                  backgroundImage: AppTheme.defaultAvatar,
-                                  backgroundColor: Colors.grey,
-                                  radius: 14,
-                                ),
-                                const SizedBox(
-                                  width: 8,
-                                ),
-                                CustomText(
-                                    text: firebaseAuthService
-                                            .getCurrentUser()
-                                            ?.displayName ??
-                                        '')
-                              ],
-                            ),
-                          );
-                        },
-                        itemCount: listFolder.length,
-                        title: 'Thư mục',
-                        isShowOption: false,
-                        itemHeight: 108,
+                      Skeletonizer(
+                        enabled: isLoading,
+                        containersColor: Colors.grey.shade400,
+                        child: GroupList(
+                          buildItem: (context, index) {
+                            return ItemList(
+                              headText: listTopicOfUser[index].title,
+                              bodyText:
+                                  '${listTopicOfUser[index].listCard.length} thuật ngữ',
+                              bottom: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      const CircleAvatar(
+                                        backgroundColor: Colors.grey,
+                                        radius: 14,
+                                      ),
+                                      const SizedBox(
+                                        width: 8,
+                                      ),
+                                      CustomText(
+                                          text: listTopicOfUser[index].username)
+                                    ],
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      print(index.toString());
+                                    },
+                                    icon: const Icon(
+                                      Icons.more_vert,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                          itemCount: listTopicOfUser.length,
+                          title:
+                              'Tương tự học phần của ${listTopicOfUser[0].username}',
+                          isShowOption: false,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 32,
+                      ),
+                      Skeletonizer(
+                        enabled: isLoading,
+                        containersColor: Colors.grey.shade400,
+                        child: GroupList(
+                          buildItem: (context, index) {
+                            return ItemList(
+                              head: Row(
+                                children: [
+                                  Icon(
+                                    Icons.folder_outlined,
+                                    color: Colors.grey.withOpacity(0.6),
+                                    size: 28,
+                                  ),
+                                  const SizedBox(
+                                    width: 12,
+                                  ),
+                                  CustomText(
+                                    text: listFolder[index].title,
+                                    type: TextStyleEnum.large,
+                                  ),
+                                ],
+                              ),
+                              body: Row(
+                                children: [
+                                  CustomText(
+                                      text:
+                                          '${listFolder[index].listTopic.length} học phần'),
+                                  Container(
+                                    margin: const EdgeInsets.symmetric(
+                                        horizontal: 16),
+                                    color: Colors.grey.shade600.withOpacity(0.5),
+                                    width: 1,
+                                    height: 18,
+                                  ),
+                                  const CircleAvatar(
+                                    backgroundImage: AppTheme.defaultAvatar,
+                                    backgroundColor: Colors.grey,
+                                    radius: 14,
+                                  ),
+                                  const SizedBox(
+                                    width: 8,
+                                  ),
+                                  CustomText(
+                                      text: firebaseAuthService
+                                              .getCurrentUser()
+                                              ?.displayName ??
+                                          '')
+                                ],
+                              ),
+                            );
+                          },
+                          itemCount: listFolder.length,
+                          title: 'Thư mục',
+                          isShowOption: false,
+                          itemHeight: 108,
+                        ),
                       ),
                       Container(
                         margin: const EdgeInsets.symmetric(vertical: 32),
@@ -366,111 +382,115 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ],
                   )
-                : Column(
-                    children: [
-                      GroupList(
-                        itemHeight: null,
-                        isList: true,
-                        itemCount: 1,
-                        title: 'Đây là cách để bắt đầu',
-                        isShowOption: false,
-                        builList: (index) {
-                          return Column(
-                            children: [
-                              if (index != 0)
-                                const SizedBox(
-                                  height: 16,
+                : Skeletonizer(
+                  enabled: isLoading,
+                  containersColor: Colors.grey.shade400,
+                  child: Column(
+                      children: [
+                        GroupList(
+                          itemHeight: null,
+                          isList: true,
+                          itemCount: 1,
+                          title: 'Đây là cách để bắt đầu',
+                          isShowOption: false,
+                          builList: (index) {
+                            return Column(
+                              children: [
+                                if (index != 0)
+                                  const SizedBox(
+                                    height: 16,
+                                  ),
+                                ButtonListTile(
+                                  onTap: () async {
+                                    var result = await Navigator.pushNamed(
+                                        context, '/topic/create');
+                                    if (result == 401) {
+                                      _fetchMyTopics();
+                                    }
+                                  },
+                                  title: CustomText(
+                                    text: 'Tạo thẻ ghi nhớ',
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                  icon: const Icon(
+                                    Icons.library_add_sharp,
+                                    color: Colors.blue,
+                                    size: 40,
+                                  ),
+                                  boxDecoration: BoxDecoration(
+                                    color: Colors.transparent,
+                                    border:
+                                        Border.all(width: 1, color: Colors.grey),
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 4),
                                 ),
-                              ButtonListTile(
-                                onTap: () async {
-                                  var result = await Navigator.pushNamed(
-                                      context, '/topic/create');
-                                  if (result == 401) {
-                                    _fetchMyTopics();
-                                  }
-                                },
-                                title: CustomText(
-                                  text: 'Tạo thẻ ghi nhớ',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w500),
+                              ],
+                            );
+                          },
+                        ),
+                        const SizedBox(
+                          height: 32,
+                        ),
+                        GroupList(
+                          itemHeight: null,
+                          isList: true,
+                          itemCount: 3,
+                          title: 'Duyệt tìm theo chủ đề',
+                          isShowOption: false,
+                          builList: (index) {
+                            return Column(
+                              children: [
+                                if (index != 0)
+                                  const SizedBox(
+                                    height: 16,
+                                  ),
+                                ButtonListTile(
+                                  onTap: () {
+                                    Navigator.pushNamed(context, '/search-topic',
+                                        arguments: {
+                                          'code': index,
+                                          'key': listTopicToFind[index]['label']
+                                        });
+                                  },
+                                  title: CustomText(
+                                    text: listTopicToFind[index]['label']
+                                        .toString(),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                  icon: listTopicToFind[index]['icon'] as Icon,
+                                  boxDecoration: BoxDecoration(
+                                    color: Colors.transparent,
+                                    border:
+                                        Border.all(width: 1, color: Colors.grey),
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 4),
                                 ),
-                                icon: const Icon(
-                                  Icons.library_add_sharp,
-                                  color: Colors.blue,
-                                  size: 40,
-                                ),
-                                boxDecoration: BoxDecoration(
-                                  color: Colors.transparent,
-                                  border:
-                                      Border.all(width: 1, color: Colors.grey),
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 4),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                      const SizedBox(
-                        height: 32,
-                      ),
-                      GroupList(
-                        itemHeight: null,
-                        isList: true,
-                        itemCount: 3,
-                        title: 'Duyệt tìm theo chủ đề',
-                        isShowOption: false,
-                        builList: (index) {
-                          return Column(
-                            children: [
-                              if (index != 0)
-                                const SizedBox(
-                                  height: 16,
-                                ),
-                              ButtonListTile(
-                                onTap: () {
-                                  Navigator.pushNamed(context, '/search-topic',
-                                      arguments: {
-                                        'code': index,
-                                        'key': listTopicToFind[index]['label']
-                                      });
-                                },
-                                title: CustomText(
-                                  text: listTopicToFind[index]['label']
-                                      .toString(),
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w500),
-                                ),
-                                icon: listTopicToFind[index]['icon'] as Icon,
-                                boxDecoration: BoxDecoration(
-                                  color: Colors.transparent,
-                                  border:
-                                      Border.all(width: 1, color: Colors.grey),
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 4),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                      Container(
-                        margin: const EdgeInsets.symmetric(vertical: 32),
-                        alignment: Alignment.center,
-                        child: GestureDetector(
-                            onTap: () {
-                              print('Xem chính sách quyền riêng tư');
-                            },
-                            child: CustomText(
-                              text: 'Chính sách quyền riêng tư',
-                              style: TextStyle(
-                                  fontSize: 12, fontWeight: FontWeight.w500),
-                            )),
-                      )
-                    ],
-                  ),
+                              ],
+                            );
+                          },
+                        ),
+                        Container(
+                          margin: const EdgeInsets.symmetric(vertical: 32),
+                          alignment: Alignment.center,
+                          child: GestureDetector(
+                              onTap: () {
+                                print('Xem chính sách quyền riêng tư');
+                              },
+                              child: CustomText(
+                                text: 'Chính sách quyền riêng tư',
+                                style: TextStyle(
+                                    fontSize: 12, fontWeight: FontWeight.w500),
+                              )),
+                        )
+                      ],
+                    ),
+                ),
           ),
         ),
       ),

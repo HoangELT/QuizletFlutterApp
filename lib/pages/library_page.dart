@@ -1,9 +1,12 @@
+import 'dart:isolate';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
 import 'package:quizletapp/services/firebase_auth.dart';
 import 'package:quizletapp/utils/app_theme.dart';
 import 'package:quizletapp/widgets/text.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class LibraryPage extends StatefulWidget {
   int initIndex;
@@ -21,11 +24,12 @@ class _LibraryPageState extends State<LibraryPage>
       FirebaseAuthService firebaseAuthService = FirebaseAuthService();
   late final TabController _tabController;
   late var currentUser;
+  bool isLoading = false;
 
   @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
-    currentUser = firebaseAuthService.getCurrentUser();
+    _fetchCurrentUser();
     setState(() {
       _tabController.index = widget.initIndex;
     });
@@ -36,6 +40,16 @@ class _LibraryPageState extends State<LibraryPage>
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+
+  _fetchCurrentUser() async {
+    setState(() {
+      isLoading = true;
+    });
+    currentUser = await firebaseAuthService.getCurrentUser();
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
@@ -173,36 +187,40 @@ class _LibraryPageState extends State<LibraryPage>
         vertical: 64,
       ),
       child: SingleChildScrollView(
-        child: Column(
-          children: [
-            const Row(),
-            const CircleAvatar(
-              backgroundImage: AppTheme.defaultAvatar,
-              radius: 28,
-            ),
-            const SizedBox(
-              height: 8,
-            ),
-            CustomText(
-              text: 'Xin chào ${currentUser?.displayName ?? ''}!',
-              type: TextStyleEnum.large,
-              style: const TextStyle(fontWeight: FontWeight.w500),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                children: [
-                  const Divider(),
-                  CustomText(
-                    text: 'Bắt đầu bằng cách tìm học phần hoặc tự tạo học phần',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w500, color: Colors.grey.shade300),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+        child: Skeletonizer(
+          enabled: isLoading,
+          containersColor: Colors.grey.shade400,
+          child: Column(
+            children: [
+              const Row(),
+              const CircleAvatar(
+                backgroundImage: AppTheme.defaultAvatar,
+                radius: 28,
               ),
-            ),
-          ],
+              const SizedBox(
+                height: 8,
+              ),
+              CustomText(
+                text: 'Xin chào ${currentUser?.displayName ?? ''}!',
+                type: TextStyleEnum.large,
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  children: [
+                    const Divider(),
+                    CustomText(
+                      text: 'Bắt đầu bằng cách tìm học phần hoặc tự tạo học phần',
+                      style: TextStyle(
+                          fontWeight: FontWeight.w500, color: Colors.grey.shade300),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

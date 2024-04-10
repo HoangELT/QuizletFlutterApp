@@ -27,6 +27,10 @@ class TopicModel {
       'dateCreated': dateCreated.toIso8601String(), // Chuyển đổi dateCreated thành chuỗi ISO 8601
     };
   }
+  // Phương thức chuyển đổi từ List<TopicModal> sang List<Map<String, dynamic>>
+  static List<Map<String, dynamic>> topicsToMapList(List<TopicModel> topics) {
+    return topics.map((topic) => topic.toMap()).toList();
+  }
 
   // Phương thức tạo danh sách các đối tượng từ danh sách Map
   static List<TopicModel> fromListMap(List<Map<String, dynamic>> listMap) {
@@ -38,7 +42,7 @@ class TopicModel {
     return TopicModel(
       map['userId'],
       map['username'],
-      map['topicId'],
+      map['id'],
       map['title'],
       map['description'],
       map['public'],
