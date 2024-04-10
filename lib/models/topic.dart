@@ -45,4 +45,9 @@ class TopicModel {
       List<CardModel>.from((map['listCard'] ?? []).map((x) => CardModel.fromMap(x))),
     )..dateCreated = DateTime.parse(map['dateCreated']); // Chuyển đổi chuỗi ISO 8601 thành DateTime
   }
+
+  @override
+  String toString(){
+    return 'TopicModel( userId= $userId, userName= $username, topicId= $topicId, title= $title, description= $description, public= $public, listCard= $listCard, dateCreated= $dateCreated)';
+  }
 }

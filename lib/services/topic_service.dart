@@ -1,4 +1,5 @@
 import 'package:quizletapp/models/topic.dart';
+import 'package:quizletapp/models/user.dart';
 import 'package:quizletapp/services/firebase.dart';
 import 'package:quizletapp/services/firebase_auth.dart';
 
@@ -9,7 +10,8 @@ class TopicService {
   Future<List<TopicModel>> getMyListTopic() async {
     try {
       if (firebaseAuthService.isUserLoggedIn()) {
-        var listTopic = await firebaseService.getDocuments('topics');
+        var user = await firebaseAuthService.getCurrentUser();
+        var listTopic = await firebaseService.getDocumentsByField('topics', 'userId', user?.uid);
         return TopicModel.fromListMap(listTopic);
       } else {
         // Nếu người dùng chưa đăng nhập, trả về danh sách trống

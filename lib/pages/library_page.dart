@@ -1,7 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
+import 'package:quizletapp/services/firebase_auth.dart';
 import 'package:quizletapp/utils/app_theme.dart';
 import 'package:quizletapp/widgets/text.dart';
 
@@ -18,11 +18,14 @@ class LibraryPage extends StatefulWidget {
 
 class _LibraryPageState extends State<LibraryPage>
     with SingleTickerProviderStateMixin {
+      FirebaseAuthService firebaseAuthService = FirebaseAuthService();
   late final TabController _tabController;
+  late var currentUser;
 
   @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
+    currentUser = firebaseAuthService.getCurrentUser();
     setState(() {
       _tabController.index = widget.initIndex;
     });
@@ -111,41 +114,42 @@ class _LibraryPageState extends State<LibraryPage>
               horizontal: 16,
               vertical: 16,
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Container(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton(
-                    onPressed: () {
-                      print('Clicked button sắp xếp');
-                    },
-                    style: const ButtonStyle(
-                        padding: MaterialStatePropertyAll(EdgeInsets.all(0))),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        border: Border.all(
-                            width: 2, color: Colors.grey.withOpacity(0.8)),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Wrap(
-                        spacing: 4,
-                        children: [
-                          CustomText(text: 'Tất cả'),
-                          const Icon(
-                            Icons.keyboard_arrow_down,
-                            color: Colors.white,
-                          ),
-                        ],
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton(
+                      onPressed: () {
+                        print('Clicked button sắp xếp');
+                      },
+                      style: const ButtonStyle(
+                          padding: MaterialStatePropertyAll(EdgeInsets.all(0))),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          border: Border.all(
+                              width: 2, color: Colors.grey.withOpacity(0.8)),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Wrap(
+                          spacing: 4,
+                          children: [
+                            CustomText(text: 'Tất cả'),
+                            const Icon(
+                              Icons.keyboard_arrow_down,
+                              color: Colors.white,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-                _buildInitContent(),
-              ],
+                  _buildInitContent(),
+                ],
+              ),
             ),
           ),
           Container(
@@ -168,36 +172,38 @@ class _LibraryPageState extends State<LibraryPage>
       margin: const EdgeInsets.symmetric(
         vertical: 64,
       ),
-      child: Column(
-        children: [
-          const Row(),
-          const CircleAvatar(
-            backgroundImage: AppTheme.defaultAvatar,
-            radius: 28,
-          ),
-          const SizedBox(
-            height: 8,
-          ),
-          CustomText(
-            text: 'Xin chào daicuong!',
-            type: TextStyleEnum.large,
-            style: const TextStyle(fontWeight: FontWeight.w500),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              children: [
-                const Divider(),
-                CustomText(
-                  text: 'Bắt đầu bằng cách tìm học phần hoặc tự tạo học phần',
-                  style: TextStyle(
-                      fontWeight: FontWeight.w500, color: Colors.grey.shade300),
-                  textAlign: TextAlign.center,
-                ),
-              ],
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            const Row(),
+            const CircleAvatar(
+              backgroundImage: AppTheme.defaultAvatar,
+              radius: 28,
             ),
-          ),
-        ],
+            const SizedBox(
+              height: 8,
+            ),
+            CustomText(
+              text: 'Xin chào ${currentUser?.displayName ?? ''}!',
+              type: TextStyleEnum.large,
+              style: const TextStyle(fontWeight: FontWeight.w500),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                children: [
+                  const Divider(),
+                  CustomText(
+                    text: 'Bắt đầu bằng cách tìm học phần hoặc tự tạo học phần',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500, color: Colors.grey.shade300),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

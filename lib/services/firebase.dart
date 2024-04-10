@@ -84,4 +84,24 @@ class FirebaseService {
       throw error;
     }
   }
+
+  // Phương thức để lấy tài liệu từ Firestore dựa trên một trường cụ thể
+  Future<List<Map<String, dynamic>>> getDocumentsByField(
+      String collectionName, String fieldName, dynamic value) async {
+    try {
+      // Thực hiện truy vấn để lấy tài liệu có trường fieldName có giá trị là value
+      QuerySnapshot querySnapshot = await _firestore
+          .collection(collectionName)
+          .where(fieldName, isEqualTo: value)
+          .get();
+
+      // Chuyển đổi kết quả truy vấn thành danh sách các Map<String, dynamic>
+      return querySnapshot.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
+    } catch (error) {
+      print('Error getting documents by field: $error');
+      throw error;
+    }
+  }
 }

@@ -71,7 +71,7 @@ class _AppPageState extends State<AppPage> {
                           onTap: () async {
                             Navigator.pop(context);
                             var result = await Navigator.pushNamed(context, '/topic/create');
-                            if(result == 401) {
+                            if(result == 201) {
                               //xữ lý ở trang này nếu thêm topic thành công
                             }
                           },
@@ -92,8 +92,12 @@ class _AppPageState extends State<AppPage> {
                             Icons.folder_outlined,
                             color: Colors.white,
                           ),
-                          onTap: () {
+                          onTap: () async {
                             Navigator.pop(context);
+                            var result = await Navigator.pushNamed(context, '/folder/create');
+                            if(result == 201) {
+                              //xữ lý ở trang này nếu thêm topic thành công
+                            }
                           },
                         ),
                       ],

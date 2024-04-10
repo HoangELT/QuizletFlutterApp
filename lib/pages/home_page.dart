@@ -52,7 +52,8 @@ class _HomePageState extends State<HomePage> {
       TopicModel('0', 'daicuong', '0', 'Famous', 'description', true, []),
       TopicModel('0', 'daicuong', '0', 'Famous', 'description', true, []),
       TopicModel('0', 'daicuong', '0', 'Famous', 'description', true, []),
-    ]),FolderModel('0', 'Folder 3', 'description', [
+    ]),
+    FolderModel('0', 'Folder 3', 'description', [
       TopicModel('0', 'daicuong', '0', 'Famous', 'description', true, []),
       TopicModel('0', 'daicuong', '0', 'Famous', 'description', true, []),
       TopicModel('0', 'daicuong', '0', 'Famous', 'description', true, []),
@@ -106,6 +107,10 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _onRefresh() async {
     await _fetchMyTopics();
+    print('Danh sách topic của tôi');
+    for (TopicModel topic in myTopics) {
+      print(topic.toString());
+    }
   }
 
   @override
@@ -236,7 +241,7 @@ class _HomePageState extends State<HomePage> {
                                 const SizedBox(
                                   width: 8,
                                 ),
-                                CustomText(text: myTopics[index].username)
+                                CustomText(text: myTopics[index].username),
                               ],
                             ),
                           );
@@ -332,7 +337,11 @@ class _HomePageState extends State<HomePage> {
                                 const SizedBox(
                                   width: 8,
                                 ),
-                                CustomText(text: firebaseAuthService.getCurrentUser()?.displayName ?? '')
+                                CustomText(
+                                    text: firebaseAuthService
+                                            .getCurrentUser()
+                                            ?.displayName ??
+                                        '')
                               ],
                             ),
                           );

@@ -230,4 +230,26 @@ class FirebaseAuthService {
       return false;
     }
   }
+
+  // Phương thức để lấy thông tin người dùng bằng UID
+  Future<UserModel?> getUserByUid(String uid) async {
+    try {
+      // Truy vấn dữ liệu người dùng từ Firestore
+      DocumentSnapshot<Map<String, dynamic>> userDoc =
+          await _firestore.collection('users').doc(uid).get();
+
+      // Kiểm tra xem người dùng có tồn tại không
+      if (userDoc.exists) {
+        // Convert dữ liệu từ DocumentSnapshot thành UserModel
+        return UserModel.fromMap(userDoc.data()!);
+      } else {
+        // Trả về null nếu không tìm thấy người dùng
+        return null;
+      }
+    } catch (error) {
+      // Xử lý lỗi nếu có
+      print('Error getting user by UID: $error');
+      return null;
+    }
+  }
 }
