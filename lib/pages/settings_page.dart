@@ -92,11 +92,19 @@ class _SettingsPageState extends State<SettingsPage> {
                       const Divider(thickness: 1.0),
                       createInkWell(currentUser.email, "Email", () {
                         // thực hiện show bottom sheet check password rồi mới đổi email
-                        showPasswordCheckBottomSheet(context);
+                        if (auth.getIsSignInGG()) {
+                          showNotAllowAction();
+                        } else {
+                          showPasswordCheckBottomSheet(context);
+                        }
                       }),
                       const Divider(thickness: 1.0),
                       createInkWell('', "Đổi mật khẩu", () {
-                        Navigator.pushNamed(context, "/changePassword");
+                        if (auth.getIsSignInGG()) {
+                          showNotAllowAction();
+                        } else {
+                          Navigator.pushNamed(context, "/changePassword");
+                        }
                       }),
                     ],
                   ),
@@ -149,10 +157,14 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
         ),
         child: Container(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(8),
           child: CustomText(
             text: text,
-            type: TextStyleEnum.large,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
       ),
@@ -198,7 +210,7 @@ class _SettingsPageState extends State<SettingsPage> {
         const SizedBox(height: 5),
         CustomText(
           text: text,
-          style: const TextStyle(fontSize: 18.0),
+          style: const TextStyle(fontSize: 15.0),
         ),
       ],
     );
@@ -234,7 +246,6 @@ class _SettingsPageState extends State<SettingsPage> {
             );
           },
         );
-
         await Future.delayed(const Duration(seconds: 2));
       }
       passwordController.clear();
@@ -272,6 +283,9 @@ class _SettingsPageState extends State<SettingsPage> {
                       const SizedBox(height: 15),
                       TextField(
                         controller: passwordController,
+                        onSubmitted: (value) {
+                          checkPassword(setStateBottomSheet);
+                        },
                         obscureText: true,
                         decoration: InputDecoration(
                           label: CustomText(
@@ -348,12 +362,11 @@ class _SettingsPageState extends State<SettingsPage> {
           title: CustomText(
             text: 'Thông báo',
             type: TextStyleEnum.xl,
-            style: const TextStyle(color: Colors.black),
           ),
           content: CustomText(
             text: 'Bạn có chắc chắn muốn $text?',
-            style: const TextStyle(color: Colors.black),
           ),
+          backgroundColor: AppTheme.primaryBackgroundColor,
           actions: [
             TextButton(
               onPressed: () {
@@ -362,7 +375,6 @@ class _SettingsPageState extends State<SettingsPage> {
               child: CustomText(
                 text: 'Không',
                 type: TextStyleEnum.large,
-                style: const TextStyle(color: Colors.black),
               ),
             ),
             TextButton(
@@ -370,8 +382,47 @@ class _SettingsPageState extends State<SettingsPage> {
               child: CustomText(
                 text: 'Có',
                 type: TextStyleEnum.large,
-                style: const TextStyle(color: Colors.black),
               ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  showNotAllowAction() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: CustomText(
+            text: "Thông báo",
+            type: TextStyleEnum.large,
+          ),
+          content: CustomText(
+            text:
+                'Bạn đang đăng nhập bằng tài khoản Google nên không thể thực hiện chức năng này!',
+          ),
+          backgroundColor: AppTheme.primaryBackgroundColor,
+          actionsAlignment: MainAxisAlignment.center,
+          actions: [
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  style: const ButtonStyle(
+                      backgroundColor: MaterialStatePropertyAll(Colors.white)),
+                  child: CustomText(
+                    text: "Ok",
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 18,
+                    ),
+                  )),
             ),
           ],
         );

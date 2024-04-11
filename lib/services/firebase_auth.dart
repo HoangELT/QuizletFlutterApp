@@ -13,7 +13,7 @@ class FirebaseAuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   //đăng nhập với GG
-  final GoogleSignIn googleSignIn = GoogleSignIn();
+  final GoogleSignIn googleSignIn = GoogleSignIn(scopes: ['email']);
 
   // khởi tạo đối tượng từ firebase firestore
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -23,6 +23,7 @@ class FirebaseAuthService {
     return _instance;
   }
 
+  bool isSignInGG = false;
   // Constructor private
   FirebaseAuthService._internal();
 
@@ -32,6 +33,7 @@ class FirebaseAuthService {
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
+      isSignInGG = false;
       return userCredential;
     } catch (error) {
       print('Error signing in: $error');
@@ -47,6 +49,7 @@ class FirebaseAuthService {
           .createUserWithEmailAndPassword(email: email, password: password);
       await userCredential.user!
           .updateDisplayName(UserModel.createUsernameFormEmail(email));
+
       return userCredential;
     } catch (error) {
       print('Error signing up: $error');
@@ -55,8 +58,10 @@ class FirebaseAuthService {
   }
 
   // đăng nhập bằng google
-  Future<User?> signInWithGoogle() async {
+  Future<UserCredential?> signInWithGoogle() async {
     try {
+      await googleSignIn.signInSilently();
+
       final GoogleSignInAccount? googleSignInAccount =
           await googleSignIn.signIn();
       final GoogleSignInAuthentication googleSignInAuthentication =
@@ -69,40 +74,17 @@ class FirebaseAuthService {
 
       final UserCredential authResult =
           await _auth.signInWithCredential(credential);
-      final User? user = authResult.user;
-      return user;
+
+      isSignInGG = true;
+      return authResult;
     } catch (error) {
       print('Error signing in with Google: $error');
       return null;
     }
   }
 
-  //đăng ký bằng tài khoản google
-  Future<UserCredential?> signUpWithGoogle() async {
-    try {
-      // Đăng nhập bằng Google
-      final GoogleSignInAccount? googleSignInAccount =
-          await googleSignIn.signIn();
-      final GoogleSignInAuthentication googleSignInAuth =
-          await googleSignInAccount!.authentication;
-
-      // Tạo credential từ thông tin xác thực của Google
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleSignInAuth.accessToken,
-        idToken: googleSignInAuth.idToken,
-      );
-
-      // Đăng ký vào Firebase với credential của Google
-      final UserCredential userCredential =
-          await _auth.signInWithCredential(credential);
-
-      // Trả về thông tin người dùng
-      return userCredential;
-    } catch (error) {
-      // Xử lý lỗi nếu có
-      print('Error signing up with Google: $error');
-      return null;
-    }
+  getIsSignInGG() {
+    return isSignInGG;
   }
 
   // Hàm kiểm tra mật khẩu trước khi thay đổi email

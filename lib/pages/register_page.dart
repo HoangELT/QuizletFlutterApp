@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../enums/text_style_enum.dart';
 import '../services/firebase_auth.dart';
+import '../services/shared_preferences_service.dart';
 import '../utils/app_theme.dart';
 import '../widgets/appbar_default.dart';
 import '../widgets/elevatedButton.dart';
@@ -26,14 +27,20 @@ class _RegisterPageState extends State<RegisterPage> {
   String cfPassWord = '';
   bool isLoading = false;
   final formKey = GlobalKey<FormState>();
+  FocusNode focusNode = FocusNode();
+  @override
+  void dispose() {
+    focusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.primaryBackgroundColorAppbar,
-      appBar: const CustomAppBar(),
-      body: Stack(children: [
-        SafeArea(
+    return Stack(children: [
+      Scaffold(
+        backgroundColor: AppTheme.primaryBackgroundColorAppbar,
+        appBar: const CustomAppBar(),
+        body: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             child: Form(
@@ -48,7 +55,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   const SizedBox(height: 16),
                   ElevatedButton.icon(
                     onPressed: () {
-                      auth.signUpWithGoogle();
+                      _googleSignIn(context);
                     },
                     style: ButtonStyle(
                       minimumSize:
@@ -153,6 +160,9 @@ class _RegisterPageState extends State<RegisterPage> {
                   const SizedBox(height: 16),
                   TextFormField(
                     textInputAction: TextInputAction.next,
+                    onFieldSubmitted: (value) {
+                      focusNode.requestFocus();
+                    },
                     onSaved: (newPassWord) {
                       passWord = newPassWord!;
                     },
@@ -215,6 +225,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   const SizedBox(height: 16),
                   TextFormField(
                     textInputAction: TextInputAction.done,
+                    focusNode: focusNode,
                     onSaved: (newCfPassWord) {
                       cfPassWord = newCfPassWord!;
                     },
@@ -223,6 +234,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         return "Vui lòng xác nhận mật khẩu của bạn";
                       }
                       return null;
+                    },
+                    onFieldSubmitted: (value) {
+                      _submit();
                     },
                     decoration: InputDecoration(
                       suffixIcon: IconButton(
@@ -273,17 +287,17 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
           ),
         ),
-        if (isLoading)
-          Container(
-            color: Colors.transparent.withOpacity(0.5),
-            child: const Center(
-              child: CircularProgressIndicator(
-                color: Colors.white,
-              ),
+      ),
+      if (isLoading)
+        Container(
+          color: Colors.transparent.withOpacity(0.5),
+          child: const Center(
+            child: CircularProgressIndicator(
+              color: Colors.white,
             ),
           ),
-      ]),
-    );
+        ),
+    ]);
   }
 
   void _ShowPassword() {
@@ -340,13 +354,14 @@ class _RegisterPageState extends State<RegisterPage> {
           title: CustomText(
             text: text,
             type: TextStyleEnum.large,
-            style: const TextStyle(color: Colors.black),
           ),
+          backgroundColor: AppTheme.primaryBackgroundColorAppbar,
         );
       },
     );
-    await Future.delayed(const Duration(milliseconds: 1500));
-    Navigator.pop(context);
+    await Future.delayed(const Duration(seconds: 2));
+    Navigator.of(context, rootNavigator: true).pop();
+
     if (text == "Đăng ký thành công") {
       // Nếu đăng ký thành công, thực hiện chuyển hướng đến trang login
       Navigator.pushReplacementNamed(context, "/login");
@@ -365,5 +380,26 @@ class _RegisterPageState extends State<RegisterPage> {
         selectedDate = picked;
       });
     }
+  }
+
+  _googleSignIn(BuildContext context) async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      // Đăng nhập với GG
+      var result = await auth.signInWithGoogle();
+      print(result);
+      if (result != null) {
+        setState(() {
+          isLoading = false;
+        });
+        //lưu uid vào local sau khi đăng nhập thành công
+        SharedPreferencesService().saveUID(result.user!.uid.toString());
+        // Nếu xác thực thành công, thực hiện chuyển hướng đến app page và xóa hết các màn hình khác
+        Navigator.pushNamedAndRemoveUntil(
+            context, '/', (route) => route.settings.name == '/');
+      }
+    } catch (e) {}
   }
 }

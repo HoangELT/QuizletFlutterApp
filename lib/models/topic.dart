@@ -11,7 +11,8 @@ class TopicModel {
   DateTime dateCreated; // Thêm trường dateCreated kiểu DateTime
 
   // Constructor mặc định, sử dụng DateTime.now() để gán ngày hiện tại cho dateCreated
-  TopicModel(this.userId, this.username, this.topicId, this.title, this.description, this.public, this.listCard)
+  TopicModel(this.userId, this.username, this.topicId, this.title,
+      this.description, this.public, this.listCard)
       : dateCreated = DateTime.now();
 
   // Phương thức tạo một Map từ đối tượng TopicModel
@@ -23,8 +24,11 @@ class TopicModel {
       'title': title,
       'description': description,
       'public': public,
-      'listCard': listCard.map((card) => card.toMap()).toList(), // Chuyển đổi listCard thành List<Map<String, dynamic>>
-      'dateCreated': dateCreated.toIso8601String(), // Chuyển đổi dateCreated thành chuỗi ISO 8601
+      'listCard': listCard
+          .map((card) => card.toMap())
+          .toList(), // Chuyển đổi listCard thành List<Map<String, dynamic>>
+      'dateCreated': dateCreated
+          .toIso8601String(), // Chuyển đổi dateCreated thành chuỗi ISO 8601
     };
   }
 
@@ -42,12 +46,9 @@ class TopicModel {
       map['title'],
       map['description'],
       map['public'],
-      List<CardModel>.from((map['listCard'] ?? []).map((x) => CardModel.fromMap(x))),
-    )..dateCreated = DateTime.parse(map['dateCreated']); // Chuyển đổi chuỗi ISO 8601 thành DateTime
-  }
-
-  @override
-  String toString(){
-    return 'TopicModel( userId= $userId, userName= $username, topicId= $topicId, title= $title, description= $description, public= $public, listCard= $listCard, dateCreated= $dateCreated)';
+      List<CardModel>.from(
+          (map['listCard'] ?? []).map((x) => CardModel.fromMap(x))),
+    )..dateCreated = DateTime.parse(
+        map['dateCreated']); // Chuyển đổi chuỗi ISO 8601 thành DateTime
   }
 }

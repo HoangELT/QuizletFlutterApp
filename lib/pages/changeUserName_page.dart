@@ -145,11 +145,12 @@ class _ChangeUserNameState extends State<ChangeUserName> {
                   color: Colors.green,
                   size: 45,
                 ),
-                title: CustomText(
+                content: CustomText(
+                  textAlign: TextAlign.center,
                   text: "Thay đổi tên người dùng thành công",
                   type: TextStyleEnum.large,
-                  style: const TextStyle(color: Colors.black),
                 ),
+                backgroundColor: AppTheme.primaryBackgroundColor,
               );
             },
           );

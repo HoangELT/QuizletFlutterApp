@@ -143,6 +143,7 @@ class _ChangeEmailState extends State<ChangeEmail> {
                     size: 45,
                   ),
                   title: CustomText(
+                    textAlign: TextAlign.center,
                     text:
                         'Chúng tôi đã gửi email đến $newEmail. Vui lòng kiểm tra hòm thư đến của bạn để xác nhận thay đổi email và đăng nhập lại ứng dụng',
                     type: TextStyleEnum.large,
@@ -150,8 +151,8 @@ class _ChangeEmailState extends State<ChangeEmail> {
                   ),
                   actions: [
                     TextButton(
-                      onPressed: () async {
-                        // Navigator.pop(context); // Đóng dialog
+                      onPressed: () {
+                        auth.signOut();
                         Navigator.pushNamedAndRemoveUntil(
                             context, "/intro", (route) => false);
                       },
@@ -177,11 +178,12 @@ class _ChangeEmailState extends State<ChangeEmail> {
                     color: Colors.blue,
                     size: 45,
                   ),
-                  title: CustomText(
+                  content: CustomText(
+                    textAlign: TextAlign.center,
                     text: 'Email không tồn tại. Vui lòng thử lại sau!',
                     type: TextStyleEnum.large,
-                    style: const TextStyle(color: Colors.black),
                   ),
+                  backgroundColor: AppTheme.primaryBackgroundColor,
                   actions: [
                     TextButton(
                       onPressed: () async {
@@ -191,7 +193,6 @@ class _ChangeEmailState extends State<ChangeEmail> {
                         child: CustomText(
                           text: 'OK',
                           type: TextStyleEnum.large,
-                          style: const TextStyle(color: Colors.blue),
                         ),
                       ),
                     ),

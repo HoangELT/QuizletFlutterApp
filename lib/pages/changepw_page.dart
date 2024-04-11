@@ -222,17 +222,18 @@ class _ChangePassWordState extends State<ChangePassWord> {
                     color: Colors.green,
                     size: 45,
                   ),
-                  title: CustomText(
+                  content: CustomText(
+                    textAlign: TextAlign.center,
                     text: 'Đổi mật khẩu thành công',
                     type: TextStyleEnum.large,
-                    style: const TextStyle(color: Colors.black),
                   ),
+                  backgroundColor: AppTheme.primaryBackgroundColor,
                 );
               },
             );
 
             await Future.delayed(const Duration(seconds: 2));
-            Navigator.pop(context);
+            Navigator.of(context, rootNavigator: true).pop();
             Navigator.pop(context);
           } else {
             setState(() {

@@ -74,19 +74,19 @@ class _IntroPageState extends State<IntroPage> {
                     imageUrl: 'assets/images/image1.jpg',
                     text:
                         'Hơn 90% học sinh sử dụng Quizlet cho biết họ đã cải thiện được diểm số',
-                    textStyle: TextStyleEnum.xl),
+                    textStyle: TextStyleEnum.large),
                 _buildPage(
                     imageUrl: 'assets/images/image2.jpg',
                     text: 'Tìm kiếm hàng triệu bộ thẻ ghi nhớ',
-                    textStyle: TextStyleEnum.xxl),
+                    textStyle: TextStyleEnum.xl),
                 _buildPage(
                     imageUrl: 'assets/images/image3.jpg',
                     text: 'Học bằng bốn cách khác nhau',
-                    textStyle: TextStyleEnum.xxl),
+                    textStyle: TextStyleEnum.xl),
                 _buildPage(
                     imageUrl: 'assets/images/image4.png',
                     text: 'Tùy chỉnh thẻ ghi nhớ theo nhu cầu của bạn',
-                    textStyle: TextStyleEnum.xxl),
+                    textStyle: TextStyleEnum.xl),
               ],
             ),
           ),

@@ -32,8 +32,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void dispose() {
-    super.dispose();
     controllerForgorPw.dispose();
+    super.dispose();
   }
 
   @override
@@ -59,7 +59,7 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 16),
                   ElevatedButton.icon(
                     onPressed: () {
-                      auth.signInWithGoogle();
+                      _googleSignIn(context);
                     },
                     style: ButtonStyle(
                       minimumSize:
@@ -145,6 +145,9 @@ class _LoginPageState extends State<LoginPage> {
                       }
                       return null;
                     },
+                    onFieldSubmitted: (value) {
+                      _submit();
+                    },
                     decoration: InputDecoration(
                       prefixIcon: const Icon(
                         Icons.lock,
@@ -222,7 +225,7 @@ class _LoginPageState extends State<LoginPage> {
           style: const TextStyle(color: Colors.white),
           children: [
             TextSpan(
-              text: "Click here",
+              text: "Nhấn vào đây",
               style: const TextStyle(
                 color: Colors.blue,
               ),
@@ -473,13 +476,14 @@ class _LoginPageState extends State<LoginPage> {
               title: CustomText(
                 text: 'Vui lòng nhập đúng địa chỉ email',
                 type: TextStyleEnum.large,
-                style: const TextStyle(color: Colors.black),
               ),
+              backgroundColor: AppTheme.primaryBackgroundColorAppbar,
             );
           },
         );
 
         await Future.delayed(const Duration(seconds: 2));
+        Navigator.of(context, rootNavigator: true).pop();
       }
       controllerForgorPw.clear();
     } catch (e) {}
@@ -522,14 +526,35 @@ class _LoginPageState extends State<LoginPage> {
               title: CustomText(
                 text: 'Sai email hoặc password. Vui lòng thử lại!',
                 type: TextStyleEnum.large,
-                style: const TextStyle(color: Colors.black),
               ),
+              backgroundColor: AppTheme.primaryBackgroundColorAppbar,
             );
           },
         );
         await Future.delayed(const Duration(seconds: 2));
-        Navigator.pop(context);
+        Navigator.of(context, rootNavigator: true).pop();
       }
     }
+  }
+
+  _googleSignIn(BuildContext context) async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      // Đăng nhập với GG
+      var result = await auth.signInWithGoogle();
+      print(result);
+      if (result != null) {
+        setState(() {
+          isLoading = false;
+        });
+        //lưu uid vào local sau khi đăng nhập thành công
+        SharedPreferencesService().saveUID(result.user!.uid.toString());
+        // Nếu xác thực thành công, thực hiện chuyển hướng đến app page và xóa hết các màn hình khác
+        Navigator.pushNamedAndRemoveUntil(
+            context, '/', (route) => route.settings.name == '/');
+      }
+    } catch (e) {}
   }
 }
