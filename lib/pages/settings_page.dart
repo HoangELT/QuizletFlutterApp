@@ -397,7 +397,7 @@ class _SettingsPageState extends State<SettingsPage> {
         return AlertDialog(
           title: CustomText(
             text: "Thông báo",
-            type: TextStyleEnum.large,
+            type: TextStyleEnum.xl,
           ),
           content: CustomText(
             text:
