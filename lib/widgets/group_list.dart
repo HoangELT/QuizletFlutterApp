@@ -1,9 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
 import 'package:quizletapp/widgets/text.dart';
-import 'package:quizletapp/widgets/item_list.dart';
 
 class GroupList extends StatefulWidget {
   final bool isList;

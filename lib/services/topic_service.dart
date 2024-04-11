@@ -7,12 +7,44 @@ class TopicService {
   FirebaseAuthService firebaseAuthService = FirebaseAuthService();
   FirebaseService firebaseService = FirebaseService();
 
+  Future<List<TopicModel>> getTopicsWithUsers() async {
+    List<TopicModel> topics = [];
+
+    try {
+      // Lấy danh sách topic từ Firestore
+      var listTopic = await firebaseService.getDocuments('topics');
+
+      for (var topicMap in listTopic) {
+        print(topicMap['userId']);
+        UserModel? user =
+            await firebaseAuthService.getUserByUid(topicMap['userId']);
+        print('Danh sách user');
+        print(user);
+
+        TopicModel topic = TopicModel.fromMap(topicMap);
+        topic.username = user?.username ?? ''; // Gán username từ dữ liệu user
+        topics.add(topic);
+      }
+    } catch (e) {}
+
+    return topics;
+  }
+
   Future<List<TopicModel>> getMyListTopic() async {
     try {
       if (firebaseAuthService.isUserLoggedIn()) {
         var user = await firebaseAuthService.getCurrentUser();
-        var listTopic = await firebaseService.getDocumentsByField('topics', 'userId', user?.uid);
-        return TopicModel.fromListMap(listTopic);
+        var listTopic = await firebaseService.getDocumentsByField(
+            'topics', 'userId', user?.uid);
+        List<Map<String, dynamic>> listResult = listTopic
+            .map((e) => {
+                  ...e,
+                  ...{
+                    'username': user?.displayName ?? '',
+                  },
+                })
+            .toList();
+        return TopicModel.fromListMap(listResult);
       } else {
         // Nếu người dùng chưa đăng nhập, trả về danh sách trống
         return [];
