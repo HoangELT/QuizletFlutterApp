@@ -33,7 +33,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
     setState(() {
       currentUser = UserModel(
-          user!.uid, user.email.toString(), user.displayName.toString());
+          '', user!.uid, user.email.toString(), user.displayName.toString());
     });
   }
 

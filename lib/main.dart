@@ -12,6 +12,7 @@ import 'package:quizletapp/pages/not_found_page.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:quizletapp/services/firebase_auth.dart';
+import 'package:quizletapp/services/provider/current_user_provider.dart';
 import 'package:quizletapp/services/provider/topic_provider.dart';
 import 'pages/changepw_page.dart';
 import 'pages/register_page.dart';
@@ -27,13 +28,25 @@ void main() async {
 
   usePathUrlStrategy();
 
-  FirebaseAuthService firebaseAuthService = FirebaseAuthService();
   return runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => TopicProvider()),
+        ChangeNotifierProvider(create: (_) => CurrentUserProvider()),
       ],
-      child: MaterialApp(
+      child: MyApp(),
+    ),
+  );
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+  FirebaseAuthService firebaseAuthService = FirebaseAuthService();
+
+    return MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primaryColor: const Color.fromARGB(255, 10, 4, 60),
@@ -106,7 +119,6 @@ void main() async {
               );
           }
         },
-      ),
-    ),
-  );
+      );
+  }
 }

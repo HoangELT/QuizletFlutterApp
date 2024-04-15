@@ -2,10 +2,12 @@ import 'package:quizletapp/models/topic.dart';
 import 'package:quizletapp/models/user.dart';
 import 'package:quizletapp/services/firebase.dart';
 import 'package:quizletapp/services/firebase_auth.dart';
+import 'package:quizletapp/services/models_services/user_service.dart';
 
 class TopicService {
   FirebaseAuthService firebaseAuthService = FirebaseAuthService();
   FirebaseService firebaseService = FirebaseService();
+  UserService userService = UserService();
 
   Future<List<TopicModel>> getTopicsWithUsers() async {
     List<TopicModel> topics = [];
@@ -16,8 +18,7 @@ class TopicService {
 
       for (var topicMap in listTopic) {
         print(topicMap['userId']);
-        UserModel? user =
-            await firebaseAuthService.getUserByUid(topicMap['userId']);
+        UserModel? user = await userService.getUserByUid(topicMap['userId']);
         print('Danh sách user');
         print(user);
 

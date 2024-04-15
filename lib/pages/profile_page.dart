@@ -15,7 +15,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   FirebaseAuthService auth = FirebaseAuthService();
-  late UserModel currentUser = UserModel("", "", "");
+  late UserModel currentUser = UserModel('',"", "", "");
 
   @override
   void initState() {
@@ -27,7 +27,7 @@ class _ProfilePageState extends State<ProfilePage> {
     var user = auth.getCurrentUser();
 
     setState(() {
-      currentUser = UserModel(
+      currentUser = UserModel('',
           user!.uid, user.email.toString(), user.displayName.toString());
     });
   }

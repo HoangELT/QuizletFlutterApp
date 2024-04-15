@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:quizletapp/services/models_services/user_service.dart';
+import 'package:quizletapp/services/provider/current_user_provider.dart';
 import '../enums/text_style_enum.dart';
 import '../models/user.dart';
 import '../services/firebase_auth.dart';
@@ -497,16 +500,45 @@ class _LoginPageState extends State<LoginPage> {
           isLoading = true;
         });
         // Thực hiện xác thực từ Firebase
-        var result = await auth.signInWithEmailAndPassword(email, passWord);
-        setState(() {
-          isLoading = false;
-        });
-        print(result);
-        //lưu uid vào local sau khi đăng nhập thành công
-        SharedPreferencesService().saveUID(result.user!.uid.toString());
-        // Nếu xác thực thành công, thực hiện chuyển hướng đến app page và xóa hết các màn hình khác
-        Navigator.pushNamedAndRemoveUntil(
-            context, '/', (route) => route.settings.name == '/');
+        var user = await auth.signInWithEmailAndPassword(email, passWord);
+
+        print(user);
+        // setCurrentUser trong provider
+        UserService userService = UserService();
+        UserModel? currentUser = await userService.getUserByUid(user.user!.uid);
+        if (currentUser != null) {
+          context.read<CurrentUserProvider>().setCurrentUser = currentUser;
+          // Nếu xác thực thành công, thực hiện chuyển hướng đến app page và xóa hết các màn hình khác
+          setState(() {
+            isLoading = false;
+          });
+          Navigator.pushNamedAndRemoveUntil(
+              context, '/', (route) => route.settings.name == '/');
+        } else {
+          print('Lỗi Login_page: Không tìm được user trong firestore');
+          setState(() {
+            isLoading = false;
+          });
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                icon: const Icon(
+                  Icons.warning_amber_rounded,
+                  color: Colors.red,
+                  size: 45,
+                ),
+                title: CustomText(
+                  text: 'Không tìm thấy tài khoản!',
+                  type: TextStyleEnum.large,
+                ),
+                backgroundColor: AppTheme.primaryBackgroundColorAppbar,
+              );
+            },
+          );
+          await Future.delayed(const Duration(seconds: 2));
+          Navigator.of(context, rootNavigator: true).pop();
+        }
       } catch (error) {
         // Xử lý khi có lỗi xác thực từ Firebase
         print('Error signing in: $error');
@@ -543,18 +575,31 @@ class _LoginPageState extends State<LoginPage> {
         isLoading = true;
       });
       // Đăng nhập với GG
-      var result = await auth.signInWithGoogle();
-      print(result);
-      if (result != null) {
-        setState(() {
-          isLoading = false;
-        });
-        //lưu uid vào local sau khi đăng nhập thành công
-        SharedPreferencesService().saveUID(result.user!.uid.toString());
-        // Nếu xác thực thành công, thực hiện chuyển hướng đến app page và xóa hết các màn hình khác
-        Navigator.pushNamedAndRemoveUntil(
-            context, '/', (route) => route.settings.name == '/');
+      var fetchUser = await auth.signInWithGoogle();
+      print(fetchUser);
+      if (fetchUser != null) {
+        // setCurrentUser trong provider
+        UserService userService = UserService();
+        UserModel? currentUser =
+            await userService.getUserByUid(fetchUser.user!.uid);
+        if (currentUser != null) {
+          context.read<CurrentUserProvider>().setCurrentUser = currentUser;
+          // Nếu xác thực thành công, thực hiện chuyển hướng đến app page và xóa hết các màn hình khác
+          setState(() {
+            isLoading = false;
+          });
+          Navigator.pushNamedAndRemoveUntil(
+              context, '/', (route) => route.settings.name == '/');
+        } else {
+          print('Lỗi Login_page: Không tìm được user trong firestore');
+          setState(() {
+            isLoading = false;
+          });
+        }
       }
     } catch (e) {}
+    setState(() {
+      isLoading = false;
+    });
   }
 }

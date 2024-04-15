@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:quizletapp/models/topic.dart';
-import 'package:quizletapp/services/topic_service.dart';
+import 'package:quizletapp/services/models_services/topic_service.dart';
 
 class TopicProvider extends ChangeNotifier {
   List<TopicModel> _listTopicOfCurrentUser = [];

@@ -1,5 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:quizletapp/models/user.dart';
+import 'package:quizletapp/services/firebase.dart';
 import '../enums/text_style_enum.dart';
 import '../services/firebase_auth.dart';
 import '../services/shared_preferences_service.dart';
@@ -21,6 +24,7 @@ class _RegisterPageState extends State<RegisterPage> {
   bool isObShowPassWord = true;
   bool isObShowCfPassWord = true;
   FirebaseAuthService auth = FirebaseAuthService();
+  FirebaseService firebaseService = FirebaseService();
   String email = '';
   String passWord = '';
   String birthday = '';
@@ -321,7 +325,10 @@ class _RegisterPageState extends State<RegisterPage> {
             isLoading = true;
           });
           // Thực hiện xác thực từ Firebase
-          await auth.signUpWithEmailAndPassword(email, passWord);
+          var newUser = await auth.signUpWithEmailAndPassword(email, passWord);
+          // Lưu newUser vào firestore
+          User newUserTemp = newUser.user!;
+          await firebaseService.addDocument('users', UserModel('', newUserTemp.uid, newUserTemp.email!, UserModel.createUsernameFromEmail(newUserTemp.email!)).toMap());
           setState(() {
             isLoading = false;
           });
