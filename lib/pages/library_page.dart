@@ -21,7 +21,7 @@ class LibraryPage extends StatefulWidget {
 
 class _LibraryPageState extends State<LibraryPage>
     with SingleTickerProviderStateMixin {
-      FirebaseAuthService firebaseAuthService = FirebaseAuthService();
+  FirebaseAuthService firebaseAuthService = FirebaseAuthService();
   late final TabController _tabController;
   late var currentUser;
   bool isLoading = false;
@@ -69,10 +69,7 @@ class _LibraryPageState extends State<LibraryPage>
             onPressed: () async {
               if (_tabController.index == 0) {
                 print('add topic');
-                var result = await Navigator.pushNamed(context, '/topic/create');
-                if (result == 401) {
-                  // _fetchMyTopics();
-                }
+                Navigator.pushNamed(context, '/topic/create');
               } else if (_tabController.index == 1) {
                 Navigator.pushNamed(context, '/folder/create');
               }
@@ -211,9 +208,11 @@ class _LibraryPageState extends State<LibraryPage>
                   children: [
                     const Divider(),
                     CustomText(
-                      text: 'Bắt đầu bằng cách tìm học phần hoặc tự tạo học phần',
+                      text:
+                          'Bắt đầu bằng cách tìm học phần hoặc tự tạo học phần',
                       style: TextStyle(
-                          fontWeight: FontWeight.w500, color: Colors.grey.shade300),
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey.shade300),
                       textAlign: TextAlign.center,
                     ),
                   ],

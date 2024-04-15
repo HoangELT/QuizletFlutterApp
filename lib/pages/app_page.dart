@@ -68,12 +68,8 @@ class _AppPageState extends State<AppPage> {
                             Icons.filter,
                             color: Colors.white,
                           ),
-                          onTap: () async {
-                            Navigator.pop(context);
-                            var result = await Navigator.pushNamed(context, '/topic/create');
-                            if(result == 201) {
-                              //xữ lý ở trang này nếu thêm topic thành công
-                            }
+                          onTap: () {
+                            Navigator.pushNamed(context, '/topic/create');
                           },
                         ),
                         const SizedBox(
@@ -94,8 +90,9 @@ class _AppPageState extends State<AppPage> {
                           ),
                           onTap: () async {
                             Navigator.pop(context);
-                            var result = await Navigator.pushNamed(context, '/folder/create');
-                            if(result == 201) {
+                            var result = await Navigator.pushNamed(
+                                context, '/folder/create');
+                            if (result == 201) {
                               //xữ lý ở trang này nếu thêm topic thành công
                             }
                           },

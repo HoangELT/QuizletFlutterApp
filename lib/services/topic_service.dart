@@ -30,7 +30,7 @@ class TopicService {
     return topics;
   }
 
-  Future<List<TopicModel>> getMyListTopic() async {
+  Future<List<TopicModel>> getListTopicOfCurrentUser() async {
     try {
       if (firebaseAuthService.isUserLoggedIn()) {
         var user = await firebaseAuthService.getCurrentUser();
@@ -57,10 +57,10 @@ class TopicService {
   }
 
   //Thêm một topic mới vào firestore
-  Future<void> addTopic(TopicModel topic) async {
+  Future<void> addTopic(TopicModel newTopic) async {
     try {
       // Chuyển đổi TopicModel thành một Map<String, dynamic>
-      Map<String, dynamic> topicData = topic.toMap();
+      Map<String, dynamic> topicData = newTopic.toMap();
       await firebaseService.addDocument('topics', topicData);
     } catch (error) {
       print('Error adding topic document: $error');
