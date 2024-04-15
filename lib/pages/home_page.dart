@@ -6,6 +6,7 @@ import 'package:quizletapp/models/folder.dart';
 import 'package:quizletapp/models/topic.dart';
 import 'package:quizletapp/models/user.dart';
 import 'package:quizletapp/services/firebase_auth.dart';
+import 'package:quizletapp/services/provider/current_user_provider.dart';
 import 'package:quizletapp/services/provider/topic_provider.dart';
 import 'package:quizletapp/services/models_services/topic_service.dart';
 import 'package:quizletapp/utils/app_theme.dart';
@@ -28,13 +29,6 @@ class _HomePageState extends State<HomePage> {
   bool isInit = false;
   bool isLoading = false;
   final TextEditingController _textEditingController = TextEditingController();
-
-  UserModel currentUser = UserModel(
-    '',
-    '0',
-    'lydaicuong784',
-    'lydaicuong784@gmail.com',
-  );
 
   // List<TopicModel> myTopics = [];
 
@@ -116,8 +110,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<TopicProvider>(
-      builder: (context, topicProvider, child) {
+    return Consumer2<TopicProvider, CurrentUserProvider>(
+      builder: (context, topicProvider, currentUserProvider, child) {
         return Scaffold(
           backgroundColor: AppTheme.primaryBackgroundColor,
           appBar: AppBar(
@@ -141,7 +135,10 @@ class _HomePageState extends State<HomePage> {
                   backgroundColor: MaterialStatePropertyAll<Color>(
                       AppTheme.primaryButtonColor),
                 ),
-                onPressed: () {},
+                onPressed: () async {
+                  UserModel? currentUser = currentUserProvider.currentUser;
+                  print('currentUser: $currentUser');
+                },
                 child: CustomText(
                   text: 'Nâng cấp',
                   style: const TextStyle(color: Colors.black87),
@@ -154,7 +151,13 @@ class _HomePageState extends State<HomePage> {
                 Stack(
                   children: [
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        //test get all topic
+                        TopicService topicService = TopicService();
+                        var listAllTopic =
+                            await topicService.getTopicsWithUsers();
+                            topicService.printListTopics(listAllTopic);
+                      },
                       icon: const Icon(
                         Icons.notifications_outlined,
                         size: 32,

@@ -2,8 +2,10 @@ import 'dart:isolate';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
 import 'package:quizletapp/services/firebase_auth.dart';
+import 'package:quizletapp/services/provider/current_user_provider.dart';
 import 'package:quizletapp/utils/app_theme.dart';
 import 'package:quizletapp/widgets/text.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -21,15 +23,12 @@ class LibraryPage extends StatefulWidget {
 
 class _LibraryPageState extends State<LibraryPage>
     with SingleTickerProviderStateMixin {
-  FirebaseAuthService firebaseAuthService = FirebaseAuthService();
   late final TabController _tabController;
-  late var currentUser;
   bool isLoading = false;
 
   @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
-    _fetchCurrentUser();
     setState(() {
       _tabController.index = widget.initIndex;
     });
@@ -40,16 +39,6 @@ class _LibraryPageState extends State<LibraryPage>
   void dispose() {
     _tabController.dispose();
     super.dispose();
-  }
-
-  _fetchCurrentUser() async {
-    setState(() {
-      isLoading = true;
-    });
-    currentUser = await firebaseAuthService.getCurrentUser();
-    setState(() {
-      isLoading = false;
-    });
   }
 
   @override
@@ -198,7 +187,7 @@ class _LibraryPageState extends State<LibraryPage>
                 height: 8,
               ),
               CustomText(
-                text: 'Xin chào ${currentUser?.displayName ?? ''}!',
+                text: 'Xin chào ${context.watch<CurrentUserProvider>().currentUser!.username}!',
                 type: TextStyleEnum.large,
                 style: const TextStyle(fontWeight: FontWeight.w500),
               ),

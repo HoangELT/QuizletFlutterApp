@@ -69,6 +69,7 @@ class _AppPageState extends State<AppPage> {
                             color: Colors.white,
                           ),
                           onTap: () {
+                            Navigator.pop(context);
                             Navigator.pushNamed(context, '/topic/create');
                           },
                         ),

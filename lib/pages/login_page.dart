@@ -502,7 +502,7 @@ class _LoginPageState extends State<LoginPage> {
         // Thực hiện xác thực từ Firebase
         var user = await auth.signInWithEmailAndPassword(email, passWord);
 
-        print(user);
+        // print(user);
         // setCurrentUser trong provider
         UserService userService = UserService();
         UserModel? currentUser = await userService.getUserByUid(user.user!.uid);

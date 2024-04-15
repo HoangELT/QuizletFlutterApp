@@ -136,6 +136,15 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
     return null;
   }
 
+  List<CardModel> listCardCleaned(List<CardModel> list) {
+    List<CardModel> listResult = [];
+    for(var i in list){
+      if(i.term.isNotEmpty || i.define.isNotEmpty)
+        listResult.add(i);
+    }
+    return listResult;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -188,10 +197,10 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
                         TopicService topicService = TopicService();
 
                         var listClone = listCard.sublist(1);
-
+                        List<CardModel> newListCard = listCardCleaned(listClone);
                         //in ra check
                         print('Danh sách thẻ sau khi thêm mới:');
-                        for (CardModel card in listClone) {
+                        for (CardModel card in newListCard) {
                           print(
                               'Thuật ngữ: ${card.term}, Định nghĩa: ${card.define}');
                         }
@@ -206,7 +215,7 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
                               titleAndDes.term,
                               titleAndDes.define,
                               isPublic,
-                              listClone);
+                              newListCard);
                           setState(() {
                             isLoading = true;
                           });
@@ -218,6 +227,10 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
                           context.read<TopicProvider>().reloadListTopic();
                         }
                         Navigator.pop(context, 201);
+                      }
+                      else
+                      {
+                        print('listCard rỗng');
                       }
                     } else if (resultCheck.compareTo('not create') == 0) {
                       //chưa điền gì nên không lưu

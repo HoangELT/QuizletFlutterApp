@@ -17,10 +17,7 @@ class TopicService {
       var listTopic = await firebaseService.getDocuments('topics');
 
       for (var topicMap in listTopic) {
-        print(topicMap['userId']);
         UserModel? user = await userService.getUserByUid(topicMap['userId']);
-        print('Danh sách user');
-        print(user);
 
         TopicModel topic = TopicModel.fromMap(topicMap);
         topic.username = user?.username ?? ''; // Gán username từ dữ liệu user
@@ -66,6 +63,13 @@ class TopicService {
     } catch (error) {
       print('Error adding topic document: $error');
       throw error;
+    }
+  }
+
+  void printListTopics (List<TopicModel> listTopics) {
+    print('List topics:');
+    for(var i in listTopics)  {
+      print(i.toString());
     }
   }
 }

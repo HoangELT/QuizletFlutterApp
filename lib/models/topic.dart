@@ -55,4 +55,9 @@ class TopicModel {
     )..dateCreated = DateTime.parse(
         map['dateCreated']); // Chuyển đổi chuỗi ISO 8601 thành DateTime
   }
+
+  @override
+  String toString() {
+    return 'TopicModel(userId: $userId, username: $username, topicId: $topicId, title: $title, description: $description, public: $public, listCard: $listCard, dateCreated: $dateCreated)';
+  }
 }
