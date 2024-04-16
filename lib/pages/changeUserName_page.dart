@@ -1,5 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:quizletapp/models/user.dart';
+import 'package:quizletapp/services/models_services/user_service.dart';
+import 'package:quizletapp/services/provider/current_user_provider.dart';
 import '../services/firebase_auth.dart';
 
 import '../enums/text_style_enum.dart';
@@ -131,6 +135,7 @@ class _ChangeUserNameState extends State<ChangeUserName> {
         });
         // Thực hiện xác thực từ Firebase
         var t = await auth.changeUserName(newUserName);
+        await context.read<CurrentUserProvider>().changeUserName(newUserName);
         setState(() {
           isLoading = false;
         });

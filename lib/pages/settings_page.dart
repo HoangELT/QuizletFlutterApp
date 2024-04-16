@@ -20,125 +20,98 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   FirebaseAuthService auth = FirebaseAuthService();
-  late UserModel currentUser;
   final TextEditingController passwordController = TextEditingController();
   bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _loadUser();
-  }
-
-  Future<void> _loadUser() async {
-    var user = auth.getCurrentUser();
-
-    setState(() {
-      currentUser = UserModel(
-          '', user!.uid, user.email.toString(), user.displayName.toString());
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        Navigator.pop(context, currentUser.username);
-        return true;
-      },
-      child: Scaffold(
+    return Scaffold(
+      backgroundColor: AppTheme.primaryBackgroundColor,
+      appBar: AppBar(
+        foregroundColor: Colors.white,
+        centerTitle: true,
         backgroundColor: AppTheme.primaryBackgroundColor,
-        appBar: AppBar(
-          foregroundColor: Colors.white,
-          centerTitle: true,
-          backgroundColor: AppTheme.primaryBackgroundColor,
-          title: CustomText(
-            text: "Cài đặt",
-            type: TextStyleEnum.large,
-          ),
+        title: CustomText(
+          text: "Cài đặt",
+          type: TextStyleEnum.large,
         ),
-        body: SingleChildScrollView(
-          child: Container(
-            decoration: const BoxDecoration(shape: BoxShape.circle),
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Container(
-                    padding: const EdgeInsets.fromLTRB(0, 20, 0, 15),
-                    child: CustomText(
-                      text: "Thông tin cá nhân",
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
+      ),
+      body: SingleChildScrollView(
+        child: Container(
+          decoration: const BoxDecoration(shape: BoxShape.circle),
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(0, 20, 0, 15),
+                  child: CustomText(
+                    text: "Thông tin cá nhân",
+                    style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
-                  decoration: createBoxDecoration(),
-                  child: Column(
-                    children: [
-                      createInkWell(currentUser.username, "Tên người dùng", () {
-                        Navigator.pushNamed(context, "/changeUserName")
-                            .then((newUserName) {
-                          if (newUserName != null) {
-                            // Cập nhật lại thông tin người dùng với tên người dùng mới
-                            setState(() {
-                              if (currentUser.username == newUserName) {
-                                currentUser.username = newUserName.toString();
-                              }
-                            });
-                          }
-                        });
-                      }),
-                      const Divider(thickness: 1.0),
-                      createInkWell(currentUser.email, "Email", () {
-                        // thực hiện show bottom sheet check password rồi mới đổi email
-                        if (auth.getIsSignInGG()) {
-                          showNotAllowAction();
-                        } else {
-                          showPasswordCheckBottomSheet(context);
-                        }
-                      }),
-                      const Divider(thickness: 1.0),
-                      createInkWell('', "Đổi mật khẩu", () {
-                        if (auth.getIsSignInGG()) {
-                          showNotAllowAction();
-                        } else {
-                          Navigator.pushNamed(context, "/changePassword");
-                        }
-                      }),
-                    ],
-                  ),
+              ),
+              Container(
+                padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                decoration: createBoxDecoration(),
+                child: Column(
+                  children: [
+                    createInkWell(context.watch<CurrentUserProvider>().currentUser?.username ?? '', "Tên người dùng", () {
+                      Navigator.pushNamed(context, "/changeUserName");
+                    }),
+                    const Divider(thickness: 1.0),
+                    createInkWell(context.watch<CurrentUserProvider>().currentUser?.email ?? '', "Email", () {
+                      // thực hiện show bottom sheet check password rồi mới đổi email
+                      if (auth.getIsSignInGG()) {
+                        showNotAllowAction();
+                      } else {
+                        showPasswordCheckBottomSheet(context);
+                      }
+                    }),
+                    const Divider(thickness: 1.0),
+                    createInkWell('', "Đổi mật khẩu", () {
+                      if (auth.getIsSignInGG()) {
+                        showNotAllowAction();
+                      } else {
+                        Navigator.pushNamed(context, "/changePassword");
+                      }
+                    }),
+                  ],
                 ),
-                const SizedBox(height: 100),
-                createElevatedButton("Đăng xuất", () async {
-                  showConfirmDialog(context, "đăng xuất", () async {
-                    try {
-                      // Đăng xuất khỏi Firebase Authentication
-                      await auth.signOut();
-                      context.read<CurrentUserProvider>().setCurrentUser = null;
-                      Navigator.pushNamedAndRemoveUntil(context, '/intro',
-                          (route) => route.settings.name == '/intro');
-                    } catch (error) {}
-                  });
-                }),
-                const SizedBox(height: 20),
-                createElevatedButton(
-                    "Xóa tài khoản",
-                    () => {
-                          showConfirmDialog(context, "xóa tài khoản", () async {
-                            try {
-                              await auth.deleteAccount();
-                              Navigator.pushNamedAndRemoveUntil(
-                                  context,
-                                  '/intro',
-                                  (route) => route.settings.name == '/intro');
-                            } catch (e) {}
-                          })
+              ),
+              const SizedBox(height: 100),
+              createElevatedButton("Đăng xuất", () async {
+                showConfirmDialog(context, "đăng xuất", () async {
+                  try {
+                    // Đăng xuất khỏi Firebase Authentication
+                    await auth.signOut();
+                    context.read<CurrentUserProvider>().setCurrentUser = null;
+                    Navigator.pushNamedAndRemoveUntil(context, '/intro',
+                        (route) => route.settings.name == '/intro');
+                  } catch (error) {}
+                });
+              }),
+              const SizedBox(height: 20),
+              createElevatedButton(
+                  "Xóa tài khoản",
+                  () => {
+                        showConfirmDialog(context, "xóa tài khoản", () async {
+                          try {
+                            await auth.deleteAccount();
+                            Navigator.pushNamedAndRemoveUntil(
+                                context,
+                                '/intro',
+                                (route) => route.settings.name == '/intro');
+                          } catch (e) {}
                         })
-              ],
-            ),
+                      })
+            ],
           ),
         ),
       ),

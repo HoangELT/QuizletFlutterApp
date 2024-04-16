@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:quizletapp/services/provider/current_user_provider.dart';
 import '../enums/text_style_enum.dart';
 import '../models/user.dart';
 import '../utils/app_theme.dart';
@@ -15,21 +17,10 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   FirebaseAuthService auth = FirebaseAuthService();
-  late UserModel currentUser = UserModel('',"", "", "");
 
   @override
   void initState() {
     super.initState();
-    _loadUser();
-  }
-
-  Future<void> _loadUser() async {
-    var user = auth.getCurrentUser();
-
-    setState(() {
-      currentUser = UserModel('',
-          user!.uid, user.email.toString(), user.displayName.toString());
-    });
   }
 
   @override
@@ -64,7 +55,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   const SizedBox(height: 20.0),
                   CustomText(
-                    text: currentUser.username,
+                    text: context.watch<CurrentUserProvider>().currentUser?.username ?? '',
                     type: TextStyleEnum.large,
                   ),
                 ],
@@ -73,14 +64,7 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(height: 30.0),
             OutlinedButton(
               onPressed: () {
-                Navigator.pushNamed(context, "/settings").then((newUserName) {
-                  if (newUserName != null) {
-                    // Cập nhật lại thông tin người dùng với tên người dùng mới
-                    setState(() {
-                      currentUser.username = newUserName.toString();
-                    });
-                  }
-                });
+                Navigator.pushNamed(context, "/settings");
               },
               style: ButtonStyle(
                 padding: MaterialStateProperty.all(const EdgeInsets.all(20.0)),
