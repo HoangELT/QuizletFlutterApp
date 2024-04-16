@@ -1,16 +1,13 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
 import 'package:quizletapp/models/card.dart'; // Changed from 'package:quizletapp/models/card.dart';
 import 'package:quizletapp/models/topic.dart';
-import 'package:quizletapp/models/user.dart';
 import 'package:quizletapp/pages/topic_setting.dart';
 import 'package:quizletapp/services/firebase_auth.dart';
 import 'package:quizletapp/services/provider/topic_provider.dart';
 import 'package:quizletapp/services/models_services/topic_service.dart';
 import 'package:quizletapp/utils/app_theme.dart';
-import 'package:quizletapp/widgets/group_field_card.dart';
 import 'package:quizletapp/widgets/loading.dart';
 import 'package:quizletapp/widgets/text.dart';
 import 'package:cupertino_interactive_keyboard/cupertino_interactive_keyboard.dart';

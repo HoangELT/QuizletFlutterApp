@@ -40,85 +40,85 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
+  FirebaseAuthService firebaseAuthService = FirebaseAuthService();
 
   @override
   Widget build(BuildContext context) {
-  FirebaseAuthService firebaseAuthService = FirebaseAuthService();
-
+    context.read<CurrentUserProvider>().initCurrentUse();
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primaryColor: const Color.fromARGB(255, 10, 4, 60),
-        ),
-        initialRoute: (firebaseAuthService.isUserLoggedIn()) ? '/' : '/intro',
-        onGenerateRoute: (settings) {
-          final args = settings.arguments;
-          switch (settings.name) {
-            case '/intro':
-              return MaterialPageRoute(
-                builder: (context) => const IntroPage(),
-              );
-            case '/':
-              return MaterialPageRoute(
-                builder: (context) => const AppPage(),
-              );
-            case '/login':
-              return MaterialPageRoute(
-                builder: (context) => const LoginPage(),
-              );
-            case '/register':
-              return MaterialPageRoute(
-                builder: (context) => const RegisterPage(),
-              );
-            case '/changeEmail':
-              return MaterialPageRoute(
-                builder: (context) => const ChangeEmail(),
-              );
-            case '/changeUserName':
-              return MaterialPageRoute(
-                builder: (context) => const ChangeUserName(),
-              );
-            case '/settings':
-              return MaterialPageRoute(
-                builder: (context) => const SettingsPage(),
-              );
-            case '/search-topic':
-              return MaterialPageRoute(
-                builder: (context) => SearchTopicPage(
-                  keyWord: args as Map<String, dynamic>,
-                ),
-              );
-            case '/changePassword':
-              return MaterialPageRoute(
-                builder: (context) => const ChangePassWord(),
-              );
-            case '/topic':
-              return MaterialPageRoute(
-                builder: (context) => LibraryPage(
-                  initIndex: 0,
-                ),
-              );
-            case '/folder':
-              return MaterialPageRoute(
-                builder: (context) => LibraryPage(
-                  initIndex: 1,
-                ),
-              );
-            case '/topic/create':
-              return MaterialPageRoute(
-                builder: (context) => const CreateTopicPage(),
-              );
-            case '/folder/create':
-              return MaterialPageRoute(
-                builder: (context) => const CreateFolderPage(),
-              );
-            default:
-              return MaterialPageRoute(
-                builder: (context) => const NotFoundPage(),
-              );
-          }
-        },
-      );
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primaryColor: const Color.fromARGB(255, 10, 4, 60),
+      ),
+      initialRoute: (firebaseAuthService.isUserLoggedIn()) ? '/' : '/intro',
+      onGenerateRoute: (settings) {
+        final args = settings.arguments;
+        switch (settings.name) {
+          case '/intro':
+            return MaterialPageRoute(
+              builder: (context) => const IntroPage(),
+            );
+          case '/':
+            return MaterialPageRoute(
+              builder: (context) => const AppPage(),
+            );
+          case '/login':
+            return MaterialPageRoute(
+              builder: (context) => const LoginPage(),
+            );
+          case '/register':
+            return MaterialPageRoute(
+              builder: (context) => const RegisterPage(),
+            );
+          case '/changeEmail':
+            return MaterialPageRoute(
+              builder: (context) => const ChangeEmail(),
+            );
+          case '/changeUserName':
+            return MaterialPageRoute(
+              builder: (context) => const ChangeUserName(),
+            );
+          case '/settings':
+            return MaterialPageRoute(
+              builder: (context) => const SettingsPage(),
+            );
+          case '/search-topic':
+            return MaterialPageRoute(
+              builder: (context) => SearchTopicPage(
+                keyWord: args as Map<String, dynamic>,
+              ),
+            );
+          case '/changePassword':
+            return MaterialPageRoute(
+              builder: (context) => const ChangePassWord(),
+            );
+          case '/topic':
+            return MaterialPageRoute(
+              builder: (context) => LibraryPage(
+                initIndex: 0,
+              ),
+            );
+          case '/folder':
+            return MaterialPageRoute(
+              builder: (context) => LibraryPage(
+                initIndex: 1,
+              ),
+            );
+          case '/topic/create':
+            return MaterialPageRoute(
+              builder: (context) => const CreateTopicPage(),
+            );
+          case '/folder/create':
+            return MaterialPageRoute(
+              builder: (context) => const CreateFolderPage(),
+            );
+          default:
+            return MaterialPageRoute(
+              builder: (context) => const NotFoundPage(),
+            );
+        }
+      },
+    );
   }
 }

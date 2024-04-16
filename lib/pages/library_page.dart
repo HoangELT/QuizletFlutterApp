@@ -187,7 +187,7 @@ class _LibraryPageState extends State<LibraryPage>
                 height: 8,
               ),
               CustomText(
-                text: 'Xin chào ${context.watch<CurrentUserProvider>().currentUser!.username}!',
+                text: 'Xin chào ${context.watch<CurrentUserProvider>().currentUser?.username ?? ''}',
                 type: TextStyleEnum.large,
                 style: const TextStyle(fontWeight: FontWeight.w500),
               ),

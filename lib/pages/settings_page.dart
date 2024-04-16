@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
 import 'package:quizletapp/models/user.dart';
+import 'package:quizletapp/services/provider/current_user_provider.dart';
 import 'package:quizletapp/utils/app_theme.dart';
 import 'package:quizletapp/widgets/text.dart';
 
@@ -115,6 +117,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     try {
                       // Đăng xuất khỏi Firebase Authentication
                       await auth.signOut();
+                      context.read<CurrentUserProvider>().setCurrentUser = null;
                       Navigator.pushNamedAndRemoveUntil(context, '/intro',
                           (route) => route.settings.name == '/intro');
                     } catch (error) {}
