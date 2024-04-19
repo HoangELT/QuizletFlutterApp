@@ -31,7 +31,7 @@ class TopicService {
   Future<List<TopicModel>> getListTopicOfCurrentUser() async {
     try {
       if (firebaseAuthService.isUserLoggedIn()) {
-        var user = await firebaseAuthService.getCurrentUser();
+        var user = firebaseAuthService.getCurrentUser();
         var listTopic = await firebaseService.getDocumentsByField(
             'topics', 'userId', user?.uid);
         List<Map<String, dynamic>> listResult = listTopic
@@ -42,7 +42,7 @@ class TopicService {
                   },
                 })
             .toList();
-        return TopicModel.fromListMap(listResult);
+        return sortTopicsByDateDescending(TopicModel.fromListMap(listResult));
       } else {
         // Nếu người dùng chưa đăng nhập, trả về danh sách trống
         return [];
@@ -57,13 +57,21 @@ class TopicService {
   //Thêm một topic mới vào firestore
   Future<void> addTopic(TopicModel newTopic) async {
     try {
-      // Chuyển đổi TopicModel thành một Map<String, dynamic>
-      Map<String, dynamic> topicData = newTopic.toMap();
-      await firebaseService.addDocument('topics', topicData);
+      await firebaseService.addDocument('topics', newTopic.toMap());
     } catch (error) {
       print('Error adding topic document: $error');
       throw error;
     }
+  }
+
+  static List<TopicModel> sortTopicsByDate(List<TopicModel> topics) {
+    topics.sort((a, b) => a.dateCreated.compareTo(b.dateCreated));
+    return topics;
+  }
+
+  static List<TopicModel> sortTopicsByDateDescending(List<TopicModel> topics) {
+    topics.sort((a, b) => b.dateCreated.compareTo(a.dateCreated));
+    return topics;
   }
 
   void printListTopics (List<TopicModel> listTopics) {

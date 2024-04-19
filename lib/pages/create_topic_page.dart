@@ -13,6 +13,7 @@ import 'package:quizletapp/widgets/text.dart';
 import 'package:cupertino_interactive_keyboard/cupertino_interactive_keyboard.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
+import 'package:file_picker/file_picker.dart';
 
 class CreateTopicPage extends StatefulWidget {
   const CreateTopicPage({Key? key}) : super(key: key);
@@ -33,6 +34,8 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
   List<CardModel> listCard = [];
 
   List<FocusNode> listFocus = [];
+
+  String _filePath = '';
 
   var viewCards = [];
 
@@ -63,6 +66,38 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
       i.dispose();
     }
     super.dispose();
+  }
+
+  void _openFilePicker() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['xlsx', 'xls'],
+      allowMultiple: false,
+    );
+
+    if (result != null) {
+      String filePath = result.files.first.path!;
+      setState(() {
+        _filePath = filePath;
+      });
+
+      // Gọi hàm để đọc file Excel và xử lý dữ liệu
+      _readExcelFile(filePath);
+    }
+  }
+
+  void _readExcelFile(String filePath) {
+    // Use a library like 'excel' to read data from the Excel file
+    // Example:
+    // Excel excel = Excel.decodeBytes(File(filePath).readAsBytesSync());
+    // for (var table in excel.tables.keys) {
+    //   print(table); //sheet Name
+    //   print(excel.tables[table]!.maxCols);
+    //   print(excel.tables[table]!.maxRows);
+    //   for (var row in excel.tables[table]!.rows) {
+    //     print("$row");
+    //   }
+    // }
   }
 
   int? getIndexFocus() {
@@ -135,9 +170,8 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
 
   List<CardModel> listCardCleaned(List<CardModel> list) {
     List<CardModel> listResult = [];
-    for(var i in list){
-      if(i.term.isNotEmpty || i.define.isNotEmpty)
-        listResult.add(i);
+    for (var i in list) {
+      if (i.term.isNotEmpty || i.define.isNotEmpty) listResult.add(i);
     }
     return listResult;
   }
@@ -194,7 +228,8 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
                         TopicService topicService = TopicService();
 
                         var listClone = listCard.sublist(1);
-                        List<CardModel> newListCard = listCardCleaned(listClone);
+                        List<CardModel> newListCard =
+                            listCardCleaned(listClone);
                         //in ra check
                         print('Danh sách thẻ sau khi thêm mới:');
                         for (CardModel card in newListCard) {
@@ -224,9 +259,7 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
                           context.read<TopicProvider>().reloadListTopic();
                         }
                         Navigator.pop(context, 201);
-                      }
-                      else
-                      {
+                      } else {
                         print('listCard rỗng');
                       }
                     } else if (resultCheck.compareTo('not create') == 0) {
@@ -524,6 +557,7 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
                               TextFormField(
                                 initialValue: listCard[0].define,
                                 focusNode: listFocus[1],
+                                maxLines: null,
                                 onChanged: (value) {
                                   listCard[index].define = value ?? '';
                                 },
@@ -567,9 +601,7 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
                               padding:
                                   MaterialStateProperty.all(EdgeInsets.zero),
                             ),
-                            onPressed: () {
-                              print('quét tài liệu');
-                            },
+                            onPressed: _openFilePicker,
                             child: Wrap(
                               spacing: 4,
                               children: [
@@ -623,6 +655,7 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
                               TextFormField(
                                 initialValue: listCard[index].term,
                                 focusNode: listFocus[index * 2],
+                                maxLines: null,
                                 onChanged: (value) {
                                   listCard[index].term = value ?? '';
                                 },
@@ -661,6 +694,7 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
                               TextFormField(
                                 initialValue: listCard[index].define,
                                 focusNode: listFocus[index * 2 + 1],
+                                maxLines: null,
                                 onChanged: (value) {
                                   listCard[index].define = value ?? '';
                                 },

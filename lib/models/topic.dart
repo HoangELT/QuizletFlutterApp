@@ -3,7 +3,7 @@ import 'package:quizletapp/models/card.dart';
 class TopicModel {
   String userId;
   String username;
-  String topicId;
+  String id;
   String title;
   String description;
   bool public;
@@ -11,7 +11,7 @@ class TopicModel {
   DateTime dateCreated; // Thêm trường dateCreated kiểu DateTime
 
   // Constructor mặc định, sử dụng DateTime.now() để gán ngày hiện tại cho dateCreated
-  TopicModel(this.userId, this.username, this.topicId, this.title,
+  TopicModel(this.userId, this.username, this.id, this.title,
       this.description, this.public, this.listCard)
       : dateCreated = DateTime.now();
 
@@ -20,7 +20,7 @@ class TopicModel {
     return {
       'userId': userId,
       'username': username,
-      'topicId': topicId,
+      'id': id,
       'title': title,
       'description': description,
       'public': public,
@@ -58,6 +58,6 @@ class TopicModel {
 
   @override
   String toString() {
-    return 'TopicModel(userId: $userId, username: $username, topicId: $topicId, title: $title, description: $description, public: $public, listCard: $listCard, dateCreated: $dateCreated)';
+    return 'TopicModel(userId: $userId, username: $username, id: $id, title: $title, description: $description, public: $public, listCard: $listCard, dateCreated: $dateCreated)';
   }
 }

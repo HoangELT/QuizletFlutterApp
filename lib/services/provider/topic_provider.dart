@@ -10,8 +10,7 @@ class TopicProvider extends ChangeNotifier {
   Future<void> reloadListTopic() async {
     try {
       TopicService topicService = TopicService();
-      List<TopicModel> fetchedListTopicOfCurrentUser = await topicService.getListTopicOfCurrentUser();
-      _listTopicOfCurrentUser = fetchedListTopicOfCurrentUser;
+      _listTopicOfCurrentUser = await topicService.getListTopicOfCurrentUser();
       notifyListeners();
     } catch (e) {
       print('TopicProvider: Lỗi reload listTopicOfCurrentUser.');

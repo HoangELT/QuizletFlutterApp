@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
-import 'package:quizletapp/models/folder.dart';
 import 'package:quizletapp/models/topic.dart';
 import 'package:quizletapp/models/user.dart';
 import 'package:quizletapp/services/firebase_auth.dart';
+import 'package:quizletapp/services/models_services/folder_service.dart';
 import 'package:quizletapp/services/provider/current_user_provider.dart';
+import 'package:quizletapp/services/provider/folder_provider.dart';
 import 'package:quizletapp/services/provider/topic_provider.dart';
 import 'package:quizletapp/services/models_services/topic_service.dart';
 import 'package:quizletapp/utils/app_theme.dart';
@@ -39,24 +40,6 @@ class _HomePageState extends State<HomePage> {
     TopicModel('0', 'hoanviet', '0', 'Famous', 'description', true, []),
   ];
 
-  List<FolderModel> listFolder = [
-    FolderModel('0', 'Folder 1', 'description', [
-      TopicModel('0', 'daicuong', '0', 'Famous', 'description', true, []),
-      TopicModel('0', 'daicuong', '0', 'Famous', 'description', true, []),
-      TopicModel('0', 'daicuong', '0', 'Famous', 'description', true, []),
-    ]),
-    FolderModel('0', 'Folder 2', 'description', [
-      TopicModel('0', 'daicuong', '0', 'Famous', 'description', true, []),
-      TopicModel('0', 'daicuong', '0', 'Famous', 'description', true, []),
-      TopicModel('0', 'daicuong', '0', 'Famous', 'description', true, []),
-    ]),
-    FolderModel('0', 'Folder 3', 'description', [
-      TopicModel('0', 'daicuong', '0', 'Famous', 'description', true, []),
-      TopicModel('0', 'daicuong', '0', 'Famous', 'description', true, []),
-      TopicModel('0', 'daicuong', '0', 'Famous', 'description', true, []),
-    ]),
-  ];
-
   var listTopicToFind = [
     {
       'label': 'Nghệ thuật và nhân văn',
@@ -86,16 +69,17 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    _fetchListTopicOfCurrentUser();
+    _fetchInitTopicsAndFoldersOfCurrentUser();
     super.initState();
   }
 
-  Future<void> _fetchListTopicOfCurrentUser() async {
+  Future<void> _fetchInitTopicsAndFoldersOfCurrentUser() async {
     setState(() {
       isLoading = true;
     });
     try {
       await context.read<TopicProvider>().reloadListTopic();
+      await context.read<FolderProvider>().reloadListFolderOfCurrentUser();
     } catch (e) {
       print('Lỗi lấy danh sách chủ đề: $e');
     }
@@ -105,13 +89,14 @@ class _HomePageState extends State<HomePage> {
   }
 
   // Future<void> _onRefresh() async {
-  //   await _fetchListTopicOfCurrentUser();
+  //   await _fetchInitTopicsAndFoldersOfCurrentUser();
   // }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<TopicProvider, CurrentUserProvider>(
-      builder: (context, topicProvider, currentUserProvider, child) {
+    return Consumer3<CurrentUserProvider, TopicProvider, FolderProvider>(
+      builder:
+          (context, currentUserProvider, topicProvider, folderProvider, child) {
         return Scaffold(
           backgroundColor: AppTheme.primaryBackgroundColor,
           appBar: AppBar(
@@ -136,8 +121,8 @@ class _HomePageState extends State<HomePage> {
                       AppTheme.primaryButtonColor),
                 ),
                 onPressed: () async {
-                  UserModel? currentUser = currentUserProvider.currentUser;
-                  print('currentUser: $currentUser');
+                  FolderService.printListFolders(
+                      folderProvider.listFolderOfCurrentUser);
                 },
                 child: CustomText(
                   text: 'Nâng cấp',
@@ -156,7 +141,7 @@ class _HomePageState extends State<HomePage> {
                         TopicService topicService = TopicService();
                         var listAllTopic =
                             await topicService.getTopicsWithUsers();
-                            topicService.printListTopics(listAllTopic);
+                        topicService.printListTopics(listAllTopic);
                       },
                       icon: const Icon(
                         Icons.notifications_outlined,
@@ -227,68 +212,153 @@ class _HomePageState extends State<HomePage> {
           ),
           body: RefreshIndicator(
             triggerMode: RefreshIndicatorTriggerMode.anywhere,
-            onRefresh: _fetchListTopicOfCurrentUser,
+            onRefresh: _fetchInitTopicsAndFoldersOfCurrentUser,
             child: SingleChildScrollView(
               child: Container(
+                height: MediaQuery.of(context).size.height * 0.7,
                 margin: const EdgeInsets.only(top: 32),
-                child: (topicProvider.listTopicOfCurrentUser.isNotEmpty)
+                child: (topicProvider.listTopicOfCurrentUser.isNotEmpty ||
+                        folderProvider.listFolderOfCurrentUser.isNotEmpty)
                     ? Column(
                         children: [
-                          Skeletonizer(
-                            containersColor: Colors.grey.shade400,
-                            enabled: isLoading,
-                            child: GroupList(
-                              itemCount:
-                                  topicProvider.listTopicOfCurrentUser.length,
-                              title: 'Các học phần',
-                              onShowAll: () {
-                                print('show');
-                              },
-                              buildItem: (context, index) {
-                                return ItemList(
-                                  onTap: () {},
-                                  headText: topicProvider
-                                      .listTopicOfCurrentUser[index].title,
-                                  bodyText:
-                                      '${topicProvider.listTopicOfCurrentUser[index].listCard.length} thuật ngữ',
-                                  bottom: Row(
-                                    children: [
-                                      const CircleAvatar(
-                                        backgroundImage: AppTheme.defaultAvatar,
-                                        radius: 14,
-                                      ),
-                                      const SizedBox(
-                                        width: 8,
-                                      ),
-                                      CustomText(
-                                          text: topicProvider
-                                              .listTopicOfCurrentUser[index]
-                                              .username),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 32,
-                          ),
-                          Skeletonizer(
-                            enabled: isLoading,
-                            containersColor: Colors.grey.shade400,
-                            child: GroupList(
-                              buildItem: (context, index) {
-                                return ItemList(
-                                  headText: listTopicOfUser[index].title,
-                                  bodyText:
-                                      '${listTopicOfUser[index].listCard.length} thuật ngữ',
-                                  bottom: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
+                          if (topicProvider.listTopicOfCurrentUser.isNotEmpty)
+                            Container(
+                              margin: const EdgeInsets.only(bottom: 32),
+                              child: Skeletonizer(
+                                containersColor: Colors.grey.shade400,
+                                enabled: isLoading,
+                                child: GroupList(
+                                  itemCount: topicProvider
+                                      .listTopicOfCurrentUser.length,
+                                  title: 'Các học phần',
+                                  onShowAll: () {
+                                    print('show');
+                                  },
+                                  buildItem: (context, index) {
+                                    return ItemList(
+                                      onTap: () {},
+                                      headText: topicProvider
+                                          .listTopicOfCurrentUser[index].title,
+                                      bodyText:
+                                          '${topicProvider.listTopicOfCurrentUser[index].listCard.length} thuật ngữ',
+                                      bottom: Row(
                                         children: [
                                           const CircleAvatar(
+                                            backgroundImage:
+                                                AppTheme.defaultAvatar,
+                                            radius: 14,
+                                          ),
+                                          const SizedBox(
+                                            width: 8,
+                                          ),
+                                          CustomText(
+                                              text: topicProvider
+                                                  .listTopicOfCurrentUser[index]
+                                                  .username),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          if (false)
+                            Container(
+                              margin: const EdgeInsets.only(bottom: 32),
+                              child: Skeletonizer(
+                                enabled: isLoading,
+                                containersColor: Colors.grey.shade400,
+                                child: GroupList(
+                                  itemCount: listTopicOfUser.length,
+                                  title:
+                                      'Tương tự học phần của ${listTopicOfUser[0].username}',
+                                  isShowOption: false,
+                                  buildItem: (context, index) {
+                                    return ItemList(
+                                      headText: listTopicOfUser[index].title,
+                                      bodyText:
+                                          '${listTopicOfUser[index].listCard.length} thuật ngữ',
+                                      bottom: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              const CircleAvatar(
+                                                backgroundColor: Colors.grey,
+                                                radius: 14,
+                                              ),
+                                              const SizedBox(
+                                                width: 8,
+                                              ),
+                                              CustomText(
+                                                  text: listTopicOfUser[index]
+                                                      .username)
+                                            ],
+                                          ),
+                                          IconButton(
+                                            onPressed: () {
+                                              print(index.toString());
+                                            },
+                                            icon: const Icon(
+                                              Icons.more_vert,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          if (folderProvider.listFolderOfCurrentUser.isNotEmpty)
+                            Container(
+                              margin: const EdgeInsets.only(bottom: 32),
+                              child: Skeletonizer(
+                                enabled: isLoading,
+                                containersColor: Colors.grey.shade400,
+                                child: GroupList(
+                                  itemCount: folderProvider
+                                      .listFolderOfCurrentUser.length,
+                                  title: 'Thư mục',
+                                  itemHeight: 108,
+                                  buildItem: (context, index) {
+                                    return ItemList(
+                                      head: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.folder_outlined,
+                                            color: Colors.grey.withOpacity(0.6),
+                                            size: 28,
+                                          ),
+                                          const SizedBox(
+                                            width: 12,
+                                          ),
+                                          CustomText(
+                                            text: folderProvider
+                                                .listFolderOfCurrentUser[index]
+                                                .title,
+                                            type: TextStyleEnum.large,
+                                          ),
+                                        ],
+                                      ),
+                                      body: Row(
+                                        children: [
+                                          CustomText(
+                                              text:
+                                                  '${folderProvider.listFolderOfCurrentUser[index].listTopic.length} học phần'),
+                                          Container(
+                                            margin: const EdgeInsets.symmetric(
+                                                horizontal: 16),
+                                            color: Colors.grey.shade600
+                                                .withOpacity(0.5),
+                                            width: 1,
+                                            height: 18,
+                                          ),
+                                          const CircleAvatar(
+                                            backgroundImage:
+                                                AppTheme.defaultAvatar,
                                             backgroundColor: Colors.grey,
                                             radius: 14,
                                           ),
@@ -296,104 +366,33 @@ class _HomePageState extends State<HomePage> {
                                             width: 8,
                                           ),
                                           CustomText(
-                                              text: listTopicOfUser[index]
-                                                  .username)
+                                              text: firebaseAuthService
+                                                      .getCurrentUser()
+                                                      ?.displayName ??
+                                                  '')
                                         ],
                                       ),
-                                      IconButton(
-                                        onPressed: () {
-                                          print(index.toString());
-                                        },
-                                        icon: const Icon(
-                                          Icons.more_vert,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                              itemCount: listTopicOfUser.length,
-                              title:
-                                  'Tương tự học phần của ${listTopicOfUser[0].username}',
-                              isShowOption: false,
+                                    );
+                                  },
+                                ),
+                              ),
                             ),
-                          ),
-                          const SizedBox(
-                            height: 32,
-                          ),
-                          Skeletonizer(
-                            enabled: isLoading,
-                            containersColor: Colors.grey.shade400,
-                            child: GroupList(
-                              buildItem: (context, index) {
-                                return ItemList(
-                                  head: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.folder_outlined,
-                                        color: Colors.grey.withOpacity(0.6),
-                                        size: 28,
-                                      ),
-                                      const SizedBox(
-                                        width: 12,
-                                      ),
-                                      CustomText(
-                                        text: listFolder[index].title,
-                                        type: TextStyleEnum.large,
-                                      ),
-                                    ],
-                                  ),
-                                  body: Row(
-                                    children: [
-                                      CustomText(
-                                          text:
-                                              '${listFolder[index].listTopic.length} học phần'),
-                                      Container(
-                                        margin: const EdgeInsets.symmetric(
-                                            horizontal: 16),
-                                        color: Colors.grey.shade600
-                                            .withOpacity(0.5),
-                                        width: 1,
-                                        height: 18,
-                                      ),
-                                      const CircleAvatar(
-                                        backgroundImage: AppTheme.defaultAvatar,
-                                        backgroundColor: Colors.grey,
-                                        radius: 14,
-                                      ),
-                                      const SizedBox(
-                                        width: 8,
-                                      ),
-                                      CustomText(
-                                          text: firebaseAuthService
-                                                  .getCurrentUser()
-                                                  ?.displayName ??
-                                              '')
-                                    ],
-                                  ),
-                                );
-                              },
-                              itemCount: listFolder.length,
-                              title: 'Thư mục',
-                              isShowOption: false,
-                              itemHeight: 108,
+                          if (topicProvider.listTopicOfCurrentUser.isNotEmpty &&
+                              folderProvider.listFolderOfCurrentUser.isNotEmpty)
+                            Container(
+                              margin: const EdgeInsets.only(bottom: 32),
+                              alignment: Alignment.center,
+                              child: GestureDetector(
+                                  onTap: () {
+                                    print('Xem chính sách quyền riêng tư');
+                                  },
+                                  child: CustomText(
+                                    text: 'Chính sách quyền riêng tư',
+                                    style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500),
+                                  )),
                             ),
-                          ),
-                          Container(
-                            margin: const EdgeInsets.symmetric(vertical: 32),
-                            alignment: Alignment.center,
-                            child: GestureDetector(
-                                onTap: () {
-                                  print('Xem chính sách quyền riêng tư');
-                                },
-                                child: CustomText(
-                                  text: 'Chính sách quyền riêng tư',
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500),
-                                )),
-                          ),
                         ],
                       )
                     : Skeletonizer(

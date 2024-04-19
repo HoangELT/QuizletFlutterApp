@@ -13,6 +13,7 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:quizletapp/services/firebase_auth.dart';
 import 'package:quizletapp/services/provider/current_user_provider.dart';
+import 'package:quizletapp/services/provider/folder_provider.dart';
 import 'package:quizletapp/services/provider/topic_provider.dart';
 import 'pages/changepw_page.dart';
 import 'pages/register_page.dart';
@@ -33,6 +34,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => TopicProvider()),
         ChangeNotifierProvider(create: (_) => CurrentUserProvider()),
+        ChangeNotifierProvider(create: (_) => FolderProvider()),
       ],
       child: MyApp(),
     ),
