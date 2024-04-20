@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class IndexedAppScreenProvider extends ChangeNotifier {
+class IndexOfAppProvider extends ChangeNotifier {
   int _indexSelected = 0;
 
   int get indexSelected => _indexSelected;

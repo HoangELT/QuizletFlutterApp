@@ -3,11 +3,12 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
 import 'package:quizletapp/models/topic.dart';
-import 'package:quizletapp/models/user.dart';
 import 'package:quizletapp/services/firebase_auth.dart';
 import 'package:quizletapp/services/models_services/folder_service.dart';
 import 'package:quizletapp/services/provider/current_user_provider.dart';
 import 'package:quizletapp/services/provider/folder_provider.dart';
+import 'package:quizletapp/services/provider/index_of_app_provider.dart';
+import 'package:quizletapp/services/provider/index_of_library_provider.dart';
 import 'package:quizletapp/services/provider/topic_provider.dart';
 import 'package:quizletapp/services/models_services/topic_service.dart';
 import 'package:quizletapp/utils/app_theme.dart';
@@ -94,9 +95,10 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer3<CurrentUserProvider, TopicProvider, FolderProvider>(
-      builder:
-          (context, currentUserProvider, topicProvider, folderProvider, child) {
+    return Consumer5<CurrentUserProvider, TopicProvider, FolderProvider,
+        IndexOfAppProvider, IndexOfLibraryProvider>(
+      builder: (context, currentUserProvider, topicProvider, folderProvider,
+          indexOfAppProvider, indexOfLibraryProvider, child) {
         return Scaffold(
           backgroundColor: AppTheme.primaryBackgroundColor,
           appBar: AppBar(
@@ -182,6 +184,7 @@ class _HomePageState extends State<HomePage> {
                       'code': 0,
                       'key': _textEditingController.text
                     });
+                    _textEditingController.clear();
                   },
                   style: const TextStyle(
                     fontSize: 18,
@@ -232,7 +235,8 @@ class _HomePageState extends State<HomePage> {
                                       .listTopicOfCurrentUser.length,
                                   title: 'Các học phần',
                                   onShowAll: () {
-                                    print('show');
+                                    indexOfLibraryProvider.changeIndex(0);
+                                    indexOfAppProvider.changeIndex(3);
                                   },
                                   buildItem: (context, index) {
                                     return ItemList(
@@ -323,6 +327,10 @@ class _HomePageState extends State<HomePage> {
                                       .listFolderOfCurrentUser.length,
                                   title: 'Thư mục',
                                   itemHeight: 108,
+                                  onShowAll: () {
+                                    indexOfLibraryProvider.changeIndex(1);
+                                    indexOfAppProvider.changeIndex(3);
+                                  },
                                   buildItem: (context, index) {
                                     return ItemList(
                                       head: Row(
@@ -466,6 +474,7 @@ class _HomePageState extends State<HomePage> {
                                               'key': listTopicToFind[index]
                                                   ['label']
                                             });
+                                            
                                       },
                                       title: CustomText(
                                         text: listTopicToFind[index]['label']

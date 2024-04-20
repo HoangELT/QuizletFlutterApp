@@ -14,6 +14,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:quizletapp/services/firebase_auth.dart';
 import 'package:quizletapp/services/provider/current_user_provider.dart';
 import 'package:quizletapp/services/provider/folder_provider.dart';
+import 'package:quizletapp/services/provider/index_of_app_provider.dart';
+import 'package:quizletapp/services/provider/index_of_library_provider.dart';
 import 'package:quizletapp/services/provider/topic_provider.dart';
 import 'pages/changepw_page.dart';
 import 'pages/register_page.dart';
@@ -35,6 +37,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => TopicProvider()),
         ChangeNotifierProvider(create: (_) => CurrentUserProvider()),
         ChangeNotifierProvider(create: (_) => FolderProvider()),
+        ChangeNotifierProvider(create: (_) => IndexOfAppProvider()),
+        ChangeNotifierProvider(create: (_) => IndexOfLibraryProvider()),
       ],
       child: MyApp(),
     ),
@@ -96,15 +100,15 @@ class MyApp extends StatelessWidget {
               builder: (context) => const ChangePassWord(),
             );
           case '/topic':
+
             return MaterialPageRoute(
               builder: (context) => LibraryPage(
-                initIndex: 0,
               ),
             );
           case '/folder':
+            context.read<IndexOfLibraryProvider>().changeIndex(1);
             return MaterialPageRoute(
               builder: (context) => LibraryPage(
-                initIndex: 1,
               ),
             );
           case '/topic/create':
