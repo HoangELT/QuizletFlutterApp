@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
+import 'package:quizletapp/utils/app_theme.dart';
 import 'package:quizletapp/widgets/text.dart';
 
 class ItemList extends StatefulWidget {
@@ -38,7 +39,7 @@ class _ItemListState extends State<ItemList> {
         width: widget.width,
         height: widget.height,
         decoration: BoxDecoration(
-          color: Colors.transparent,
+          color: AppTheme.primaryBackgroundColor,
           border: Border.all(
             color: Colors.grey.withOpacity(0.4),
             width: 2,
@@ -72,10 +73,7 @@ class _ItemListState extends State<ItemList> {
                           ),
                         ),
                       )
-                : Container(
-                    margin: const EdgeInsets.only(top: 16),
-                    child: widget.body!,
-                  ),
+                : widget.body!,
               ],
             ),
             if (widget.bottom != null) widget.bottom!

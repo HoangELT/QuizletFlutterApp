@@ -74,9 +74,27 @@ class TopicService {
     return topics;
   }
 
-  void printListTopics (List<TopicModel> listTopics) {
+  List<TopicModel> getTopicsToday(List<TopicModel> listTopicOfCurrentUser) {
+    DateTime now = DateTime.now();
+    DateTime startOfToday = DateTime(now.year, now.month, now.day, 0, 0, 0, 0);
+    DateTime endOfToday =
+        DateTime(now.year, now.month, now.day, 23, 59, 59, 999);
+
+    List<TopicModel> topicsToday = [];
+
+    listTopicOfCurrentUser.forEach((topicModel) {
+      if (topicModel.dateCreated.isAfter(startOfToday) &&
+          topicModel.dateCreated.isBefore(endOfToday)) {
+        topicsToday.add(topicModel);
+      }
+    });
+
+    return topicsToday;
+  }
+
+  void printListTopics(List<TopicModel> listTopics) {
     print('List topics:');
-    for(var i in listTopics)  {
+    for (var i in listTopics) {
       print(i.toString());
     }
   }

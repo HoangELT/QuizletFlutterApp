@@ -17,6 +17,7 @@ import 'package:quizletapp/services/provider/folder_provider.dart';
 import 'package:quizletapp/services/provider/index_of_app_provider.dart';
 import 'package:quizletapp/services/provider/index_of_library_provider.dart';
 import 'package:quizletapp/services/provider/topic_provider.dart';
+import 'package:quizletapp/utils/custom_scrollbehavior.dart';
 import 'pages/changepw_page.dart';
 import 'pages/register_page.dart';
 import 'firebase_options.dart';
@@ -53,6 +54,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     context.read<CurrentUserProvider>().initCurrentUse();
     return MaterialApp(
+      scrollBehavior: MyCustomScrollBehavior(),
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: const Color.fromARGB(255, 10, 4, 60),

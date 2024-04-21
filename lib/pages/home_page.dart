@@ -228,7 +228,8 @@ class _HomePageState extends State<HomePage> {
                             Container(
                               margin: const EdgeInsets.only(bottom: 32),
                               child: Skeletonizer(
-                                containersColor: Colors.grey.shade400,
+                                containersColor:
+                                    AppTheme.primaryColorSkeletonContainer,
                                 enabled: isLoading,
                                 child: GroupList(
                                   itemCount: topicProvider
@@ -271,7 +272,8 @@ class _HomePageState extends State<HomePage> {
                               margin: const EdgeInsets.only(bottom: 32),
                               child: Skeletonizer(
                                 enabled: isLoading,
-                                containersColor: Colors.grey.shade400,
+                                containersColor:
+                                    AppTheme.primaryColorSkeletonContainer,
                                 child: GroupList(
                                   itemCount: listTopicOfUser.length,
                                   title:
@@ -321,7 +323,8 @@ class _HomePageState extends State<HomePage> {
                               margin: const EdgeInsets.only(bottom: 32),
                               child: Skeletonizer(
                                 enabled: isLoading,
-                                containersColor: Colors.grey.shade400,
+                                containersColor:
+                                    AppTheme.primaryColorSkeletonContainer,
                                 child: GroupList(
                                   itemCount: folderProvider
                                       .listFolderOfCurrentUser.length,
@@ -405,7 +408,7 @@ class _HomePageState extends State<HomePage> {
                       )
                     : Skeletonizer(
                         enabled: isLoading,
-                        containersColor: Colors.grey.shade400,
+                        containersColor: AppTheme.primaryColorSkeletonContainer,
                         child: Column(
                           children: [
                             GroupList(
@@ -474,7 +477,6 @@ class _HomePageState extends State<HomePage> {
                                               'key': listTopicToFind[index]
                                                   ['label']
                                             });
-                                            
                                       },
                                       title: CustomText(
                                         text: listTopicToFind[index]['label']
