@@ -1,3 +1,4 @@
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
@@ -266,218 +267,28 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
                       //chưa điền gì nên không lưu
                       Navigator.pop(context);
                     } else {
-                      var code = await showModalBottomSheet(
-                        backgroundColor: const Color.fromARGB(255, 44, 63, 79),
+                      var chooseResult = await showOkCancelAlertDialog(
                         context: context,
-                        builder: (BuildContext context) {
-                          return Container(
-                            padding: const EdgeInsets.only(bottom: 32),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.only(top: 6),
-                                  width: 44,
-                                  height: 6,
-                                  decoration: BoxDecoration(
-                                    color: const Color.fromARGB(
-                                        160, 127, 144, 155),
-                                    borderRadius: BorderRadius.circular(9999),
-                                  ),
-                                ),
-                                Container(
-                                  alignment: Alignment.center,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 40,
-                                    vertical: 12,
-                                  ),
-                                  child: CustomText(
-                                    text: resultCheck,
-                                    style: const TextStyle(fontSize: 14),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                                // Divider(
-                                //   height: 0.05,
-                                //   color: Colors.grey.withOpacity(0.5),
-                                // ),
-                                // InkWell(
-                                //   onTap: () {
-                                //     Navigator.pop(context, 0);
-                                //   },
-                                //   child: Container(
-                                //     height: 52,
-                                //     decoration: BoxDecoration(
-                                //       color: Colors.transparent,
-                                //       borderRadius: BorderRadius.circular(8),
-                                //       border: Border.all(color: Colors.transparent),
-                                //     ),
-                                //     child: Center(
-                                //       child: CustomText(
-                                //         text: 'Lưu nháp',
-                                //         style: TextStyle(
-                                //             fontWeight: FontWeight.w400,
-                                //             fontSize: 20),
-                                //       ),
-                                //     ),
-                                //   ),
-                                // ),
-                                Divider(
-                                  height: 0.05,
-                                  color: Colors.grey.withOpacity(0.5),
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.pop(context, 1);
-                                  },
-                                  child: Container(
-                                    height: 52,
-                                    decoration: BoxDecoration(
-                                      color: Colors.transparent,
-                                      borderRadius: BorderRadius.circular(8),
-                                      border:
-                                          Border.all(color: Colors.transparent),
-                                    ),
-                                    child: Center(
-                                      child: CustomText(
-                                        text: 'Xóa học phần này',
-                                        type: TextStyleEnum.large,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w400,
-                                          color:
-                                              Color.fromARGB(255, 249, 15, 11),
-                                          fontSize: 20,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Divider(
-                                  height: 0.05,
-                                  color: Colors.grey.withOpacity(0.5),
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.pop(context, 2);
-                                  },
-                                  child: Container(
-                                    height: 52,
-                                    decoration: BoxDecoration(
-                                      color: Colors.transparent,
-                                      borderRadius: BorderRadius.circular(8),
-                                      border:
-                                          Border.all(color: Colors.transparent),
-                                    ),
-                                    child: Center(
-                                      child: CustomText(
-                                        text: 'Hủy',
-                                        type: TextStyleEnum.large,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.white,
-                                          fontSize: 20,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Divider(
-                                  height: 0.05,
-                                  color: Colors.grey.withOpacity(0.5),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
+                        cancelLabel: 'Hủy',
+                        okLabel: 'Xóa học phần này',
+                        isDestructiveAction: true,
+                        alertStyle: AdaptiveStyle.iOS,
+                        useActionSheetForIOS: true,
+                        title: resultCheck,
                       );
 
-                      if (code != null) {
-                        if (code == 0) {
-                          //lưu nháp
+                      if (chooseResult == OkCancelResult.ok) {
+                        //xóa học phần đang tạo
+                        var isDelete = await showOkCancelAlertDialog(
+                          context: context,
+                          cancelLabel: 'Hủy',
+                          okLabel: 'Xóa',
+                          isDestructiveAction: true,
+                          alertStyle: AdaptiveStyle.iOS,
+                          title: 'Bạn chắc chắn muốn xóa học phần này',
+                        );
+                        if (isDelete == OkCancelResult.ok) {
                           Navigator.pop(context);
-                        } else if (code == 1) {
-                          //xóa học phần đang tạo
-                          var isDelete = await showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                backgroundColor:
-                                    Color.fromARGB(159, 33, 38, 40),
-                                actionsAlignment: MainAxisAlignment.center,
-                                title: CustomText(
-                                  text:
-                                      'Bạn có chắc chắn muốn xóa học phần này?',
-                                  style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500),
-                                  textAlign: TextAlign.center,
-                                ),
-                                actions: <Widget>[
-                                  InkWell(
-                                    borderRadius: BorderRadius.circular(8),
-                                    onTap: () {
-                                      Navigator.pop(context, 0);
-                                    },
-                                    child: Container(
-                                      height: 44,
-                                      width: 120,
-                                      decoration: BoxDecoration(
-                                        color: Colors.transparent,
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(
-                                            color:
-                                                Colors.grey.withOpacity(0.5)),
-                                      ),
-                                      child: Center(
-                                        child: CustomText(
-                                          text: 'Hủy',
-                                          type: TextStyleEnum.large,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.white,
-                                            fontSize: 20,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  InkWell(
-                                    borderRadius: BorderRadius.circular(8),
-                                    onTap: () {
-                                      Navigator.pop(context, 1);
-                                    },
-                                    child: Container(
-                                      height: 44,
-                                      width: 120,
-                                      decoration: BoxDecoration(
-                                        color: Colors.transparent,
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(
-                                            color:
-                                                Colors.grey.withOpacity(0.5)),
-                                      ),
-                                      child: Center(
-                                        child: CustomText(
-                                          text: 'Xóa',
-                                          type: TextStyleEnum.large,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w400,
-                                            color: Color.fromARGB(
-                                                255, 249, 15, 11),
-                                            fontSize: 20,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              );
-                            },
-                          );
-                          if (isDelete != null && isDelete == 1) {
-                            //Xác nhận xóa
-                            Navigator.pop(context);
-                          }
                         }
                       }
                     }

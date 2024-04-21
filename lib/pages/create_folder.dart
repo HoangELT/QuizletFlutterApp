@@ -92,6 +92,7 @@ class _CreateFolderPageState extends State<CreateFolderPage> {
                 Wrap(
                   children: [
                     TextFormField(
+                      autofocus: true,
                       onChanged: (value) {
                         if (value.trim().isEmpty) {
                           setState(() {

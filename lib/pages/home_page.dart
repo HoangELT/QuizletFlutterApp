@@ -17,6 +17,7 @@ import 'package:quizletapp/widgets/text.dart';
 import 'package:quizletapp/widgets/group_list.dart';
 import 'package:quizletapp/widgets/item_list.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:toastification/toastification.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -123,8 +124,13 @@ class _HomePageState extends State<HomePage> {
                       AppTheme.primaryButtonColor),
                 ),
                 onPressed: () async {
-                  FolderService.printListFolders(
-                      folderProvider.listFolderOfCurrentUser);
+                  await toastification.show(
+                    context: context,
+                    title: Text('Helllo'),
+                    style: ToastificationStyle.fillColored,
+                    type: ToastificationType.success,
+                    autoCloseDuration: const Duration(seconds: 2),
+                  );
                 },
                 child: CustomText(
                   text: 'Nâng cấp',
@@ -218,7 +224,9 @@ class _HomePageState extends State<HomePage> {
             onRefresh: _fetchInitTopicsAndFoldersOfCurrentUser,
             child: SingleChildScrollView(
               child: Container(
-                height: MediaQuery.of(context).size.height * 0.7,
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height * 0.7,
+                ),
                 margin: const EdgeInsets.only(top: 32),
                 child: (topicProvider.listTopicOfCurrentUser.isNotEmpty ||
                         folderProvider.listFolderOfCurrentUser.isNotEmpty)
@@ -362,8 +370,9 @@ class _HomePageState extends State<HomePage> {
                                                 text:
                                                     '${folderProvider.listFolderOfCurrentUser[index].listTopic.length} học phần'),
                                             Container(
-                                              margin: const EdgeInsets.symmetric(
-                                                  horizontal: 16),
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 16),
                                               color: Colors.grey.shade600
                                                   .withOpacity(0.5),
                                               width: 1,
@@ -443,7 +452,7 @@ class _HomePageState extends State<HomePage> {
                                         size: 40,
                                       ),
                                       boxDecoration: BoxDecoration(
-                                        color: Colors.transparent,
+                                        color: AppTheme.primaryBackgroundColor,
                                         border: Border.all(
                                             width: 1, color: Colors.grey),
                                         borderRadius: BorderRadius.circular(16),
@@ -490,7 +499,7 @@ class _HomePageState extends State<HomePage> {
                                       icon: listTopicToFind[index]['icon']
                                           as Icon,
                                       boxDecoration: BoxDecoration(
-                                        color: Colors.transparent,
+                                        color: AppTheme.primaryBackgroundColor,
                                         border: Border.all(
                                             width: 1, color: Colors.grey),
                                         borderRadius: BorderRadius.circular(16),

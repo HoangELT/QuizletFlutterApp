@@ -1,20 +1,18 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:quizletapp/services/models_services/user_service.dart';
 import 'package:quizletapp/services/provider/current_user_provider.dart';
+import 'package:quizletapp/services/provider/index_of_app_provider.dart';
 import '../enums/text_style_enum.dart';
 import '../models/user.dart';
 import '../services/firebase_auth.dart';
-import '../services/shared_preferences_service.dart';
 import '../utils/app_theme.dart';
 import '../widgets/appbar_default.dart';
 import '../widgets/elevatedButton.dart';
 import '../widgets/text.dart';
+import 'package:toastification/toastification.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -50,7 +48,6 @@ class _LoginPageState extends State<LoginPage> {
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             child: Form(
               key: formKey,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -62,6 +59,7 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 16),
                   ElevatedButton.icon(
                     onPressed: () {
+                      context.read<IndexOfAppProvider>().changeIndex(0);
                       _googleSignIn(context);
                     },
                     style: ButtonStyle(
@@ -93,6 +91,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
                     textInputAction: TextInputAction.next,
                     onSaved: (newEmail) {
                       email = newEmail!;
@@ -132,6 +131,7 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 28),
                   TextFormField(
                     textInputAction: TextInputAction.done,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
                     onSaved: (newPassWord) {
                       passWord = newPassWord!;
                     },
@@ -149,6 +149,7 @@ class _LoginPageState extends State<LoginPage> {
                       return null;
                     },
                     onFieldSubmitted: (value) {
+                      context.read<IndexOfAppProvider>().changeIndex(0);
                       _submit();
                     },
                     decoration: InputDecoration(
@@ -199,6 +200,7 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 28),
                   CustomElevatedButton(
                       onPressed: () {
+                        context.read<IndexOfAppProvider>().changeIndex(0);
                         _submit();
                       },
                       text: "Đăng nhập"),
@@ -519,25 +521,13 @@ class _LoginPageState extends State<LoginPage> {
           setState(() {
             isLoading = false;
           });
-          showDialog(
+          toastification.show(
             context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                icon: const Icon(
-                  Icons.warning_amber_rounded,
-                  color: Colors.red,
-                  size: 45,
-                ),
-                title: CustomText(
-                  text: 'Không tìm thấy tài khoản!',
-                  type: TextStyleEnum.large,
-                ),
-                backgroundColor: AppTheme.primaryBackgroundColorAppbar,
-              );
-            },
+            title: const Text('Tài khoản không tồn tại'),
+            style: ToastificationStyle.fillColored,
+            type: ToastificationType.error,
+            autoCloseDuration: const Duration(seconds: 3),
           );
-          await Future.delayed(const Duration(seconds: 2));
-          Navigator.of(context, rootNavigator: true).pop();
         }
       } catch (error) {
         // Xử lý khi có lỗi xác thực từ Firebase
@@ -546,25 +536,13 @@ class _LoginPageState extends State<LoginPage> {
           isLoading = false;
         });
         // Hiển thị alertDialog thông báo lỗi
-        showDialog(
+        toastification.show(
           context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              icon: const Icon(
-                Icons.warning_amber_rounded,
-                color: Colors.red,
-                size: 45,
-              ),
-              title: CustomText(
-                text: 'Sai email hoặc password. Vui lòng thử lại!',
-                type: TextStyleEnum.large,
-              ),
-              backgroundColor: AppTheme.primaryBackgroundColorAppbar,
-            );
-          },
+          title: const Text('Sai tài khoản hoặc mật khẩu'),
+          style: ToastificationStyle.fillColored,
+          type: ToastificationType.error,
+          autoCloseDuration: const Duration(seconds: 3),
         );
-        await Future.delayed(const Duration(seconds: 2));
-        Navigator.of(context, rootNavigator: true).pop();
       }
     }
   }

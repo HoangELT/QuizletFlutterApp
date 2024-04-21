@@ -339,32 +339,35 @@ class _LibraryPageState extends State<LibraryPage>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Container(
-                              margin:
-                                  const EdgeInsets.only(top: 24, bottom: 12),
-                              child: TextFormField(
-                                cursorColor: Colors.white,
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.white,
-                                ),
-                                decoration: const InputDecoration(
-                                  hintText: 'Lọc học phần',
-                                  hintStyle: TextStyle(
-                                    color: Colors.grey,
+                            if (topicProvider
+                                    .listTopicOfCurrentUser.isNotEmpty ||
+                                listTopicToday.isNotEmpty)
+                              Container(
+                                margin:
+                                    const EdgeInsets.only(top: 24, bottom: 12),
+                                child: TextFormField(
+                                  cursorColor: Colors.white,
+                                  style: const TextStyle(
                                     fontSize: 20,
+                                    color: Colors.white,
                                   ),
-                                  focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(
-                                        width: 4.0, color: Colors.white),
-                                  ),
-                                  enabledBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(
-                                        width: 2.0, color: Colors.white),
+                                  decoration: const InputDecoration(
+                                    hintText: 'Lọc học phần',
+                                    hintStyle: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 20,
+                                    ),
+                                    focusedBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                          width: 4.0, color: Colors.white),
+                                    ),
+                                    enabledBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                          width: 2.0, color: Colors.white),
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
                             Column(
                               children: [
                                 if (listTopicToday.isNotEmpty)
@@ -613,14 +616,17 @@ class _LibraryPageState extends State<LibraryPage>
               padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
               child: ListView.separated(
                 itemCount: folderProvider.listFolderOfCurrentUser.length,
-                separatorBuilder: (context, index) => const SizedBox(height: 16,),
+                separatorBuilder: (context, index) => const SizedBox(
+                  height: 16,
+                ),
                 itemBuilder: (context, index) {
                   return Skeletonizer(
                     enabled: isLoading,
                     containersColor: AppTheme.primaryColorSkeletonContainer,
                     child: ItemList(
                       onTap: () {
-                        print('tap in item id: ${folderProvider.listFolderOfCurrentUser[index].id}');
+                        print(
+                            'tap in item id: ${folderProvider.listFolderOfCurrentUser[index].id}');
                       },
                       height: null,
                       width: double.infinity,
@@ -635,8 +641,8 @@ class _LibraryPageState extends State<LibraryPage>
                             width: 12,
                           ),
                           CustomText(
-                            text:
-                                folderProvider.listFolderOfCurrentUser[index].title,
+                            text: folderProvider
+                                .listFolderOfCurrentUser[index].title,
                             type: TextStyleEnum.large,
                           ),
                         ],
@@ -649,7 +655,8 @@ class _LibraryPageState extends State<LibraryPage>
                                 text:
                                     '${folderProvider.listFolderOfCurrentUser[index].listTopic.length} học phần'),
                             Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 16),
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 16),
                               color: Colors.grey.shade600.withOpacity(0.5),
                               width: 1,
                               height: 18,
@@ -663,7 +670,10 @@ class _LibraryPageState extends State<LibraryPage>
                               width: 8,
                             ),
                             CustomText(
-                                text: folderProvider.listFolderOfCurrentUser[index].userCreate!.username)
+                                text: folderProvider
+                                    .listFolderOfCurrentUser[index]
+                                    .userCreate!
+                                    .username)
                           ],
                         ),
                       ),
@@ -674,59 +684,63 @@ class _LibraryPageState extends State<LibraryPage>
             );
           }
           return SingleChildScrollView(
-            child: Container(
-              constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.height * 0.7),
-              margin: const EdgeInsets.symmetric(
-                vertical: 64,
-              ),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 16,
-              ),
-              child: Column(
-                children: [
-                  const Icon(
-                    FontAwesomeIcons.solidFolderOpen,
-                    color: Colors.blue,
-                    size: 44,
-                  ),
-                  Container(
-                    margin: const EdgeInsets.symmetric(
-                      vertical: 32,
+            child: Skeletonizer(
+              enabled: isLoading,
+              containersColor: AppTheme.primaryColorSkeletonContainer,
+              child: Container(
+                constraints: BoxConstraints(
+                    minHeight: MediaQuery.of(context).size.height * 0.7),
+                margin: const EdgeInsets.symmetric(
+                  vertical: 64,
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
+                child: Column(
+                  children: [
+                    const Icon(
+                      FontAwesomeIcons.solidFolderOpen,
+                      color: Colors.blue,
+                      size: 44,
                     ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
+                    Container(
+                      margin: const EdgeInsets.symmetric(
+                        vertical: 32,
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                      ),
+                      child: CustomText(
+                        text: 'Sắp xếp học phần của bạn theo chủ đề.',
+                        type: TextStyleEnum.xl,
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                    child: CustomText(
-                      text: 'Sắp xếp học phần của bạn theo chủ đề.',
-                      type: TextStyleEnum.xl,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  Ink(
-                    decoration: BoxDecoration(
-                      color: AppTheme.primaryColor,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/folder/create');
-                      },
-                      borderRadius: BorderRadius.circular(8),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 10,
-                        ),
-                        child: CustomText(
-                          text: 'Tạo thư mục',
-                          type: TextStyleEnum.large,
+                    Ink(
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryColor,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/folder/create');
+                        },
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
+                          ),
+                          child: CustomText(
+                            text: 'Tạo thư mục',
+                            type: TextStyleEnum.large,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );

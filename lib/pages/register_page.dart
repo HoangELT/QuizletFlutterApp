@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:quizletapp/models/user.dart';
 import 'package:quizletapp/services/firebase.dart';
+import 'package:toastification/toastification.dart';
 import '../enums/text_style_enum.dart';
 import '../services/firebase_auth.dart';
 import '../services/shared_preferences_service.dart';
@@ -93,6 +94,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     //   birthday = newBirthday!;
                     // },
                     textInputAction: TextInputAction.next,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
 
                     validator: (value) {
                       if (value!.isEmpty) {
@@ -129,6 +131,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   const SizedBox(height: 16),
                   TextFormField(
                     textInputAction: TextInputAction.next,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
                     onSaved: (newEmail) {
                       email = newEmail!;
                     },
@@ -164,6 +167,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   const SizedBox(height: 16),
                   TextFormField(
                     textInputAction: TextInputAction.next,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
                     onFieldSubmitted: (value) {
                       focusNode.requestFocus();
                     },
@@ -229,6 +233,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   const SizedBox(height: 16),
                   TextFormField(
                     textInputAction: TextInputAction.done,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
                     focusNode: focusNode,
                     onSaved: (newCfPassWord) {
                       cfPassWord = newCfPassWord!;
@@ -328,12 +333,22 @@ class _RegisterPageState extends State<RegisterPage> {
           var newUser = await auth.signUpWithEmailAndPassword(email, passWord);
           // Lưu newUser vào firestore
           User newUserTemp = newUser.user!;
-          await firebaseService.addDocument('users', UserModel('', newUserTemp.uid, newUserTemp.email!, UserModel.createUsernameFromEmail(newUserTemp.email!)).toMap());
+          await firebaseService.addDocument(
+              'users',
+              UserModel('', newUserTemp.uid, newUserTemp.email!,
+                      UserModel.createUsernameFromEmail(newUserTemp.email!))
+                  .toMap());
           setState(() {
             isLoading = false;
           });
-          _showDialog("Đăng ký thành công", Icons.check_circle_outline_outlined,
-              Colors.green);
+          toastification.show(
+            context: context,
+            title: const Text('Đăng ký thành công'),
+            style: ToastificationStyle.fillColored,
+            type: ToastificationType.success,
+            autoCloseDuration: const Duration(seconds: 3),
+          );
+          Navigator.pushReplacementNamed(context, "/login");
         } catch (error) {
           // Xử lý khi có lỗi xác thực từ Firebase
           print('Error signing up: $error');
@@ -341,8 +356,13 @@ class _RegisterPageState extends State<RegisterPage> {
             isLoading = false;
           });
           // Hiển thị AlertDialog thông báo lỗi
-          _showDialog('Đăng ký thất bại. Vui lòng thử lại!',
-              Icons.warning_amber_rounded, Colors.red);
+          toastification.show(
+            context: context,
+            title: const Text('Đăng ký thất bại. Vui lòng thử lại!'),
+            style: ToastificationStyle.fillColored,
+            type: ToastificationType.error,
+            autoCloseDuration: const Duration(seconds: 3),
+          );
         }
       }
     }
