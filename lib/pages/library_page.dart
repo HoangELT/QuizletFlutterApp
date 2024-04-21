@@ -603,57 +603,134 @@ class _LibraryPageState extends State<LibraryPage>
   }
 
   Widget _buildInitFolderPage() {
-    return Container(
-      margin: const EdgeInsets.symmetric(
-        vertical: 64,
-      ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 16,
-      ),
-      child: Column(
-        children: [
-          const Icon(
-            FontAwesomeIcons.solidFolderOpen,
-            color: Colors.blue,
-            size: 44,
-          ),
-          Container(
-            margin: const EdgeInsets.symmetric(
-              vertical: 32,
-            ),
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16,
-            ),
-            child: CustomText(
-              text: 'Sắp xếp học phần của bạn theo chủ đề.',
-              type: TextStyleEnum.xl,
-              textAlign: TextAlign.center,
-            ),
-          ),
-          Ink(
-            decoration: BoxDecoration(
-              color: AppTheme.primaryColor,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: InkWell(
-              onTap: () {
-                Navigator.pushNamed(context, '/folder/create');
-              },
-              borderRadius: BorderRadius.circular(8),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 10,
-                ),
-                child: CustomText(
-                  text: 'Tạo thư mục',
-                  type: TextStyleEnum.large,
-                ),
+    return RefreshIndicator(
+      onRefresh: _fetchFolders,
+      triggerMode: RefreshIndicatorTriggerMode.anywhere,
+      child: Consumer<FolderProvider>(
+        builder: (context, folderProvider, child) {
+          if (folderProvider.listFolderOfCurrentUser.isNotEmpty) {
+            return Container(
+              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+              child: ListView.separated(
+                itemCount: folderProvider.listFolderOfCurrentUser.length,
+                separatorBuilder: (context, index) => const SizedBox(height: 16,),
+                itemBuilder: (context, index) {
+                  return Skeletonizer(
+                    enabled: isLoading,
+                    containersColor: AppTheme.primaryColorSkeletonContainer,
+                    child: ItemList(
+                      onTap: () {
+                        print('tap in item id: ${folderProvider.listFolderOfCurrentUser[index].id}');
+                      },
+                      height: null,
+                      width: double.infinity,
+                      head: Row(
+                        children: [
+                          Icon(
+                            Icons.folder_outlined,
+                            color: Colors.grey.withOpacity(0.6),
+                            size: 28,
+                          ),
+                          const SizedBox(
+                            width: 12,
+                          ),
+                          CustomText(
+                            text:
+                                folderProvider.listFolderOfCurrentUser[index].title,
+                            type: TextStyleEnum.large,
+                          ),
+                        ],
+                      ),
+                      body: Container(
+                        margin: const EdgeInsets.only(top: 12),
+                        child: Row(
+                          children: [
+                            CustomText(
+                                text:
+                                    '${folderProvider.listFolderOfCurrentUser[index].listTopic.length} học phần'),
+                            Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 16),
+                              color: Colors.grey.shade600.withOpacity(0.5),
+                              width: 1,
+                              height: 18,
+                            ),
+                            const CircleAvatar(
+                              backgroundImage: AppTheme.defaultAvatar,
+                              backgroundColor: Colors.grey,
+                              radius: 14,
+                            ),
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            CustomText(
+                                text: folderProvider.listFolderOfCurrentUser[index].userCreate!.username)
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            );
+          }
+          return SingleChildScrollView(
+            child: Container(
+              constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height * 0.7),
+              margin: const EdgeInsets.symmetric(
+                vertical: 64,
+              ),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 16,
+              ),
+              child: Column(
+                children: [
+                  const Icon(
+                    FontAwesomeIcons.solidFolderOpen,
+                    color: Colors.blue,
+                    size: 44,
+                  ),
+                  Container(
+                    margin: const EdgeInsets.symmetric(
+                      vertical: 32,
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                    ),
+                    child: CustomText(
+                      text: 'Sắp xếp học phần của bạn theo chủ đề.',
+                      type: TextStyleEnum.xl,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  Ink(
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryColor,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pushNamed(context, '/folder/create');
+                      },
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
+                        child: CustomText(
+                          text: 'Tạo thư mục',
+                          type: TextStyleEnum.large,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }

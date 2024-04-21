@@ -11,7 +11,8 @@ class FolderProvider extends ChangeNotifier{
 
   Future<void> reloadListFolderOfCurrentUser () async {
     try {
-      _listFolderOfCurrentUser = await folderService.getAllTopicOfCurrentUser();
+      var result = await folderService.getAllTopicOfCurrentUser();
+      _listFolderOfCurrentUser = FolderService.sortFoldersByDateDescending(result);
       notifyListeners();
     } catch (e) {
       print('FolderProvider error: $e');

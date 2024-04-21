@@ -354,34 +354,37 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                         ],
                                       ),
-                                      body: Row(
-                                        children: [
-                                          CustomText(
-                                              text:
-                                                  '${folderProvider.listFolderOfCurrentUser[index].listTopic.length} học phần'),
-                                          Container(
-                                            margin: const EdgeInsets.symmetric(
-                                                horizontal: 16),
-                                            color: Colors.grey.shade600
-                                                .withOpacity(0.5),
-                                            width: 1,
-                                            height: 18,
-                                          ),
-                                          const CircleAvatar(
-                                            backgroundImage:
-                                                AppTheme.defaultAvatar,
-                                            backgroundColor: Colors.grey,
-                                            radius: 14,
-                                          ),
-                                          const SizedBox(
-                                            width: 8,
-                                          ),
-                                          CustomText(
-                                              text: firebaseAuthService
-                                                      .getCurrentUser()
-                                                      ?.displayName ??
-                                                  '')
-                                        ],
+                                      body: Container(
+                                        margin: const EdgeInsets.only(top: 12),
+                                        child: Row(
+                                          children: [
+                                            CustomText(
+                                                text:
+                                                    '${folderProvider.listFolderOfCurrentUser[index].listTopic.length} học phần'),
+                                            Container(
+                                              margin: const EdgeInsets.symmetric(
+                                                  horizontal: 16),
+                                              color: Colors.grey.shade600
+                                                  .withOpacity(0.5),
+                                              width: 1,
+                                              height: 18,
+                                            ),
+                                            const CircleAvatar(
+                                              backgroundImage:
+                                                  AppTheme.defaultAvatar,
+                                              backgroundColor: Colors.grey,
+                                              radius: 14,
+                                            ),
+                                            const SizedBox(
+                                              width: 8,
+                                            ),
+                                            CustomText(
+                                                text: firebaseAuthService
+                                                        .getCurrentUser()
+                                                        ?.displayName ??
+                                                    '')
+                                          ],
+                                        ),
                                       ),
                                     );
                                   },

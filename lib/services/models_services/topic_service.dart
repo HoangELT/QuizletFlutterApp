@@ -89,7 +89,7 @@ class TopicService {
       }
     });
 
-    return topicsToday;
+    return sortTopicsByDateDescending(topicsToday);
   }
 
   void printListTopics(List<TopicModel> listTopics) {
