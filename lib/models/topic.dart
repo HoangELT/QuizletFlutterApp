@@ -11,9 +11,21 @@ class TopicModel {
   DateTime dateCreated; // Thêm trường dateCreated kiểu DateTime
 
   // Constructor mặc định, sử dụng DateTime.now() để gán ngày hiện tại cho dateCreated
-  TopicModel(this.userId, this.username, this.id, this.title,
-      this.description, this.public, this.listCard)
+  TopicModel(this.userId, this.username, this.id, this.title, this.description,
+      this.public, this.listCard)
       : dateCreated = DateTime.now();
+
+  // Correct copy constructor using an initializer list
+  TopicModel.copy(TopicModel source)
+      : userId = source.userId,
+        username = source.username,
+        id = source.id,
+        title = source.title,
+        description = source.description,
+        public = source.public,
+        listCard = List<CardModel>.from(source.listCard.map((card) =>
+            CardModel.copy(card))), // Assuming CardModel has a copy constructor
+        dateCreated = source.dateCreated;
 
   // Phương thức tạo một Map từ đối tượng TopicModel
   Map<String, dynamic> toMap() {
@@ -31,6 +43,7 @@ class TopicModel {
           .toIso8601String(), // Chuyển đổi dateCreated thành chuỗi ISO 8601
     };
   }
+
   // Phương thức chuyển đổi từ List<TopicModal> sang List<Map<String, dynamic>>
   static List<Map<String, dynamic>> topicsToMapList(List<TopicModel> topics) {
     return topics.map((topic) => topic.toMap()).toList();

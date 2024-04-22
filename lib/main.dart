@@ -11,6 +11,7 @@ import 'package:quizletapp/pages/login_page.dart';
 import 'package:quizletapp/pages/not_found_page.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:quizletapp/pages/topic_detail_page.dart';
 import 'package:quizletapp/services/firebase_auth.dart';
 import 'package:quizletapp/services/provider/current_user_provider.dart';
 import 'package:quizletapp/services/provider/folder_provider.dart';
@@ -120,6 +121,10 @@ class MyApp extends StatelessWidget {
           case '/folder/create':
             return MaterialPageRoute(
               builder: (context) => const CreateFolderPage(),
+            );
+          case '/topic/detail':
+            return MaterialPageRoute(
+              builder: (context) => TopicDetailPage(topicId: args as String),
             );
           default:
             return MaterialPageRoute(

@@ -252,14 +252,17 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
                           setState(() {
                             isLoading = true;
                           });
-                          await topicService.addTopic(newTopic);
+                          var newTopicId =
+                              await topicService.addTopic(newTopic);
                           setState(() {
                             isLoading = false;
                           });
                           print('Tạo topic thành công');
                           context.read<TopicProvider>().reloadListTopic();
+                          Navigator.pushReplacementNamed(
+                              context, '/topic/detail',
+                              arguments: newTopicId);
                         }
-                        Navigator.pop(context, 201);
                       } else {
                         print('listCard rỗng');
                       }
@@ -272,7 +275,7 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
                         cancelLabel: 'Hủy',
                         okLabel: 'Xóa học phần này',
                         isDestructiveAction: true,
-                        alertStyle: AdaptiveStyle.iOS,
+                        style: AdaptiveStyle.iOS,
                         useActionSheetForIOS: true,
                         title: resultCheck,
                       );

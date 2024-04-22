@@ -16,7 +16,7 @@ class FirebaseService {
   FirebaseService._internal();
 
   // Phương thức để thêm một tài liệu vào Firestore
-  Future<void> addDocument(
+  Future<String> addDocument(
       String collectionName, Map<String, dynamic> data) async {
     try {
       // Thêm tài liệu vào Firestore và lưu trữ DocumentReference
@@ -31,6 +31,7 @@ class FirebaseService {
 
       // Lưu dữ liệu mới vào Firestore với trường id đã được thêm vào
       await docRef.update(newData);
+      return docId;
     } catch (error) {
       print('Error adding document: $error');
       throw error;

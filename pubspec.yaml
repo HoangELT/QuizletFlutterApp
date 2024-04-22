@@ -53,6 +53,12 @@ dependencies:
   sticky_headers: ^0.3.0+2
   toastification: ^1.2.1
   adaptive_dialog: ^2.1.0
+  carousel_slider: ^4.2.1
+  flip_card: ^0.7.0
+  swipe_cards: ^2.0.0+1
+  auto_size_text: ^3.0.0
+  smooth_page_indicator: ^1.1.0
+  # flutter_tts: ^4.0.2
 
 
 dev_dependencies:

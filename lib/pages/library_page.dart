@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:quizletapp/enums/filter_topic_enum.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
+import 'package:quizletapp/pages/topic_detail_page.dart';
 import 'package:quizletapp/services/models_services/topic_service.dart';
 import 'package:quizletapp/services/provider/current_user_provider.dart';
 import 'package:quizletapp/services/provider/folder_provider.dart';
@@ -400,6 +401,20 @@ class _LibraryPageState extends State<LibraryPage>
                                             child: ItemList(
                                               height: null,
                                               width: double.infinity,
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        TopicDetailPage(
+                                                      topicId: topicProvider
+                                                          .listTopicOfCurrentUser[
+                                                              index]
+                                                          .id,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
                                               headText:
                                                   listTopicToday[index].title,
                                               body: Row(
@@ -487,6 +502,20 @@ class _LibraryPageState extends State<LibraryPage>
                                           child: ItemList(
                                             height: null,
                                             width: double.infinity,
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      TopicDetailPage(
+                                                    topicId: topicProvider
+                                                        .listTopicOfCurrentUser[
+                                                            index]
+                                                        .id,
+                                                  ),
+                                                ),
+                                              );
+                                            },
                                             headText: topicProvider
                                                 .listTopicOfCurrentUser[index]
                                                 .title,

@@ -30,7 +30,7 @@ class ButtonListTile extends StatelessWidget {
                 borderRadius: BorderRadius.all(
                   Radius.circular(borderRadius),
                 ),
-                color: Color.fromARGB(160, 127, 144, 155),
+                color: const Color.fromARGB(159, 108, 123, 132).withOpacity(0.5),
               )
             : boxDecoration,
         child: ListTile(

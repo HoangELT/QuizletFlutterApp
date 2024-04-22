@@ -9,6 +9,16 @@ class TopicService {
   FirebaseService firebaseService = FirebaseService();
   UserService userService = UserService();
 
+  Future<TopicModel?> getTopicById(String topicId) async {
+    try {
+      var getTopicById = await firebaseService.getDocument('topics', topicId);
+      return TopicModel.fromMap(getTopicById);
+    } catch (e) {
+      print('Topic service error: $e');
+    }
+    return null;
+  }
+
   Future<List<TopicModel>> getTopicsWithUsers() async {
     List<TopicModel> topics = [];
 
@@ -55,13 +65,14 @@ class TopicService {
   }
 
   //Thêm một topic mới vào firestore
-  Future<void> addTopic(TopicModel newTopic) async {
+  Future<String> addTopic(TopicModel newTopic) async {
     try {
-      await firebaseService.addDocument('topics', newTopic.toMap());
+      var id = await firebaseService.addDocument('topics', newTopic.toMap());
+      return id;
     } catch (error) {
       print('Error adding topic document: $error');
-      throw error;
     }
+    return '';
   }
 
   static List<TopicModel> sortTopicsByDate(List<TopicModel> topics) {
@@ -72,6 +83,11 @@ class TopicService {
   static List<TopicModel> sortTopicsByDateDescending(List<TopicModel> topics) {
     topics.sort((a, b) => b.dateCreated.compareTo(a.dateCreated));
     return topics;
+  }
+
+  static TopicModel sortTopicByABC(TopicModel topic) {
+    topic.listCard.sort((a, b) => a.term.compareTo(b.term));
+    return topic;
   }
 
   List<TopicModel> getTopicsToday(List<TopicModel> listTopicOfCurrentUser) {

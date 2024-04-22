@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
 import 'package:quizletapp/models/topic.dart';
+import 'package:quizletapp/pages/topic_detail_page.dart';
 import 'package:quizletapp/services/firebase_auth.dart';
 import 'package:quizletapp/services/models_services/folder_service.dart';
 import 'package:quizletapp/services/provider/current_user_provider.dart';
@@ -124,12 +125,13 @@ class _HomePageState extends State<HomePage> {
                       AppTheme.primaryButtonColor),
                 ),
                 onPressed: () async {
-                  await toastification.show(
-                    context: context,
-                    title: Text('Helllo'),
-                    style: ToastificationStyle.fillColored,
-                    type: ToastificationType.success,
-                    autoCloseDuration: const Duration(seconds: 2),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TopicDetailPage(
+                        topicId: 'jPqwQ8p2bmcLAd8mHzo3',
+                      ),
+                    ),
                   );
                 },
                 child: CustomText(
@@ -249,7 +251,19 @@ class _HomePageState extends State<HomePage> {
                                   },
                                   buildItem: (context, index) {
                                     return ItemList(
-                                      onTap: () {},
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                TopicDetailPage(
+                                              topicId: topicProvider
+                                                  .listTopicOfCurrentUser[index]
+                                                  .id,
+                                            ),
+                                          ),
+                                        );
+                                      },
                                       headText: topicProvider
                                           .listTopicOfCurrentUser[index].title,
                                       bodyText:
@@ -520,7 +534,7 @@ class _HomePageState extends State<HomePage> {
                                   },
                                   child: CustomText(
                                     text: 'Chính sách quyền riêng tư',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w500),
                                   )),
