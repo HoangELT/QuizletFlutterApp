@@ -3,8 +3,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-// import 'package:flutter_tts/flutter_tts.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
 import 'package:quizletapp/models/topic.dart';
@@ -27,7 +26,7 @@ class TopicDetailPage extends StatefulWidget {
 }
 
 class _TopicDetailPageState extends State<TopicDetailPage> {
-  // final FlutterTts flutterTts = FlutterTts();
+  final FlutterTts flutterTts = FlutterTts();
   TopicService topicService = TopicService();
   bool isLoading = false;
   TopicModel? topic;
@@ -43,11 +42,38 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
     super.initState();
   }
 
-  // Future speak(String textToSpeech) async {
-  //   await flutterTts.setLanguage('en-US');
-  //   await flutterTts.setPitch(1);
-  //   await flutterTts.speak(textToSpeech);
-  // }
+  Future<void> speak(String textToSpeech) async {
+    try {
+      // Set language to English (US)
+      var resultLanguage = await flutterTts.setLanguage('en-US');
+      if (resultLanguage == 1) {
+        print('Language set to English (US)');
+      } else {
+        print('Failed to set language');
+        return;
+      }
+
+      // Set pitch level
+      var resultPitch = await flutterTts.setPitch(0.8);
+      if (resultPitch == 1) {
+        print('Pitch set to 0.8');
+      } else {
+        print('Failed to set pitch');
+        return;
+      }
+
+      // Start speaking
+      var resultSpeak = await flutterTts.speak(textToSpeech);
+      if (resultSpeak == 1) {
+        print('Speaking initiated');
+      } else {
+        print('Failed to speak');
+        return;
+      }
+    } catch (e) {
+      print('Error occurred in TTS operation: $e');
+    }
+  }
 
   Future<void> _fetchTopic() async {
     setState(() {
@@ -435,8 +461,8 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                                               children: [
                                                 IconButton(
                                                   onPressed: () {
-                                                    // speak(topic!
-                                                    //     .listCard[index].term);
+                                                    speak(topic!
+                                                        .listCard[index].term);
                                                   },
                                                   icon: const Icon(
                                                     Icons.volume_up_outlined,
