@@ -1,3 +1,4 @@
+import 'package:quizletapp/models/card.dart';
 import 'package:quizletapp/models/topic.dart';
 import 'package:quizletapp/models/user.dart';
 import 'package:quizletapp/services/firebase.dart';
@@ -85,9 +86,12 @@ class TopicService {
     return topics;
   }
 
-  static TopicModel sortTopicByABC(TopicModel topic) {
-    topic.listCard.sort((a, b) => a.term.compareTo(b.term));
-    return topic;
+  static List<CardModel> sortTopicByABC(List<CardModel> listCard) {
+    List<CardModel> listClone = listCard.map((element) {
+      return CardModel(element.cardId, element.term, element.define);
+     }).toList();
+    listClone.sort((a, b) => a.term.compareTo(b.term));
+    return listClone;
   }
 
   List<TopicModel> getTopicsToday(List<TopicModel> listTopicOfCurrentUser) {

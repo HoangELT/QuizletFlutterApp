@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
+import 'package:quizletapp/models/card.dart';
 import 'package:quizletapp/models/topic.dart';
 import 'package:quizletapp/services/models_services/topic_service.dart';
 import 'package:quizletapp/utils/app_theme.dart';
@@ -13,6 +14,7 @@ import 'package:quizletapp/widgets/button_listtile.dart';
 import 'package:quizletapp/widgets/text.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:toggle_switch/toggle_switch.dart';
 
 class TopicDetailPage extends StatefulWidget {
   final String topicId;
@@ -30,11 +32,14 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
   TopicService topicService = TopicService();
   bool isLoading = false;
   TopicModel? topic;
-  TopicModel? topicClone;
-  TopicModel? topicSortByABC;
   int _current = 0;
+  int _currentPicked = 0;
+  List<CardModel> listCardPicked = [];
+  List<List<CardModel>> listSort = [[], []];
 
   int _currentIndexSort = 0;
+
+  var _controller = CarouselController();
 
   @override
   void initState() {
@@ -52,7 +57,6 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
         print('Failed to set language');
         return;
       }
-
       // Set pitch level
       var resultPitch = await flutterTts.setPitch(0.8);
       if (resultPitch == 1) {
@@ -75,16 +79,23 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
     }
   }
 
+  bool _checkPicked(CardModel card) {
+    return listCardPicked.contains(card);
+  }
+
   Future<void> _fetchTopic() async {
     setState(() {
       isLoading = true;
       _currentIndexSort = 0;
     });
     topic = await topicService.getTopicById(widget.topicId);
-    topicClone = (topic == null) ? null : TopicModel.copy(topic!);
-    topicSortByABC = (topic == null)
-        ? null
-        : TopicService.sortTopicByABC(TopicModel.copy(topic!));
+    if (topic != null) {
+      listSort = [
+        topic!.listCard,
+        TopicService.sortTopicByABC(topic!.listCard)
+      ];
+    }
+
     setState(() {
       isLoading = false;
     });
@@ -99,13 +110,143 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
         foregroundColor: Colors.white,
         centerTitle: true,
         actions: [
-          IconButton(
-              onPressed: () {},
-              icon: const Icon(
-                Icons.more_horiz,
-                color: Colors.white,
-              )),
+          Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.more_horiz_rounded),
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
+              tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
+            ),
+          ),
         ],
+      ),
+      endDrawer: Drawer(
+        backgroundColor: AppTheme.primaryBackgroundColor,
+        elevation: 0,
+        child: Column(
+          children: [
+            Expanded(
+              child: Container(
+                height: 200,
+              ),
+            ),
+            Wrap(
+              children: [
+                const Divider(
+                  thickness: 0.5,
+                  height: 1,
+                ),
+                InkWell(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: ListTile(
+                    minVerticalPadding: 20,
+                    title: CustomText(
+                      text: 'Sửa học phần',
+                      type: TextStyleEnum.large,
+                    ),
+                    leading: const Icon(
+                      Icons.edit,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Wrap(
+              children: [
+                const Divider(
+                  thickness: 0.5,
+                  height: 1,
+                ),
+                InkWell(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: ListTile(
+                    minVerticalPadding: 20,
+                    title: CustomText(
+                      text: 'Thêm vào thư mục',
+                      type: TextStyleEnum.large,
+                    ),
+                    leading: const Icon(
+                      Icons.folder_copy_outlined,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Wrap(
+              children: [
+                const Divider(
+                  thickness: 0.5,
+                  height: 1,
+                ),
+                InkWell(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: ListTile(
+                    minVerticalPadding: 20,
+                    title: CustomText(
+                      text: 'Thông tin học phần',
+                      type: TextStyleEnum.large,
+                    ),
+                    leading: const Icon(
+                      Icons.info_outline,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Wrap(
+              children: [
+                const Divider(
+                  thickness: 0.5,
+                  height: 1,
+                ),
+                InkWell(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: ListTile(
+                    minVerticalPadding: 20,
+                    title: CustomText(
+                      text: 'Xóa học phần',
+                      type: TextStyleEnum.large,
+                    ),
+                    leading: const Icon(
+                      Icons.delete_outline,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Wrap(
+              children: [
+                const Divider(
+                  thickness: 0.5,
+                  height: 1,
+                ),
+                InkWell(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.only(top: 20, bottom: 28),
+                    alignment: Alignment.center,
+                    child: CustomText(
+                      text: 'Hủy',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
       body: RefreshIndicator(
         onRefresh: _fetchTopic,
@@ -127,7 +268,8 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                           child: Column(
                             children: [
                               CarouselSlider.builder(
-                                itemCount: topic!.listCard.length,
+                                carouselController: _controller,
+                                itemCount: listSort[0].length,
                                 itemBuilder: (context, index, realIndex) {
                                   return FlipCard(
                                     fill: Fill.fillBack,
@@ -145,10 +287,9 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                                                 BorderRadius.circular(8),
                                           ),
                                           child: AutoSizeText(
-                                            (topic!.listCard[index].term
-                                                    .isEmpty)
+                                            (listSort[0][index].term.isEmpty)
                                                 ? '...'
-                                                : topic!.listCard[index].term,
+                                                : listSort[0][index].term,
                                             style: const TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 18),
@@ -180,10 +321,9 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                                                 BorderRadius.circular(8),
                                           ),
                                           child: AutoSizeText(
-                                            (topic!.listCard[index].define
-                                                    .isEmpty)
+                                            (listSort[0][index].define.isEmpty)
                                                 ? '...'
-                                                : topic!.listCard[index].define,
+                                                : listSort[0][index].define,
                                             style: const TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 18),
@@ -206,13 +346,13 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                                   );
                                 },
                                 options: CarouselOptions(
-                                    initialPage: 0,
+                                    initialPage: _current,
                                     height: 200,
                                     autoPlayInterval:
                                         const Duration(seconds: 2),
                                     enlargeCenterPage: true,
-                                    enlargeFactor: 0.3,
                                     scrollDirection: Axis.horizontal,
+                                    enableInfiniteScroll: false,
                                     onPageChanged: (index, reason) {
                                       setState(() {
                                         _current = index;
@@ -222,8 +362,8 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                               Container(
                                 margin:
                                     const EdgeInsets.only(top: 20, bottom: 4),
-                                child: _buildCarouseIndicator(
-                                    topic!.listCard.length),
+                                child:
+                                    _buildCarouseIndicator(listSort[0].length),
                               )
                             ],
                           ),
@@ -266,8 +406,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                                       height: 18,
                                     ),
                                     CustomText(
-                                      text:
-                                          '${topic!.listCard.length} thuật ngữ',
+                                      text: '${listSort[0].length} thuật ngữ',
                                       style: const TextStyle(
                                           fontWeight: FontWeight.w500),
                                     ),
@@ -352,6 +491,50 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                                   ),
                                 ),
                               ),
+                              if (listCardPicked.isNotEmpty)
+                                Container(
+                                  margin: const EdgeInsets.only(top: 16),
+                                  child: ToggleSwitch(
+                                    animate: true,
+                                    animationDuration: 200,
+                                    minWidth: double.infinity,
+                                    cornerRadius: 20.0,
+                                    activeBgColors: [
+                                      [Colors.green[800]!],
+                                      [Colors.red[800]!]
+                                    ],
+                                    activeFgColor: Colors.white,
+                                    inactiveBgColor:
+                                        Colors.grey.withOpacity(0.3),
+                                    inactiveFgColor: Colors.white,
+                                    initialLabelIndex: _currentPicked,
+                                    totalSwitches: 2,
+                                    labels: [
+                                      'Học hết',
+                                      'Học ${listCardPicked.length}'
+                                    ],
+                                    customTextStyles: const [
+                                      TextStyle(fontWeight: FontWeight.w500),
+                                      TextStyle(fontWeight: FontWeight.w500),
+                                    ],
+                                    radiusStyle: true,
+                                    onToggle: (index) {
+                                      if (index == 0) {
+                                        setState(() {
+                                          _currentPicked = 0;
+                                          topic!.listCard =
+                                              listSort[_currentIndexSort];
+                                        });
+                                      } else {
+                                        setState(() {
+                                          _currentPicked = 1;
+                                          topic!.listCard = listCardPicked;
+                                        });
+                                      }
+                                    },
+                                  ),
+                                ),
+
                               Container(
                                 padding: const EdgeInsets.only(top: 16),
                                 margin:
@@ -380,20 +563,16 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                                                 label: 'Bảng chữ cái', key: 1),
                                           ],
                                         );
-                                        if (_currentIndexSort !=
-                                            resultChooseTypeSort) {
-                                          if (resultChooseTypeSort == 0) {
-                                            setState(() {
-                                              _currentIndexSort = 0;
-                                              topic = topicClone;
-                                            });
-                                          } else if (resultChooseTypeSort ==
-                                              1) {
-                                            setState(() {
-                                              topic = topicSortByABC;
-                                              _currentIndexSort = 1;
-                                            });
-                                          }
+                                        if (resultChooseTypeSort == 0) {
+                                          setState(() {
+                                            _currentIndexSort = 0;
+                                            topic!.listCard = listSort[0];
+                                          });
+                                        } else if (resultChooseTypeSort == 1) {
+                                          setState(() {
+                                            _currentIndexSort = 1;
+                                            topic!.listCard = listSort[1];
+                                          });
                                         }
                                       },
                                       child: Row(
@@ -470,9 +649,36 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                                                   ),
                                                 ),
                                                 IconButton(
-                                                  onPressed: () {},
-                                                  icon: const Icon(
-                                                    Icons.star_border_outlined,
+                                                  onPressed: () {
+                                                    if (!_checkPicked(topic!
+                                                        .listCard[index])) {
+                                                      setState(() {
+                                                        listCardPicked.add(
+                                                            topic!.listCard[
+                                                                index]);
+                                                      });
+                                                    } else {
+                                                      setState(() {
+                                                        listCardPicked.remove(
+                                                            topic!.listCard[
+                                                                index]);
+                                                      });
+                                                      if (listCardPicked
+                                                          .isEmpty) {
+                                                        setState(() {
+                                                          _currentPicked = 0;
+                                                          topic!.listCard =
+                                                              listSort[0];
+                                                        });
+                                                      }
+                                                    }
+                                                  },
+                                                  icon: Icon(
+                                                    (_checkPicked(topic!
+                                                            .listCard[index]))
+                                                        ? Icons.star
+                                                        : Icons
+                                                            .star_border_outlined,
                                                     color: Colors.white,
                                                   ),
                                                 ),
@@ -733,6 +939,12 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
     return AnimatedSmoothIndicator(
       activeIndex: _current,
       count: itemLength,
+      onDotClicked: (index) {
+        setState(() {
+          _current = index;
+        });
+        _controller.animateToPage(index);
+      },
       effect: ScrollingDotsEffect(
         dotHeight: 5,
         dotWidth: 5,

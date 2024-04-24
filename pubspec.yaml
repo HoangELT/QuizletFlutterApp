@@ -59,6 +59,7 @@ dependencies:
   auto_size_text: ^3.0.0
   smooth_page_indicator: ^1.1.0
   flutter_tts: ^4.0.2
+  toggle_switch: ^2.3.0
 
 
 dev_dependencies:
