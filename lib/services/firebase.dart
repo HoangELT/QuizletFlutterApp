@@ -105,4 +105,24 @@ class FirebaseService {
       throw error;
     }
   }
+
+  Future<List<Map<String, dynamic>>> getDocumentsByDocumentIds(
+      String collectionName, List<String> documentIds) async {
+    if (documentIds.isEmpty) {
+      return [];
+    }
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection(collectionName)
+          .where(FieldPath.documentId, whereIn: documentIds)
+          .get();
+
+      return querySnapshot.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
+    } catch (e) {
+      print('Error getting documents by documentIds: $e');
+      throw e;
+    }
+  }
 }

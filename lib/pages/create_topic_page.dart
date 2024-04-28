@@ -242,12 +242,12 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
                         var user = firebaseAuthService.getCurrentUser();
                         if (user != null) {
                           TopicModel newTopic = TopicModel(
-                              user.uid,
-                              user.displayName!,
                               uuid.v4(),
+                              user.uid,
                               titleAndDes.term,
                               titleAndDes.define,
                               isPublic,
+                              null,
                               newListCard);
                           setState(() {
                             isLoading = true;

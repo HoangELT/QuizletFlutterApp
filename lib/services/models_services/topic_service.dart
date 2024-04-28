@@ -13,9 +13,13 @@ class TopicService {
   Future<TopicModel?> getTopicById(String topicId) async {
     try {
       var getTopicById = await firebaseService.getDocument('topics', topicId);
-      return TopicModel.fromMap(getTopicById);
+      UserModel? userCreate =
+          await userService.getUserByUid(getTopicById['userId']);
+      var user = TopicModel.fromMap(getTopicById);
+      user.userCreate = userCreate;
+      return user;
     } catch (e) {
-      print('Topic service error: $e');
+      print('Topic service error (method getTopicById): $e');
     }
     return null;
   }
@@ -31,10 +35,12 @@ class TopicService {
         UserModel? user = await userService.getUserByUid(topicMap['userId']);
 
         TopicModel topic = TopicModel.fromMap(topicMap);
-        topic.username = user?.username ?? ''; // Gán username từ dữ liệu user
+        topic.userCreate = user;
         topics.add(topic);
       }
-    } catch (e) {}
+    } catch (e) {
+      print('Topic service error (method getTopicsWithUsers): $e');
+    }
 
     return topics;
   }
@@ -43,24 +49,26 @@ class TopicService {
     try {
       if (firebaseAuthService.isUserLoggedIn()) {
         var user = firebaseAuthService.getCurrentUser();
+        if (user == null) return [];
         var listTopic = await firebaseService.getDocumentsByField(
-            'topics', 'userId', user?.uid);
-        List<Map<String, dynamic>> listResult = listTopic
-            .map((e) => {
-                  ...e,
-                  ...{
-                    'username': user?.displayName ?? '',
-                  },
-                })
-            .toList();
-        return sortTopicsByDateDescending(TopicModel.fromListMap(listResult));
+            'topics', 'userId', user.uid);
+
+        List<TopicModel> listResult = [];
+
+        UserModel? currentUserModel = await userService.getUserByUid(user!.uid);
+
+        for (var topicMap in listTopic) {
+          TopicModel topic = TopicModel.fromMap(topicMap);
+          topic.userCreate = currentUserModel;
+          listResult.add(topic);
+        }
+
+        return sortTopicsByDateDescending(listResult);
       } else {
-        // Nếu người dùng chưa đăng nhập, trả về danh sách trống
         return [];
       }
     } catch (e) {
       print('Lỗi lấy topics: ${e}');
-      // Trong trường hợp lỗi, cũng trả về danh sách trống
       return [];
     }
   }
@@ -70,10 +78,27 @@ class TopicService {
     try {
       var id = await firebaseService.addDocument('topics', newTopic.toMap());
       return id;
-    } catch (error) {
-      print('Error adding topic document: $error');
+    } catch (e) {
+      print('Topic service error (method add): $e');
     }
     return '';
+  }
+
+  Future<void> updateTopic(TopicModel newTopic) async {
+    try {
+      await firebaseService.updateDocument(
+          'topics', newTopic.id, newTopic.toMap());
+    } catch (e) {
+      print('Topic service error (method update): $e');
+    }
+  }
+
+  Future<void> deleteTopic(String id) async {
+    try {
+      await firebaseService.deleteDocument('topics', id);
+    } catch (e) {
+      print('Topic service error (method delete): $e');
+    }
   }
 
   static List<TopicModel> sortTopicsByDate(List<TopicModel> topics) {
@@ -89,7 +114,7 @@ class TopicService {
   static List<CardModel> sortTopicByABC(List<CardModel> listCard) {
     List<CardModel> listClone = listCard.map((element) {
       return CardModel(element.cardId, element.term, element.define);
-     }).toList();
+    }).toList();
     listClone.sort((a, b) => a.term.compareTo(b.term));
     return listClone;
   }
@@ -110,6 +135,18 @@ class TopicService {
     });
 
     return sortTopicsByDateDescending(topicsToday);
+  }
+
+  static String formatDate(DateTime dateTime) {
+    if (dateTime == null) {
+      return '';
+    }
+
+    final day = dateTime.day.toString().padLeft(2, '0');
+    final month = dateTime.month.toString().padLeft(2, '0');
+    final year = dateTime.year.toString();
+
+    return 'ngày $day tháng $month năm $year';
   }
 
   void printListTopics(List<TopicModel> listTopics) {

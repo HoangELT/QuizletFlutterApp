@@ -17,11 +17,11 @@ class _SolutionPageState extends State<SolutionPage> {
       backgroundColor: AppTheme.primaryBackgroundColor,
       appBar: AppBar(
         backgroundColor: AppTheme.primaryBackgroundColor,
-        title: Center(
-          child: CustomText(
-            text: 'Lời giải chuyên gia',
-            type: TextStyleEnum.large,
-          ),
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        title: CustomText(
+          text: 'Lời giải chuyên gia',
+          type: TextStyleEnum.large,
         ),
       ),
       body: Center(

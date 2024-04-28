@@ -8,11 +8,12 @@ class FolderModel {
   String title;
   String description;
   UserModel? userCreate;
+  List<String> listTopicId;
   List<TopicModel> listTopic;
   DateTime dateCreated;
 
   FolderModel(this.id, this.userId, this.title, this.description,
-      this.userCreate, this.listTopic)
+      this.userCreate, this.listTopicId, this.listTopic)
       : dateCreated = DateTime.now();
 
   // Phương thức tạo danh sách các đối tượng từ danh sách Map
@@ -31,7 +32,8 @@ class FolderModel {
       map['userId'],
       map['title'],
       map['description'],
-      map['userCreate'] ?? currentUser,
+      currentUser,
+      List<String>.from(map['listTopicId'] ?? []),
       List<TopicModel>.from(
           (map['listTopic'] ?? []).map((x) => TopicModel.fromMap(x))),
     )..dateCreated = DateTime.parse(map['dateCreated']);
@@ -44,7 +46,8 @@ class FolderModel {
       'userId': userId,
       'title': title,
       'description': description,
-      'userCreate': userCreate,
+      'userCreate': userCreate?.toMap(),
+      'listTopicId': listTopicId,
       'listTopic': listTopic.map((topic) => topic.toMap()).toList(),
       'dateCreated': dateCreated
           .toIso8601String(), // Chuyển đổi listTopic thành List<Map<String, dynamic>>
@@ -59,6 +62,6 @@ class FolderModel {
 
   @override
   String toString() {
-    return 'FolderModel{id: $id, userId: $userId, title: $title, description: $description, userCreate: $userCreate, listTopic: $listTopic, dateCreated: $dateCreated}';
+    return 'FolderModel{id: $id, userId: $userId, title: $title, description: $description, userCreate: $userCreate, listTopic: $listTopic, listTopicId: $listTopicId, dateCreated: $dateCreated}';
   }
 }

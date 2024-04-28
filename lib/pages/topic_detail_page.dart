@@ -8,6 +8,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
 import 'package:quizletapp/models/card.dart';
 import 'package:quizletapp/models/topic.dart';
+import 'package:quizletapp/services/models_services/folder_service.dart';
 import 'package:quizletapp/services/models_services/topic_service.dart';
 import 'package:quizletapp/utils/app_theme.dart';
 import 'package:quizletapp/widgets/button_listtile.dart';
@@ -39,7 +40,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
 
   int _currentIndexSort = 0;
 
-  var _controller = CarouselController();
+  final _controller = CarouselController();
 
   @override
   void initState() {
@@ -136,8 +137,20 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                   height: 1,
                 ),
                 InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
+                  onTap: () async {
+                    TopicModel topicClone = TopicModel.copy(topic!);
+                    topicClone.listCard = listSort[0];
+                    var result = await Navigator.popAndPushNamed(
+                        context, '/topic/edit',
+                        arguments: topicClone);
+                    if (result == 0) {
+                      //is updated this topic
+                      _fetchTopic();
+                    } else if (result == 1) {
+                      //is deleted this topic
+                      Navigator.pop(context);
+                      return;
+                    }
                   },
                   child: ListTile(
                     minVerticalPadding: 20,
@@ -160,8 +173,11 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                   height: 1,
                 ),
                 InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
+                  onTap: () async {
+                    // TopicModel topicClone = TopicModel.copy(topic!);
+                    var result = await Navigator.popAndPushNamed(
+                        context, '/topic/add',
+                        arguments: topic!);
                   },
                   child: ListTile(
                     minVerticalPadding: 20,
@@ -185,7 +201,8 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                 ),
                 InkWell(
                   onTap: () {
-                    Navigator.pop(context);
+                    Navigator.popAndPushNamed(context, '/topic/info',
+                        arguments: topic);
                   },
                   child: ListTile(
                     minVerticalPadding: 20,
@@ -208,8 +225,21 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                   height: 1,
                 ),
                 InkWell(
-                  onTap: () {
+                  onTap: () async {
                     Navigator.pop(context);
+                    var chooseResult = await showOkCancelAlertDialog(
+                      context: context,
+                      cancelLabel: 'Hủy',
+                      okLabel: 'Xóa',
+                      isDestructiveAction: true,
+                      style: AdaptiveStyle.iOS,
+                      title: 'Bạn chắc chắn muốn xóa học phần này?',
+                    );
+                    if (chooseResult == OkCancelResult.ok) {
+                      await topicService.deleteTopic(topic!.id);
+                      Navigator.pushNamedAndRemoveUntil(
+                          context, '/', (route) => false);
+                    }
                   },
                   child: ListTile(
                     minVerticalPadding: 20,
@@ -393,7 +423,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                                       width: 8,
                                     ),
                                     CustomText(
-                                      text: topic!.username,
+                                      text: topic!.userCreate?.username ?? '',
                                       style: const TextStyle(
                                           fontWeight: FontWeight.w500),
                                     ),

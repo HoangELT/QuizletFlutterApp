@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:quizletapp/enums/filter_topic_enum.dart';
@@ -462,7 +460,7 @@ class _LibraryPageState extends State<LibraryPage>
                                                         text: topicProvider
                                                             .listTopicOfCurrentUser[
                                                                 index]
-                                                            .username),
+                                                            .userCreate?.username ?? ''),
                                                   ],
                                                 ),
                                               ),
@@ -569,7 +567,7 @@ class _LibraryPageState extends State<LibraryPage>
                                                       text: topicProvider
                                                           .listTopicOfCurrentUser[
                                                               index]
-                                                          .username),
+                                                          .userCreate?.username ?? ''),
                                                 ],
                                               ),
                                             ),

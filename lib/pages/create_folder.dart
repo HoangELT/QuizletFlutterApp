@@ -60,14 +60,17 @@ class _CreateFolderPageState extends State<CreateFolderPage> {
                             isLoading = true;
                           });
                           _formKey.currentState!.save();
-                          // print('${currentUser.currentUser}');
-                          await folderService.addFolder(FolderModel(
+                          await folderService.addFolder(
+                            FolderModel(
                               uuid.v4(),
                               currentUser.currentUser!.userId,
                               titleFolder,
                               desFolder,
-                              null, []));
-                          folderProvider.reloadListFolderOfCurrentUser();
+                              null,
+                              [],
+                              [],
+                            ),
+                          );
                           setState(() {
                             isLoading = false;
                           });

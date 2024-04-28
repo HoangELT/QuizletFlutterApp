@@ -5,7 +5,6 @@ import 'package:quizletapp/enums/text_style_enum.dart';
 import 'package:quizletapp/models/topic.dart';
 import 'package:quizletapp/pages/topic_detail_page.dart';
 import 'package:quizletapp/services/firebase_auth.dart';
-import 'package:quizletapp/services/models_services/folder_service.dart';
 import 'package:quizletapp/services/provider/current_user_provider.dart';
 import 'package:quizletapp/services/provider/folder_provider.dart';
 import 'package:quizletapp/services/provider/index_of_app_provider.dart';
@@ -18,7 +17,6 @@ import 'package:quizletapp/widgets/text.dart';
 import 'package:quizletapp/widgets/group_list.dart';
 import 'package:quizletapp/widgets/item_list.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:toastification/toastification.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -36,12 +34,7 @@ class _HomePageState extends State<HomePage> {
 
   // List<TopicModel> myTopics = [];
 
-  List<TopicModel> listTopicOfUser = [
-    TopicModel('0', 'duyben', '0', 'Famous', 'description', true, []),
-    TopicModel('0', 'hogquan', '0', 'Famous', 'description', true, []),
-    TopicModel('0', 'thanhlong', '0', 'Famous', 'description', true, []),
-    TopicModel('0', 'hoanviet', '0', 'Famous', 'description', true, []),
-  ];
+  List<TopicModel> listTopicOfUser = [];
 
   var listTopicToFind = [
     {
@@ -281,7 +274,7 @@ class _HomePageState extends State<HomePage> {
                                           CustomText(
                                               text: topicProvider
                                                   .listTopicOfCurrentUser[index]
-                                                  .username),
+                                                  .userCreate?.username ?? ''),
                                         ],
                                       ),
                                     );
@@ -289,7 +282,7 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                             ),
-                          if (false)
+                          if (listTopicOfUser.isNotEmpty)
                             Container(
                               margin: const EdgeInsets.only(bottom: 32),
                               child: Skeletonizer(
@@ -299,7 +292,7 @@ class _HomePageState extends State<HomePage> {
                                 child: GroupList(
                                   itemCount: listTopicOfUser.length,
                                   title:
-                                      'Tương tự học phần của ${listTopicOfUser[0].username}',
+                                      'Tương tự học phần của ${listTopicOfUser[0].userCreate?.username ?? ''}',
                                   isShowOption: false,
                                   buildItem: (context, index) {
                                     return ItemList(
@@ -321,7 +314,7 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                               CustomText(
                                                   text: listTopicOfUser[index]
-                                                      .username)
+                                                      .userCreate?.username ?? '')
                                             ],
                                           ),
                                           IconButton(

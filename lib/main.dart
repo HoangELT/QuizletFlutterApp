@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:quizletapp/models/topic.dart';
+import 'package:quizletapp/pages/add_to_folder_page.dart';
 import 'package:quizletapp/pages/app_page.dart';
 import 'package:quizletapp/pages/changeEmail_page.dart';
 import 'package:quizletapp/pages/changeUserName_page.dart';
 import 'package:quizletapp/pages/create_folder.dart';
 import 'package:quizletapp/pages/create_topic_page.dart';
+import 'package:quizletapp/pages/edit_topic_page.dart';
 import 'package:quizletapp/pages/library_page.dart';
 import 'package:quizletapp/pages/search_topic.dart';
 import 'package:quizletapp/pages/intro_page.dart';
@@ -12,6 +15,7 @@ import 'package:quizletapp/pages/not_found_page.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:quizletapp/pages/topic_detail_page.dart';
+import 'package:quizletapp/pages/topic_info_page.dart';
 import 'package:quizletapp/services/firebase_auth.dart';
 import 'package:quizletapp/services/provider/current_user_provider.dart';
 import 'package:quizletapp/services/provider/folder_provider.dart';
@@ -103,28 +107,39 @@ class MyApp extends StatelessWidget {
               builder: (context) => const ChangePassWord(),
             );
           case '/topic':
-
             return MaterialPageRoute(
-              builder: (context) => LibraryPage(
-              ),
+              builder: (context) => LibraryPage(),
             );
           case '/folder':
             context.read<IndexOfLibraryProvider>().changeIndex(1);
             return MaterialPageRoute(
-              builder: (context) => LibraryPage(
-              ),
+              builder: (context) => LibraryPage(),
             );
           case '/topic/create':
             return MaterialPageRoute(
               builder: (context) => const CreateTopicPage(),
             );
-          case '/folder/create':
+          case '/topic/edit':
             return MaterialPageRoute(
-              builder: (context) => const CreateFolderPage(),
+              builder: (context) => EditTopicPage(
+                topic: args as TopicModel,
+              ),
+            );
+          case '/topic/add':
+            return MaterialPageRoute(
+              builder: (context) => AddToFolderPage(topic: args as TopicModel),
             );
           case '/topic/detail':
             return MaterialPageRoute(
               builder: (context) => TopicDetailPage(topicId: args as String),
+            );
+          case '/topic/info':
+            return MaterialPageRoute(
+              builder: (context) => TopicInfoPage(topic: args as TopicModel),
+            );
+          case '/folder/create':
+            return MaterialPageRoute(
+              builder: (context) => const CreateFolderPage(),
             );
           default:
             return MaterialPageRoute(
