@@ -37,7 +37,7 @@ class TopicModel {
       'title': title,
       'description': description,
       'public': public,
-      'userCreate': userCreate,
+      'userCreate': null,
       'listCard': listCard
           .map((card) => card.toMap())
           .toList(), // Chuyển đổi listCard thành List<Map<String, dynamic>>

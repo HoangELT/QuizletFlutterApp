@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:quizletapp/services/provider/current_user_provider.dart';
+import 'package:quizletapp/services/providers/current_user_provider.dart';
 import '../enums/text_style_enum.dart';
 import '../models/user.dart';
 import '../utils/app_theme.dart';

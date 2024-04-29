@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:quizletapp/models/folder.dart';
 import 'package:quizletapp/models/topic.dart';
 import 'package:quizletapp/pages/add_to_folder_page.dart';
+import 'package:quizletapp/pages/add_topic_page.dart';
 import 'package:quizletapp/pages/app_page.dart';
 import 'package:quizletapp/pages/changeEmail_page.dart';
 import 'package:quizletapp/pages/changeUserName_page.dart';
 import 'package:quizletapp/pages/create_folder.dart';
 import 'package:quizletapp/pages/create_topic_page.dart';
+import 'package:quizletapp/pages/edit_folder.dart';
 import 'package:quizletapp/pages/edit_topic_page.dart';
+import 'package:quizletapp/pages/folder_detail_page.dart';
 import 'package:quizletapp/pages/library_page.dart';
 import 'package:quizletapp/pages/search_topic.dart';
 import 'package:quizletapp/pages/intro_page.dart';
@@ -17,11 +21,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:quizletapp/pages/topic_detail_page.dart';
 import 'package:quizletapp/pages/topic_info_page.dart';
 import 'package:quizletapp/services/firebase_auth.dart';
-import 'package:quizletapp/services/provider/current_user_provider.dart';
-import 'package:quizletapp/services/provider/folder_provider.dart';
-import 'package:quizletapp/services/provider/index_of_app_provider.dart';
-import 'package:quizletapp/services/provider/index_of_library_provider.dart';
-import 'package:quizletapp/services/provider/topic_provider.dart';
+import 'package:quizletapp/services/providers/current_user_provider.dart';
+import 'package:quizletapp/services/providers/folder_provider.dart';
+import 'package:quizletapp/services/providers/index_of_app_provider.dart';
+import 'package:quizletapp/services/providers/index_of_library_provider.dart';
+import 'package:quizletapp/services/providers/topic_provider.dart';
 import 'package:quizletapp/utils/custom_scrollbehavior.dart';
 import 'pages/changepw_page.dart';
 import 'pages/register_page.dart';
@@ -110,14 +114,12 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute(
               builder: (context) => LibraryPage(),
             );
-          case '/folder':
-            context.read<IndexOfLibraryProvider>().changeIndex(1);
-            return MaterialPageRoute(
-              builder: (context) => LibraryPage(),
-            );
+
           case '/topic/create':
             return MaterialPageRoute(
-              builder: (context) => const CreateTopicPage(),
+              builder: (context) => CreateTopicPage(
+                isPop: args == null ? false : args as bool,
+              ),
             );
           case '/topic/edit':
             return MaterialPageRoute(
@@ -137,9 +139,34 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute(
               builder: (context) => TopicInfoPage(topic: args as TopicModel),
             );
+          case '/folder':
+            context.read<IndexOfLibraryProvider>().changeIndex(1);
+            return MaterialPageRoute(
+              builder: (context) => LibraryPage(),
+            );
           case '/folder/create':
             return MaterialPageRoute(
-              builder: (context) => const CreateFolderPage(),
+              builder: (context) => CreateFolderPage(
+                isPop: args == null ? false : args as bool,
+              ),
+            );
+          case '/folder/detail':
+            return MaterialPageRoute(
+              builder: (context) => FolderDetailPage(
+                folderId: args as String,
+              ),
+            );
+          case '/folder/add':
+            return MaterialPageRoute(
+              builder: (context) => AddTopicPage(
+                folder: args as FolderModel,
+              ),
+            );
+          case '/folder/edit':
+            return MaterialPageRoute(
+              builder: (context) => EditFolderPage(
+                folder: args as FolderModel,
+              ),
             );
           default:
             return MaterialPageRoute(

@@ -6,7 +6,7 @@ import 'package:quizletapp/models/card.dart'; // Changed from 'package:quizletap
 import 'package:quizletapp/models/topic.dart';
 import 'package:quizletapp/pages/topic_setting.dart';
 import 'package:quizletapp/services/firebase_auth.dart';
-import 'package:quizletapp/services/provider/topic_provider.dart';
+import 'package:quizletapp/services/providers/topic_provider.dart';
 import 'package:quizletapp/services/models_services/topic_service.dart';
 import 'package:quizletapp/utils/app_theme.dart';
 import 'package:quizletapp/widgets/loading.dart';
@@ -17,7 +17,11 @@ import 'package:uuid/uuid.dart';
 import 'package:file_picker/file_picker.dart';
 
 class CreateTopicPage extends StatefulWidget {
-  const CreateTopicPage({Key? key}) : super(key: key);
+  final bool isPop;
+  const CreateTopicPage({
+    this.isPop = false,
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<CreateTopicPage> createState() => _CreateTopicPageState();
@@ -259,9 +263,15 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
                           });
                           print('Tạo topic thành công');
                           context.read<TopicProvider>().reloadListTopic();
-                          Navigator.pushReplacementNamed(
+                          if(widget.isPop == true) {
+                            Navigator.pop(context);
+                          }
+                          else {
+                            await Navigator.pushReplacementNamed(
                               context, '/topic/detail',
                               arguments: newTopicId);
+                            Navigator.pop(context);
+                          }
                         }
                       } else {
                         print('listCard rỗng');
@@ -288,6 +298,7 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
                           okLabel: 'Xóa',
                           isDestructiveAction: true,
                           alertStyle: AdaptiveStyle.iOS,
+                          style: AdaptiveStyle.iOS,
                           title: 'Bạn chắc chắn muốn xóa học phần này',
                         );
                         if (isDelete == OkCancelResult.ok) {

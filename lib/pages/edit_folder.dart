@@ -10,18 +10,18 @@ import 'package:quizletapp/widgets/loading.dart';
 import 'package:quizletapp/widgets/text.dart';
 import 'package:uuid/uuid.dart';
 
-class CreateFolderPage extends StatefulWidget {
-  final bool isPop;
-  const CreateFolderPage({
-    this.isPop = false,
+class EditFolderPage extends StatefulWidget {
+  FolderModel folder;
+  EditFolderPage({
+    required this.folder,
     super.key,
   });
 
   @override
-  State<CreateFolderPage> createState() => _CreateFolderPageState();
+  State<EditFolderPage> createState() => _EditFolderPageState();
 }
 
-class _CreateFolderPageState extends State<CreateFolderPage> {
+class _EditFolderPageState extends State<EditFolderPage> {
   final folderService = FolderService();
   final _formKey = GlobalKey<FormState>();
   final uuid = Uuid();
@@ -29,6 +29,17 @@ class _CreateFolderPageState extends State<CreateFolderPage> {
   bool isHasTextFolderTitle = false;
   String titleFolder = '';
   String desFolder = '';
+  
+  @override
+  void initState() {
+    // TODO: implement initState
+    if(widget.folder.title.trim().isNotEmpty) {
+      setState(() {
+        isHasTextFolderTitle = true;
+      });
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +52,7 @@ class _CreateFolderPageState extends State<CreateFolderPage> {
           centerTitle: true,
           backgroundColor: AppTheme.primaryBackgroundColor,
           title: CustomText(
-            text: 'Thư mục mới',
+            text: 'Sửa thư mục',
             type: TextStyleEnum.large,
           ),
           leading: TextButton(
@@ -59,33 +70,19 @@ class _CreateFolderPageState extends State<CreateFolderPage> {
                     builder: (context, currentUser, folderProvider, child) {
                       return TextButton(
                         onPressed: () async {
-                          // create folder
+                          // update folder
                           setState(() {
                             isLoading = true;
                           });
                           _formKey.currentState!.save();
-                          String newFolderID = await folderService.addFolder(
-                            FolderModel(
-                              uuid.v4(),
-                              currentUser.currentUser!.userId,
-                              titleFolder,
-                              desFolder,
-                              null,
-                              [],
-                              [],
-                            ),
-                          );
+                          widget.folder.title = titleFolder;
+                          widget.folder.description = desFolder;
+                          await folderService.updateFolder(widget.folder);
                           folderProvider.reloadListFolderOfCurrentUser();
                           setState(() {
                             isLoading = false;
                           });
-                          if (widget.isPop) {
-                            Navigator.pop(context);
-                          } else {
-                            await Navigator.pushNamed(context, '/folder/detail',
-                                arguments: newFolderID);
-                            Navigator.pop(context);
-                          }
+                          Navigator.pop(context);
                         },
                         child: CustomText(
                           text: 'Lưu',
@@ -106,7 +103,7 @@ class _CreateFolderPageState extends State<CreateFolderPage> {
                 Wrap(
                   children: [
                     TextFormField(
-                      autofocus: true,
+                      initialValue: widget.folder.title,
                       onChanged: (value) {
                         if (value.trim().isEmpty) {
                           setState(() {
@@ -159,6 +156,7 @@ class _CreateFolderPageState extends State<CreateFolderPage> {
                 Wrap(
                   children: [
                     TextFormField(
+                      initialValue: widget.folder.description,
                       onSaved: (newValue) {
                         desFolder = newValue ?? '';
                       },

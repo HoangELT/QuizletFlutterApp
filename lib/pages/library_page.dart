@@ -5,10 +5,10 @@ import 'package:quizletapp/enums/filter_topic_enum.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
 import 'package:quizletapp/pages/topic_detail_page.dart';
 import 'package:quizletapp/services/models_services/topic_service.dart';
-import 'package:quizletapp/services/provider/current_user_provider.dart';
-import 'package:quizletapp/services/provider/folder_provider.dart';
-import 'package:quizletapp/services/provider/index_of_library_provider.dart';
-import 'package:quizletapp/services/provider/topic_provider.dart';
+import 'package:quizletapp/services/providers/current_user_provider.dart';
+import 'package:quizletapp/services/providers/folder_provider.dart';
+import 'package:quizletapp/services/providers/index_of_library_provider.dart';
+import 'package:quizletapp/services/providers/topic_provider.dart';
 import 'package:quizletapp/utils/app_theme.dart';
 import 'package:quizletapp/widgets/item_list.dart';
 import 'package:quizletapp/widgets/text.dart';
@@ -430,17 +430,14 @@ class _LibraryPageState extends State<LibraryPage>
                                                   const SizedBox(
                                                     width: 8,
                                                   ),
-                                                  Icon(
-                                                    (listTopicToday[
-                                                                index]
-                                                            .public)
-                                                        ? Icons
-                                                            .lock_open_outlined
-                                                        : Icons.lock_outline,
-                                                    color: Colors.grey
-                                                        .withOpacity(0.5),
-                                                    size: 20,
-                                                  )
+                                                  if (!listTopicToday[index]
+                                                      .public)
+                                                    Icon(
+                                                      Icons.lock_outline,
+                                                      color: Colors.grey
+                                                          .withOpacity(0.5),
+                                                      size: 20,
+                                                    ),
                                                 ],
                                               ),
                                               bottom: Container(
@@ -458,9 +455,11 @@ class _LibraryPageState extends State<LibraryPage>
                                                     ),
                                                     CustomText(
                                                         text: topicProvider
-                                                            .listTopicOfCurrentUser[
-                                                                index]
-                                                            .userCreate?.username ?? ''),
+                                                                .listTopicOfCurrentUser[
+                                                                    index]
+                                                                .userCreate
+                                                                ?.username ??
+                                                            ''),
                                                   ],
                                                 ),
                                               ),
@@ -535,18 +534,14 @@ class _LibraryPageState extends State<LibraryPage>
                                                   const SizedBox(
                                                     width: 8,
                                                   ),
-                                                  Icon(
-                                                    (topicProvider
-                                                            .listTopicOfCurrentUser[
-                                                                index]
-                                                            .public)
-                                                        ? Icons
-                                                            .lock_open_outlined
-                                                        : Icons.lock_outline,
-                                                    color: Colors.grey
-                                                        .withOpacity(0.5),
-                                                    size: 20,
-                                                  )
+                                                  if (!listTopicToday[index]
+                                                      .public)
+                                                    Icon(
+                                                      Icons.lock_outline,
+                                                      color: Colors.grey
+                                                          .withOpacity(0.5),
+                                                      size: 20,
+                                                    ),
                                                 ],
                                               ),
                                             ),
@@ -565,9 +560,11 @@ class _LibraryPageState extends State<LibraryPage>
                                                   ),
                                                   CustomText(
                                                       text: topicProvider
-                                                          .listTopicOfCurrentUser[
-                                                              index]
-                                                          .userCreate?.username ?? ''),
+                                                              .listTopicOfCurrentUser[
+                                                                  index]
+                                                              .userCreate
+                                                              ?.username ??
+                                                          ''),
                                                 ],
                                               ),
                                             ),
@@ -652,8 +649,9 @@ class _LibraryPageState extends State<LibraryPage>
                     containersColor: AppTheme.primaryColorSkeletonContainer,
                     child: ItemList(
                       onTap: () {
-                        print(
-                            'tap in item id: ${folderProvider.listFolderOfCurrentUser[index].id}');
+                        Navigator.pushNamed(context, '/folder/detail',
+                            arguments: folderProvider
+                                .listFolderOfCurrentUser[index].id);
                       },
                       height: null,
                       width: double.infinity,

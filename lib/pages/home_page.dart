@@ -5,11 +5,11 @@ import 'package:quizletapp/enums/text_style_enum.dart';
 import 'package:quizletapp/models/topic.dart';
 import 'package:quizletapp/pages/topic_detail_page.dart';
 import 'package:quizletapp/services/firebase_auth.dart';
-import 'package:quizletapp/services/provider/current_user_provider.dart';
-import 'package:quizletapp/services/provider/folder_provider.dart';
-import 'package:quizletapp/services/provider/index_of_app_provider.dart';
-import 'package:quizletapp/services/provider/index_of_library_provider.dart';
-import 'package:quizletapp/services/provider/topic_provider.dart';
+import 'package:quizletapp/services/providers/current_user_provider.dart';
+import 'package:quizletapp/services/providers/folder_provider.dart';
+import 'package:quizletapp/services/providers/index_of_app_provider.dart';
+import 'package:quizletapp/services/providers/index_of_library_provider.dart';
+import 'package:quizletapp/services/providers/topic_provider.dart';
 import 'package:quizletapp/services/models_services/topic_service.dart';
 import 'package:quizletapp/utils/app_theme.dart';
 import 'package:quizletapp/widgets/button_listtile.dart';
@@ -273,8 +273,11 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                           CustomText(
                                               text: topicProvider
-                                                  .listTopicOfCurrentUser[index]
-                                                  .userCreate?.username ?? ''),
+                                                      .listTopicOfCurrentUser[
+                                                          index]
+                                                      .userCreate
+                                                      ?.username ??
+                                                  ''),
                                         ],
                                       ),
                                     );
@@ -314,7 +317,9 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                               CustomText(
                                                   text: listTopicOfUser[index]
-                                                      .userCreate?.username ?? '')
+                                                          .userCreate
+                                                          ?.username ??
+                                                      '')
                                             ],
                                           ),
                                           IconButton(
@@ -351,6 +356,13 @@ class _HomePageState extends State<HomePage> {
                                   },
                                   buildItem: (context, index) {
                                     return ItemList(
+                                      onTap: () {
+                                        Navigator.pushNamed(
+                                            context, '/folder/detail',
+                                            arguments: folderProvider
+                                                .listFolderOfCurrentUser[index]
+                                                .id);
+                                      },
                                       head: Row(
                                         children: [
                                           Icon(

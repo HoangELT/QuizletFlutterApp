@@ -11,6 +11,7 @@ class ItemList extends StatefulWidget {
   final Widget? body;
   final Widget? bottom;
   final double? height;
+  final BoxDecoration? decoration;
   final Function()? onTap;
 
   const ItemList({
@@ -22,6 +23,7 @@ class ItemList extends StatefulWidget {
     this.body,
     this.bottom,
     this.height,
+    this.decoration,
     super.key,
   });
 
@@ -38,7 +40,7 @@ class _ItemListState extends State<ItemList> {
         padding: const EdgeInsets.all(16),
         width: widget.width,
         height: widget.height,
-        decoration: BoxDecoration(
+        decoration: widget.decoration ?? BoxDecoration(
           color: AppTheme.primaryBackgroundColor,
           border: Border.all(
             color: Colors.grey.withOpacity(0.4),

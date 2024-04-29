@@ -46,7 +46,7 @@ class FolderModel {
       'userId': userId,
       'title': title,
       'description': description,
-      'userCreate': userCreate?.toMap(),
+      'userCreate': null,
       'listTopicId': listTopicId,
       'listTopic': listTopic.map((topic) => topic.toMap()).toList(),
       'dateCreated': dateCreated

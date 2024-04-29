@@ -4,7 +4,7 @@ import 'package:quizletapp/enums/text_style_enum.dart';
 import 'package:quizletapp/models/folder.dart';
 import 'package:quizletapp/models/topic.dart';
 import 'package:quizletapp/services/models_services/folder_service.dart';
-import 'package:quizletapp/services/provider/folder_provider.dart';
+import 'package:quizletapp/services/providers/folder_provider.dart';
 import 'package:quizletapp/utils/app_theme.dart';
 import 'package:quizletapp/widgets/button_listtile.dart';
 import 'package:quizletapp/widgets/loading.dart';
@@ -120,7 +120,7 @@ class _AddToFolderPageState extends State<AddToFolderPage> {
                               isSkeleton = true;
                             });
                             await Navigator.pushNamed(
-                                context, '/folder/create');
+                                context, '/folder/create', arguments: true);
                             await folderProvider
                                 .reloadListFolderOfCurrentUser();
 
@@ -128,7 +128,7 @@ class _AddToFolderPageState extends State<AddToFolderPage> {
                               isSkeleton = false;
                             });
                           },
-                          child: CustomText(text: '+ Tạo thư mục mới'),
+                          child: CustomText(text: '+ Tạo thư mục mới', style: const TextStyle(color: Color.fromARGB(255, 207, 177, 255), fontWeight: FontWeight.bold),),
                         ),
                       ),
                       ...List.generate(

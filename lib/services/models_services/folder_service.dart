@@ -4,10 +4,25 @@ import 'package:quizletapp/models/folder.dart';
 import 'package:quizletapp/models/topic.dart';
 import 'package:quizletapp/services/firebase.dart';
 import 'package:quizletapp/services/firebase_auth.dart';
+import 'package:quizletapp/services/models_services/user_service.dart';
 
 class FolderService {
   FirebaseService firebaseService = FirebaseService();
   FirebaseAuthService firebaseAuthService = FirebaseAuthService();
+
+  Future<FolderModel?> getFolderById(String folderId) async {
+    try {
+      var getFolderById = await firebaseService.getDocument('folders', folderId);
+      var folder = FolderModel.fromMap(getFolderById);
+      var getListTopicByTopicIds = await firebaseService.getDocumentsByDocumentIds('topics', folder.listTopicId);
+      var listTopicModelOfThisFolder = TopicModel.fromListMap(getListTopicByTopicIds);
+      folder.listTopic = listTopicModelOfThisFolder;
+      return folder;
+    } catch (e) {
+      print('Folder service error (method getFolderById): $e');
+    }
+    return null;
+  }
 
   Future<List<FolderModel>> getAllTopicOfCurrentUser() async {
     try {
@@ -28,7 +43,6 @@ class FolderService {
         var listFolderOfCurrentUserByDateDescending =
             sortFoldersByDateDescending(listFolderModelOfCurrentUser);
 
-        print('listFolder: $listFolderOfCurrentUserByDateDescending');
         return listFolderOfCurrentUserByDateDescending;
       }
     } catch (e) {
@@ -37,12 +51,13 @@ class FolderService {
     return [];
   }
 
-  Future<void> addFolder(FolderModel newFolder) async {
+  Future<String> addFolder(FolderModel newFolder) async {
     try {
-      await firebaseService.addDocument('folders', newFolder.toMap());
+      return await firebaseService.addDocument('folders', newFolder.toMap());
     } catch (e) {
-      print('FolderService error( getAllTopicOfCurrentUser ): ${e}');
+      print('FolderService error( AddFolder ): $e');
     }
+    return '';
   }
 
   Future<void> addTopicToFolder(FolderModel folder, String topicId) async {
@@ -56,6 +71,14 @@ class FolderService {
     }
   }
 
+  Future<void> updateFolder (FolderModel folder) async {
+    try {
+      await firebaseService.updateDocument('folders', folder.id, folder.toMap());
+    } catch (e) {
+      print('FolderService error( updateFolder ): $e');
+    }
+  }
+
   Future<void> removeTopicInFolder(FolderModel folder, String topicId) async {
     try {
       if (!folder.listTopicId.contains(topicId)) return;
@@ -64,6 +87,14 @@ class FolderService {
           'folders', folder.id, folder.toMap());
     } catch (e) {
       print('FolderService error( addTopicToFolder ): $e');
+    }
+  }
+
+  Future<void> deleteFolder(String id) async {
+    try {
+      await firebaseService.deleteDocument('folders', id);
+    } catch (e) {
+      print('Folder service error (method delete): $e');
     }
   }
 

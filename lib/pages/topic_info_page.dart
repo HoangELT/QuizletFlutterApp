@@ -5,7 +5,7 @@ import 'package:quizletapp/models/folder.dart';
 import 'package:quizletapp/models/topic.dart';
 import 'package:quizletapp/services/models_services/folder_service.dart';
 import 'package:quizletapp/services/models_services/topic_service.dart';
-import 'package:quizletapp/services/provider/folder_provider.dart';
+import 'package:quizletapp/services/providers/folder_provider.dart';
 import 'package:quizletapp/utils/app_theme.dart';
 import 'package:quizletapp/widgets/item_list.dart';
 import 'package:quizletapp/widgets/text.dart';

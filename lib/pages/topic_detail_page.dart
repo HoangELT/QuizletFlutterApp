@@ -3,6 +3,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
@@ -412,33 +413,44 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                               ),
                               Container(
                                 margin: const EdgeInsets.only(top: 12),
-                                child: Row(
+                                child: Wrap(
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  direction: Axis.horizontal,
                                   children: [
-                                    const CircleAvatar(
-                                      backgroundImage: AppTheme.defaultAvatar,
-                                      backgroundColor: Colors.grey,
-                                      radius: 14,
-                                    ),
-                                    const SizedBox(
-                                      width: 8,
-                                    ),
-                                    CustomText(
-                                      text: topic!.userCreate?.username ?? '',
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.w500),
-                                    ),
-                                    Container(
-                                      margin: const EdgeInsets.symmetric(
-                                          horizontal: 16),
-                                      color:
-                                          Colors.grey.shade600.withOpacity(0.5),
-                                      width: 1,
-                                      height: 18,
-                                    ),
-                                    CustomText(
-                                      text: '${listSort[0].length} thuật ngữ',
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.w500),
+                                    Row(),
+                                    Wrap(
+                                      crossAxisAlignment:
+                                          WrapCrossAlignment.center,
+                                      direction: Axis.horizontal,
+                                      spacing: 8,
+                                      children: [
+                                        const CircleAvatar(
+                                          backgroundImage:
+                                              AppTheme.defaultAvatar,
+                                          backgroundColor: Colors.grey,
+                                          radius: 18,
+                                        ),
+                                        CustomText(
+                                          text:
+                                              topic!.userCreate?.username ?? '',
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        Container(
+                                          margin: const EdgeInsets.symmetric(
+                                              horizontal: 16),
+                                          color: Colors.grey.shade600
+                                              .withOpacity(0.5),
+                                          width: 1,
+                                          height: 30,
+                                        ),
+                                        CustomText(
+                                          text:
+                                              '${listSort[0].length} thuật ngữ',
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
