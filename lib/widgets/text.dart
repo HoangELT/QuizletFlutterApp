@@ -5,23 +5,29 @@ class CustomText extends StatelessWidget {
   final String text;
   TextStyleEnum type;
   TextStyle? style;
-  TextAlign? textAlign; // add them thuoc tinh textAlign
+  TextAlign? textAlign;
+  int? maxLines;
+  TextOverflow? overflow;
 
   CustomText({
     required this.text,
     this.style,
     this.type = TextStyleEnum.normal,
     this.textAlign,
+    this.maxLines,
+    this.overflow,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
     return Text(
-      text,
+      text.trim(),
       style: getStyle(),
       textDirection: TextDirection.ltr,
-      textAlign: textAlign, // add them thuoc tinh textAlign
+      textAlign: textAlign,
+      maxLines: maxLines, 
+      overflow: overflow,
     );
   }
 

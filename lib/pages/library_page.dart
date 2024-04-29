@@ -1,9 +1,13 @@
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:quizletapp/enums/filter_topic_enum.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
+import 'package:quizletapp/models/topic.dart';
 import 'package:quizletapp/pages/topic_detail_page.dart';
+import 'package:quizletapp/services/models_services/folder_service.dart';
 import 'package:quizletapp/services/models_services/topic_service.dart';
 import 'package:quizletapp/services/providers/current_user_provider.dart';
 import 'package:quizletapp/services/providers/folder_provider.dart';
@@ -27,22 +31,66 @@ class LibraryPage extends StatefulWidget {
 class _LibraryPageState extends State<LibraryPage>
     with SingleTickerProviderStateMixin {
   TopicService topicService = TopicService();
+  FolderService folderService = FolderService();
   FilterTopicEnum typeFilter = FilterTopicEnum.all;
   late final TabController _tabController;
   bool isLoading = false;
   bool isListNotEmpty = false;
   bool isActiveBtn = false;
 
+  List<TopicModel> listSearch = [];
+  List<TopicModel> listTopicOfCurrentUser = [];
+
+  final TextEditingController _searchController = TextEditingController();
+
   @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
+    _searchController.addListener(_onSearchChanged);
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    _fetchListTopic();
+    super.didChangeDependencies();
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _searchController.removeListener(_onSearchChanged);
+    _searchController.dispose();
     super.dispose();
+  }
+
+  _onSearchChanged() {
+    _searchResultList();
+  }
+
+  _searchResultList() {
+    List<TopicModel> showResult = [];
+    if (_searchController.text.trim() != '') {
+      for (var topic in listTopicOfCurrentUser) {
+        var name = topic.title.toLowerCase();
+        if (name.contains(_searchController.text.toLowerCase())) {
+          showResult.add(topic);
+        }
+      }
+    } else {
+      showResult = List.from(listTopicOfCurrentUser);
+    }
+    setState(() {
+      listSearch = showResult;
+    });
+  }
+
+  _fetchListTopic() async {
+    var list = context.watch<TopicProvider>().listTopicOfCurrentUser;
+    setState(() {
+      listSearch = list;
+      listTopicOfCurrentUser = list;
+    });
   }
 
   Future<void> _fetchTopics() async {
@@ -50,6 +98,7 @@ class _LibraryPageState extends State<LibraryPage>
       isLoading = true;
     });
     await context.read<TopicProvider>().reloadListTopic();
+    _searchController.clear();
     setState(() {
       isLoading = false;
     });
@@ -69,6 +118,13 @@ class _LibraryPageState extends State<LibraryPage>
     if (typeFilter == FilterTopicEnum.all) return 'Tất cả';
     if (typeFilter == FilterTopicEnum.created) return 'Đã tạo';
     return 'Đã học';
+  }
+
+  bool checkListSearchContainsId(String id) {
+    for (var i in listSearch) {
+      if (i.id == id) return true;
+    }
+    return false;
   }
 
   @override
@@ -177,10 +233,20 @@ class _LibraryPageState extends State<LibraryPage>
                   builder: (context) {
                     return SimpleDialog(
                       contentPadding: EdgeInsets.zero,
-                      insetPadding:
-                          const EdgeInsets.only(bottom: 150, right: 100),
                       backgroundColor: AppTheme.primaryBackgroundColorDiaLog,
+                      title: Container(
+                        padding: const EdgeInsets.only(bottom: 24),
+                        alignment: Alignment.center,
+                        child: CustomText(
+                          text: 'Chọn lựa chọn',
+                          type: TextStyleEnum.large,
+                        ),
+                      ),
                       children: [
+                        Divider(
+                          height: 0.5,
+                          color: Colors.grey.withOpacity(0.5),
+                        ),
                         SimpleDialogOption(
                           onPressed: () {
                             setState(() {
@@ -337,245 +403,314 @@ class _LibraryPageState extends State<LibraryPage>
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
-                          children: [
+                          children: <Widget>[
                             if (topicProvider
                                     .listTopicOfCurrentUser.isNotEmpty ||
                                 listTopicToday.isNotEmpty)
                               Container(
                                 margin:
                                     const EdgeInsets.only(top: 24, bottom: 12),
-                                child: TextFormField(
-                                  cursorColor: Colors.white,
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    color: Colors.white,
-                                  ),
-                                  decoration: const InputDecoration(
-                                    hintText: 'Lọc học phần',
-                                    hintStyle: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 20,
-                                    ),
-                                    focusedBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                          width: 4.0, color: Colors.white),
-                                    ),
-                                    enabledBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                          width: 2.0, color: Colors.white),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            Column(
-                              children: [
-                                if (listTopicToday.isNotEmpty)
-                                  StickyHeader(
-                                    header: Container(
-                                      color: AppTheme.primaryBackgroundColor,
-                                      padding: const EdgeInsets.only(
-                                          top: 32, bottom: 16),
-                                      alignment: Alignment.centerLeft,
-                                      child: Skeletonizer(
-                                        enabled: isLoading,
-                                        containersColor: AppTheme
-                                            .primaryColorSkeletonContainer,
-                                        child: CustomText(
-                                          text: 'Hôm nay',
-                                          type: TextStyleEnum.large,
+                                child: Stack(
+                                  children: [
+                                    TextFormField(
+                                      controller: _searchController,
+                                      cursorColor: Colors.white,
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        color: Colors.white,
+                                      ),
+                                      decoration: const InputDecoration(
+                                        contentPadding:
+                                            EdgeInsets.only(right: 44),
+                                        hintText: 'Lọc học phần',
+                                        hintStyle: TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 20,
+                                        ),
+                                        focusedBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(
+                                              width: 4.0, color: Colors.white),
+                                        ),
+                                        enabledBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(
+                                              width: 2.0, color: Colors.white),
                                         ),
                                       ),
                                     ),
-                                    content: Skeletonizer(
-                                      enabled: isLoading,
-                                      containersColor: AppTheme
-                                          .primaryColorSkeletonContainer,
-                                      child: Column(
-                                        children: List.generate(
-                                            listTopicToday.length, (index) {
-                                          return Container(
-                                            margin: const EdgeInsets.symmetric(
-                                                vertical: 8),
-                                            child: ItemList(
-                                              height: null,
-                                              width: double.infinity,
-                                              onTap: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        TopicDetailPage(
-                                                      topicId: topicProvider
-                                                          .listTopicOfCurrentUser[
-                                                              index]
-                                                          .id,
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                              headText:
-                                                  listTopicToday[index].title,
-                                              body: Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  CustomText(
-                                                    text:
-                                                        '${listTopicToday[index].listCard.length} thuật ngữ',
-                                                    style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        fontSize: 14),
-                                                  ),
-                                                  const SizedBox(
-                                                    width: 8,
-                                                  ),
-                                                  if (!listTopicToday[index]
-                                                      .public)
-                                                    Icon(
-                                                      Icons.lock_outline,
-                                                      color: Colors.grey
-                                                          .withOpacity(0.5),
-                                                      size: 20,
-                                                    ),
-                                                ],
-                                              ),
-                                              bottom: Container(
-                                                margin: const EdgeInsets.only(
-                                                    top: 16),
-                                                child: Row(
-                                                  children: [
-                                                    const CircleAvatar(
-                                                      backgroundImage: AppTheme
-                                                          .defaultAvatar,
-                                                      radius: 14,
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 8,
-                                                    ),
-                                                    CustomText(
-                                                        text: topicProvider
-                                                                .listTopicOfCurrentUser[
-                                                                    index]
-                                                                .userCreate
-                                                                ?.username ??
-                                                            ''),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                        }),
+                                    if (_searchController.text.isNotEmpty)
+                                      Positioned(
+                                        right: 0,
+                                        top: 0,
+                                        bottom: 0,
+                                        child: IconButton(
+                                          icon: Icon(
+                                            Icons.close,
+                                            color: Colors.grey.withOpacity(0.5),
+                                          ),
+                                          onPressed: () {
+                                            setState(() {
+                                              _searchController.clear();
+                                            });
+                                          },
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                StickyHeader(
-                                  header: Container(
-                                    color: AppTheme.primaryBackgroundColor,
-                                    padding: const EdgeInsets.only(
-                                        top: 32, bottom: 16),
-                                    alignment: Alignment.centerLeft,
-                                    child: Skeletonizer(
-                                      enabled: isLoading,
-                                      containersColor: AppTheme
-                                          .primaryColorSkeletonContainer,
-                                      child: CustomText(
-                                        text: 'Tất cả',
-                                        type: TextStyleEnum.large,
-                                      ),
-                                    ),
-                                  ),
-                                  content: Skeletonizer(
-                                    enabled: isLoading,
-                                    containersColor:
-                                        AppTheme.primaryColorSkeletonContainer,
-                                    child: Column(
-                                      children: List.generate(
-                                          topicProvider.listTopicOfCurrentUser
-                                              .length, (index) {
-                                        return Container(
-                                          margin: const EdgeInsets.symmetric(
-                                              vertical: 8),
-                                          child: ItemList(
-                                            height: null,
-                                            width: double.infinity,
-                                            onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      TopicDetailPage(
-                                                    topicId: topicProvider
-                                                        .listTopicOfCurrentUser[
-                                                            index]
-                                                        .id,
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                            headText: topicProvider
-                                                .listTopicOfCurrentUser[index]
-                                                .title,
-                                            body: Padding(
-                                              padding:
-                                                  const EdgeInsets.only(top: 4),
-                                              child: Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  CustomText(
-                                                    text:
-                                                        '${topicProvider.listTopicOfCurrentUser[index].listCard.length} thuật ngữ',
-                                                    style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        fontSize: 14),
-                                                  ),
-                                                  const SizedBox(
-                                                    width: 8,
-                                                  ),
-                                                  if (!listTopicToday[index]
-                                                      .public)
-                                                    Icon(
-                                                      Icons.lock_outline,
-                                                      color: Colors.grey
-                                                          .withOpacity(0.5),
-                                                      size: 20,
-                                                    ),
-                                                ],
-                                              ),
-                                            ),
-                                            bottom: Container(
-                                              margin: const EdgeInsets.only(
-                                                  top: 16),
-                                              child: Row(
-                                                children: [
-                                                  const CircleAvatar(
-                                                    backgroundImage:
-                                                        AppTheme.defaultAvatar,
-                                                    radius: 14,
-                                                  ),
-                                                  const SizedBox(
-                                                    width: 8,
-                                                  ),
-                                                  CustomText(
-                                                      text: topicProvider
-                                                              .listTopicOfCurrentUser[
-                                                                  index]
-                                                              .userCreate
-                                                              ?.username ??
-                                                          ''),
-                                                ],
+                                  ],
+                                ),
+                              ),
+                            (listSearch.isNotEmpty)
+                                ? Column(
+                                    children: [
+                                      if (listTopicToday.isNotEmpty)
+                                        StickyHeader(
+                                          header: Container(
+                                            color:
+                                                AppTheme.primaryBackgroundColor,
+                                            padding: const EdgeInsets.only(
+                                                top: 32, bottom: 16),
+                                            alignment: Alignment.centerLeft,
+                                            child: Skeletonizer(
+                                              enabled: isLoading,
+                                              containersColor: AppTheme
+                                                  .primaryColorSkeletonContainer,
+                                              child: CustomText(
+                                                text: 'Hôm nay',
+                                                type: TextStyleEnum.large,
                                               ),
                                             ),
                                           ),
-                                        );
-                                      }),
+                                          content: Skeletonizer(
+                                            enabled: isLoading,
+                                            containersColor: AppTheme
+                                                .primaryColorSkeletonContainer,
+                                            child: Column(
+                                              children: List.generate(
+                                                  listTopicToday.length,
+                                                  (index) {
+                                                if (!checkListSearchContainsId(
+                                                    listTopicToday[index].id)) {
+                                                  return Container();
+                                                }
+                                                return Container(
+                                                  margin: const EdgeInsets
+                                                      .symmetric(vertical: 8),
+                                                  child: ItemList(
+                                                    height: null,
+                                                    width: double.infinity,
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              TopicDetailPage(
+                                                            topicId: topicProvider
+                                                                .listTopicOfCurrentUser[
+                                                                    index]
+                                                                .id,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                    headText:
+                                                        listTopicToday[index]
+                                                            .title,
+                                                    body: Row(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        CustomText(
+                                                          text:
+                                                              '${listTopicToday[index].listCard.length} thuật ngữ',
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w400,
+                                                                  fontSize: 14),
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 8,
+                                                        ),
+                                                        if (!listTopicToday[
+                                                                index]
+                                                            .public)
+                                                          Icon(
+                                                            Icons.lock_outline,
+                                                            color: Colors.grey
+                                                                .withOpacity(
+                                                                    0.5),
+                                                            size: 20,
+                                                          ),
+                                                      ],
+                                                    ),
+                                                    bottom: Container(
+                                                      margin:
+                                                          const EdgeInsets.only(
+                                                              top: 16),
+                                                      child: Row(
+                                                        children: [
+                                                          const CircleAvatar(
+                                                            backgroundImage:
+                                                                AppTheme
+                                                                    .defaultAvatar,
+                                                            radius: 14,
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 8,
+                                                          ),
+                                                          CustomText(
+                                                              text: topicProvider
+                                                                      .listTopicOfCurrentUser[
+                                                                          index]
+                                                                      .userCreate
+                                                                      ?.username ??
+                                                                  ''),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              }),
+                                            ),
+                                          ),
+                                        ),
+                                      StickyHeader(
+                                        header: Container(
+                                          color:
+                                              AppTheme.primaryBackgroundColor,
+                                          padding: const EdgeInsets.only(
+                                              top: 32, bottom: 16),
+                                          alignment: Alignment.centerLeft,
+                                          child: Skeletonizer(
+                                            enabled: isLoading,
+                                            containersColor: AppTheme
+                                                .primaryColorSkeletonContainer,
+                                            child: CustomText(
+                                              text: 'Tất cả',
+                                              type: TextStyleEnum.large,
+                                            ),
+                                          ),
+                                        ),
+                                        content: Skeletonizer(
+                                          enabled: isLoading,
+                                          containersColor: AppTheme
+                                              .primaryColorSkeletonContainer,
+                                          child: Column(
+                                            children: List.generate(
+                                                topicProvider
+                                                    .listTopicOfCurrentUser
+                                                    .length, (index) {
+                                              if (!checkListSearchContainsId(
+                                                  topicProvider
+                                                      .listTopicOfCurrentUser[
+                                                          index]
+                                                      .id)) {
+                                                return Container();
+                                              }
+                                              return Container(
+                                                margin:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 8),
+                                                child: ItemList(
+                                                  height: null,
+                                                  width: double.infinity,
+                                                  onTap: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            TopicDetailPage(
+                                                          topicId: topicProvider
+                                                              .listTopicOfCurrentUser[
+                                                                  index]
+                                                              .id,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                  headText: topicProvider
+                                                      .listTopicOfCurrentUser[
+                                                          index]
+                                                      .title,
+                                                  body: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 4),
+                                                    child: Row(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        CustomText(
+                                                          text:
+                                                              '${topicProvider.listTopicOfCurrentUser[index].listCard.length} thuật ngữ',
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w400,
+                                                                  fontSize: 14),
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 8,
+                                                        ),
+                                                        if (!listTopicToday[
+                                                                index]
+                                                            .public)
+                                                          Icon(
+                                                            Icons.lock_outline,
+                                                            color: Colors.grey
+                                                                .withOpacity(
+                                                                    0.5),
+                                                            size: 20,
+                                                          ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  bottom: Container(
+                                                    margin:
+                                                        const EdgeInsets.only(
+                                                            top: 16),
+                                                    child: Row(
+                                                      children: [
+                                                        const CircleAvatar(
+                                                          backgroundImage:
+                                                              AppTheme
+                                                                  .defaultAvatar,
+                                                          radius: 14,
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 8,
+                                                        ),
+                                                        CustomText(
+                                                            text: topicProvider
+                                                                    .listTopicOfCurrentUser[
+                                                                        index]
+                                                                    .userCreate
+                                                                    ?.username ??
+                                                                ''),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            }),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : Container(
+                                    margin: const EdgeInsets.symmetric(
+                                        vertical: 32),
+                                    alignment: Alignment.center,
+                                    child: CustomText(
+                                      text:
+                                          'Không có kết quả cho \"${_searchController.text}\"',
+                                      type: TextStyleEnum.xl,
+                                      textAlign: TextAlign.center,
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
                           ],
                         );
                       }
@@ -647,59 +782,103 @@ class _LibraryPageState extends State<LibraryPage>
                   return Skeletonizer(
                     enabled: isLoading,
                     containersColor: AppTheme.primaryColorSkeletonContainer,
-                    child: ItemList(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/folder/detail',
-                            arguments: folderProvider
-                                .listFolderOfCurrentUser[index].id);
-                      },
-                      height: null,
-                      width: double.infinity,
-                      head: Row(
-                        children: [
-                          Icon(
-                            Icons.folder_outlined,
-                            color: Colors.grey.withOpacity(0.6),
-                            size: 28,
+                    child: Dismissible(
+                      key:
+                          Key(folderProvider.listFolderOfCurrentUser[index].id),
+                      direction: DismissDirection.endToStart,
+                      background: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        alignment: Alignment.centerRight,
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: const BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
                           ),
-                          const SizedBox(
-                            width: 12,
+                          child: const Icon(
+                            Icons.delete_outline,
+                            color: Colors.white,
+                            size: 32,
                           ),
-                          CustomText(
-                            text: folderProvider
-                                .listFolderOfCurrentUser[index].title,
-                            type: TextStyleEnum.large,
-                          ),
-                        ],
+                        ),
                       ),
-                      body: Container(
-                        margin: const EdgeInsets.only(top: 12),
-                        child: Row(
+                      confirmDismiss: (direction) async {
+                        if (direction == DismissDirection.endToStart) {
+                          var result = await showOkCancelAlertDialog(
+                              context: context,
+                              okLabel: 'Xóa',
+                              cancelLabel: 'Hủy',
+                              isDestructiveAction: true,
+                              style: AdaptiveStyle.iOS,
+                              title: 'Xóa thư mục',
+                              message:
+                                  'Bạn chắc chắn muốn xóa thư mục này? Các học phần trong thư mục này sẽ không bị xóa mất.');
+
+                          if (result == OkCancelResult.ok) {
+                            return true;
+                          }
+                        }
+                        return false;
+                      },
+                      onDismissed: (direction) async {
+                        await folderService.deleteFolder(
+                            folderProvider.listFolderOfCurrentUser[index].id);
+                        folderProvider.reloadListFolderOfCurrentUser();
+                      },
+                      child: ItemList(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/folder/detail',
+                              arguments: folderProvider
+                                  .listFolderOfCurrentUser[index].id);
+                        },
+                        height: null,
+                        width: double.infinity,
+                        head: Row(
                           children: [
-                            CustomText(
-                                text:
-                                    '${folderProvider.listFolderOfCurrentUser[index].listTopic.length} học phần'),
-                            Container(
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 16),
-                              color: Colors.grey.shade600.withOpacity(0.5),
-                              width: 1,
-                              height: 18,
-                            ),
-                            const CircleAvatar(
-                              backgroundImage: AppTheme.defaultAvatar,
-                              backgroundColor: Colors.grey,
-                              radius: 14,
+                            Icon(
+                              Icons.folder_outlined,
+                              color: Colors.grey.withOpacity(0.6),
+                              size: 28,
                             ),
                             const SizedBox(
-                              width: 8,
+                              width: 12,
                             ),
                             CustomText(
-                                text: folderProvider
-                                    .listFolderOfCurrentUser[index]
-                                    .userCreate!
-                                    .username)
+                              text: folderProvider
+                                  .listFolderOfCurrentUser[index].title,
+                              type: TextStyleEnum.large,
+                            ),
                           ],
+                        ),
+                        body: Container(
+                          margin: const EdgeInsets.only(top: 12),
+                          child: Row(
+                            children: [
+                              CustomText(
+                                  text:
+                                      '${folderProvider.listFolderOfCurrentUser[index].listTopic.length} học phần'),
+                              Container(
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 16),
+                                color: Colors.grey.shade600.withOpacity(0.5),
+                                width: 1,
+                                height: 18,
+                              ),
+                              const CircleAvatar(
+                                backgroundImage: AppTheme.defaultAvatar,
+                                backgroundColor: Colors.grey,
+                                radius: 14,
+                              ),
+                              const SizedBox(
+                                width: 8,
+                              ),
+                              CustomText(
+                                  text: folderProvider
+                                      .listFolderOfCurrentUser[index]
+                                      .userCreate!
+                                      .username)
+                            ],
+                          ),
                         ),
                       ),
                     ),

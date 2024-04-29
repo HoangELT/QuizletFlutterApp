@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
@@ -356,6 +357,7 @@ class _HomePageState extends State<HomePage> {
                                   },
                                   buildItem: (context, index) {
                                     return ItemList(
+                                      height: null,
                                       onTap: () {
                                         Navigator.pushNamed(
                                             context, '/folder/detail',
@@ -373,11 +375,17 @@ class _HomePageState extends State<HomePage> {
                                           const SizedBox(
                                             width: 12,
                                           ),
-                                          CustomText(
-                                            text: folderProvider
-                                                .listFolderOfCurrentUser[index]
-                                                .title,
-                                            type: TextStyleEnum.large,
+                                          Expanded(
+                                            child: CustomText(
+                                              text:
+                                                  folderProvider.listFolderOfCurrentUser[index].title.replaceAll('\n', ' ').replaceAll('\r', ' '),
+                                              type: TextStyleEnum.large,
+                                              style: const TextStyle(
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                            ),
                                           ),
                                         ],
                                       ),

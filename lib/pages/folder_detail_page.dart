@@ -11,6 +11,7 @@ import 'package:quizletapp/widgets/button.dart';
 import 'package:quizletapp/widgets/item_list.dart';
 import 'package:quizletapp/widgets/text.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:toastification/toastification.dart';
 
 class FolderDetailPage extends StatefulWidget {
   final String folderId;
@@ -96,7 +97,8 @@ class _FolderDetailPageState extends State<FolderDetailPage> {
                 InkWell(
                   onTap: () async {
                     Navigator.pop(context);
-                    await Navigator.pushNamed(context, '/folder/edit', arguments: folder);
+                    await Navigator.pushNamed(context, '/folder/edit',
+                        arguments: folder);
                     _fetchFolder();
                   },
                   child: ListTile(
@@ -121,8 +123,7 @@ class _FolderDetailPageState extends State<FolderDetailPage> {
                 ),
                 InkWell(
                   onTap: () async {
-                    await Navigator.popAndPushNamed(
-                        context, '/folder/add',
+                    await Navigator.popAndPushNamed(context, '/folder/add',
                         arguments: folder!);
                     await _fetchFolder();
                   },
@@ -159,7 +160,9 @@ class _FolderDetailPageState extends State<FolderDetailPage> {
                     );
                     if (chooseResult == OkCancelResult.ok) {
                       await folderService.deleteFolder(folder!.id);
-                      context.read<FolderProvider>().reloadListFolderOfCurrentUser();
+                      context
+                          .read<FolderProvider>()
+                          .reloadListFolderOfCurrentUser();
                       Navigator.pop(context);
                     }
                   },
@@ -326,73 +329,132 @@ class _FolderDetailPageState extends State<FolderDetailPage> {
                                               margin:
                                                   const EdgeInsets.symmetric(
                                                       vertical: 8),
-                                              child: ItemList(
-                                                height: null,
-                                                width: double.infinity,
-                                                onTap: () {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          TopicDetailPage(
-                                                        topicId: folder!
-                                                            .listTopic[index]
-                                                            .id,
-                                                      ),
+                                              child: Dismissible(
+                                                key: Key(folder!
+                                                    .listTopic[index].id),
+                                                direction:
+                                                    DismissDirection.endToStart,
+                                                background: Container(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 20),
+                                                  alignment:
+                                                      Alignment.centerRight,
+                                                  child: Container(
+                                                    padding:
+                                                        const EdgeInsets.all(6),
+                                                    decoration:
+                                                        const BoxDecoration(
+                                                      color: Colors.red,
+                                                      shape: BoxShape.circle,
                                                     ),
+                                                    child: const Icon(
+                                                      Icons.delete_outline,
+                                                      color: Colors.white,
+                                                      size: 32,
+                                                    ),
+                                                  ),
+                                                ),
+                                                onDismissed: (direction) async {
+                                                  folder!.listTopicId.remove(
+                                                      folder!
+                                                          .listTopic[index].id);
+                                                  setState(() {
+                                                    folder!.listTopic.remove(folder!.listTopic[index]);
+                                                  });
+                                                  await folderService
+                                                      .updateFolder(folder!);
+                                                  context
+                                                      .read<FolderProvider>()
+                                                      .reloadListFolderOfCurrentUser();
+                                                  toastification.show(
+                                                    context: context,
+                                                    title: CustomText(
+                                                      text: 'Đã lưu thay đổi',
+                                                      type: TextStyleEnum.large,
+                                                    ),
+                                                    style: ToastificationStyle
+                                                        .fillColored,
+                                                    foregroundColor:
+                                                        Colors.white,
+                                                    showProgressBar: false,
+                                                    type: ToastificationType
+                                                        .success,
+                                                    autoCloseDuration:
+                                                        const Duration(
+                                                            seconds: 3),
                                                   );
                                                 },
-                                                headText: folder!
-                                                    .listTopic[index].title,
-                                                body: Row(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    CustomText(
-                                                      text:
-                                                          '${folder!.listTopic[index].listCard.length} thuật ngữ',
-                                                      style: const TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.w400,
-                                                          fontSize: 14),
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 8,
-                                                    ),
-                                                    if (!folder!
-                                                        .listTopic[index]
-                                                        .public)
-                                                      Icon(
-                                                        Icons.lock_outline,
-                                                        color: Colors.grey
-                                                            .withOpacity(0.5),
-                                                        size: 20,
+                                                child: ItemList(
+                                                  height: null,
+                                                  width: double.infinity,
+                                                  onTap: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            TopicDetailPage(
+                                                          topicId: folder!
+                                                              .listTopic[index]
+                                                              .id,
+                                                        ),
                                                       ),
-                                                  ],
-                                                ),
-                                                bottom: Container(
-                                                  margin: const EdgeInsets.only(
-                                                      top: 16),
-                                                  child: Row(
+                                                    );
+                                                  },
+                                                  headText: folder!
+                                                      .listTopic[index].title,
+                                                  body: Row(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
                                                     children: [
-                                                      const CircleAvatar(
-                                                        backgroundImage:
-                                                            AppTheme
-                                                                .defaultAvatar,
-                                                        radius: 14,
+                                                      CustomText(
+                                                        text:
+                                                            '${folder!.listTopic[index].listCard.length} thuật ngữ',
+                                                        style: const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                            fontSize: 14),
                                                       ),
                                                       const SizedBox(
                                                         width: 8,
                                                       ),
-                                                      CustomText(
-                                                        text: folder!
-                                                                .listTopic[
-                                                                    index]
-                                                                .userCreate
-                                                                ?.username ??
-                                                            '',
-                                                      ),
+                                                      if (!folder!
+                                                          .listTopic[index]
+                                                          .public)
+                                                        Icon(
+                                                          Icons.lock_outline,
+                                                          color: Colors.grey
+                                                              .withOpacity(0.5),
+                                                          size: 20,
+                                                        ),
                                                     ],
+                                                  ),
+                                                  bottom: Container(
+                                                    margin:
+                                                        const EdgeInsets.only(
+                                                            top: 16),
+                                                    child: Row(
+                                                      children: [
+                                                        const CircleAvatar(
+                                                          backgroundImage:
+                                                              AppTheme
+                                                                  .defaultAvatar,
+                                                          radius: 14,
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 8,
+                                                        ),
+                                                        CustomText(
+                                                          text: folder!
+                                                                  .listTopic[
+                                                                      index]
+                                                                  .userCreate
+                                                                  ?.username ??
+                                                              '',
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
                                               ),

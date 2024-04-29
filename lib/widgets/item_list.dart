@@ -37,17 +37,19 @@ class _ItemListState extends State<ItemList> {
     return GestureDetector(
       onTap: widget.onTap,
       child: Container(
+        clipBehavior: Clip.hardEdge,
         padding: const EdgeInsets.all(16),
         width: widget.width,
         height: widget.height,
-        decoration: widget.decoration ?? BoxDecoration(
-          color: AppTheme.primaryBackgroundColor,
-          border: Border.all(
-            color: Colors.grey.withOpacity(0.4),
-            width: 2,
-          ),
-          borderRadius: BorderRadius.circular(16),
-        ),
+        decoration: widget.decoration ??
+            BoxDecoration(
+              color: AppTheme.primaryBackgroundColor,
+              border: Border.all(
+                color: Colors.grey.withOpacity(0.4),
+                width: 2,
+              ),
+              borderRadius: BorderRadius.circular(16),
+            ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -56,26 +58,29 @@ class _ItemListState extends State<ItemList> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 (widget.head == null)
-                ? CustomText(text: widget.headText, type: TextStyleEnum.large,)
-                : widget.head!,
-            (widget.body == null)
-                ? (widget.bodyText.isEmpty)
-                    ? const SizedBox()
-                    : Container(
-                        margin: const EdgeInsets.only(top: 12),
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-                        decoration: BoxDecoration(
-                            color: Colors.grey.withOpacity(0.3),
-                            borderRadius: BorderRadius.circular(9999999)),
-                        child: CustomText(
-                          text: widget.bodyText,
-                          style: const TextStyle(
-                            fontSize: 14,
-                          ),
-                        ),
+                    ? CustomText(
+                        text: widget.headText,
+                        type: TextStyleEnum.large,
                       )
-                : widget.body!,
+                    : widget.head!,
+                (widget.body == null)
+                    ? (widget.bodyText.isEmpty)
+                        ? const SizedBox()
+                        : Container(
+                            margin: const EdgeInsets.only(top: 12),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 2),
+                            decoration: BoxDecoration(
+                                color: Colors.grey.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(9999999)),
+                            child: CustomText(
+                              text: widget.bodyText,
+                              style: const TextStyle(
+                                fontSize: 14,
+                              ),
+                            ),
+                          )
+                    : widget.body!,
               ],
             ),
             if (widget.bottom != null) widget.bottom!
