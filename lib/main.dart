@@ -61,7 +61,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    context.read<CurrentUserProvider>().initCurrentUse();
+    context.read<CurrentUserProvider>().initCurrentUser();
     return MaterialApp(
       scrollBehavior: MyCustomScrollBehavior(),
       debugShowCheckedModeBanner: false,

@@ -1,6 +1,5 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:quizletapp/enums/filter_topic_enum.dart';
@@ -502,8 +501,7 @@ class _LibraryPageState extends State<LibraryPage>
                                                         MaterialPageRoute(
                                                           builder: (context) =>
                                                               TopicDetailPage(
-                                                            topicId: topicProvider
-                                                                .listTopicOfCurrentUser[
+                                                            topicId: listTopicToday[
                                                                     index]
                                                                 .id,
                                                           ),
@@ -559,8 +557,7 @@ class _LibraryPageState extends State<LibraryPage>
                                                             width: 8,
                                                           ),
                                                           CustomText(
-                                                              text: topicProvider
-                                                                      .listTopicOfCurrentUser[
+                                                              text: listTopicToday[
                                                                           index]
                                                                       .userCreate
                                                                       ?.username ??
@@ -654,7 +651,7 @@ class _LibraryPageState extends State<LibraryPage>
                                                         const SizedBox(
                                                           width: 8,
                                                         ),
-                                                        if (!listTopicToday[
+                                                        if (!topicProvider.listTopicOfCurrentUser[
                                                                 index]
                                                             .public)
                                                           Icon(

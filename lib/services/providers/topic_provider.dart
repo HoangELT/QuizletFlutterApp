@@ -1,10 +1,19 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:quizletapp/models/topic.dart';
 import 'package:quizletapp/services/models_services/topic_service.dart';
 
 class TopicProvider extends ChangeNotifier {
   TopicService topicService = TopicService();
+  
   List<TopicModel> _listTopicOfCurrentUser = [];
+
+  TopicProvider() {
+    init();
+  }
+
+  Future<void> init() async {
+    await reloadListTopic();
+  }
 
   List<TopicModel> get listTopicOfCurrentUser => _listTopicOfCurrentUser;
 
@@ -14,7 +23,7 @@ class TopicProvider extends ChangeNotifier {
       _listTopicOfCurrentUser = TopicService.sortTopicsByDateDescending(result);
       notifyListeners();
     } catch (e) {
-      print('TopicProvider: Lỗi reload listTopicOfCurrentUser.');
+      print('TopicProvider: Lỗi reload listTopicOfCurrentUser: $e');
     }
   }
 }

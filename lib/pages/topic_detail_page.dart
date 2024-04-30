@@ -499,7 +499,7 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                                   padding: const EdgeInsets.only(left: 8),
                                   borderRadius: 8,
                                   title: CustomText(
-                                    text: 'Kiểm tra',
+                                    text: 'Kiểm tra trắc nghiệm',
                                     type: TextStyleEnum.large,
                                     style: const TextStyle(
                                         fontWeight: FontWeight.w500),
