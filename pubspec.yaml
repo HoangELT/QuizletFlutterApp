@@ -55,11 +55,11 @@ dependencies:
   adaptive_dialog: ^2.1.0
   carousel_slider: ^4.2.1
   flip_card: ^0.7.0
-  swipe_cards: ^2.0.0+1
   auto_size_text: ^3.0.0
   smooth_page_indicator: ^1.1.0
   flutter_tts: ^4.0.2
   toggle_switch: ^2.3.0
+  appinio_swiper: ^2.1.1
 
 
 dev_dependencies:

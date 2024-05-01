@@ -501,9 +501,10 @@ class _LibraryPageState extends State<LibraryPage>
                                                         MaterialPageRoute(
                                                           builder: (context) =>
                                                               TopicDetailPage(
-                                                            topicId: listTopicToday[
-                                                                    index]
-                                                                .id,
+                                                            topicId:
+                                                                listTopicToday[
+                                                                        index]
+                                                                    .id,
                                                           ),
                                                         ),
                                                       );
@@ -557,11 +558,12 @@ class _LibraryPageState extends State<LibraryPage>
                                                             width: 8,
                                                           ),
                                                           CustomText(
-                                                              text: listTopicToday[
-                                                                          index]
-                                                                      .userCreate
-                                                                      ?.username ??
-                                                                  ''),
+                                                            text: listTopicToday[
+                                                                        index]
+                                                                    .userCreate
+                                                                    ?.username ??
+                                                                '',
+                                                          ),
                                                         ],
                                                       ),
                                                     ),
@@ -651,7 +653,8 @@ class _LibraryPageState extends State<LibraryPage>
                                                         const SizedBox(
                                                           width: 8,
                                                         ),
-                                                        if (!topicProvider.listTopicOfCurrentUser[
+                                                        if (!topicProvider
+                                                            .listTopicOfCurrentUser[
                                                                 index]
                                                             .public)
                                                           Icon(

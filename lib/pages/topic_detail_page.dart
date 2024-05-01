@@ -3,13 +3,11 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
 import 'package:quizletapp/models/card.dart';
 import 'package:quizletapp/models/topic.dart';
-import 'package:quizletapp/services/models_services/folder_service.dart';
 import 'package:quizletapp/services/models_services/topic_service.dart';
 import 'package:quizletapp/utils/app_theme.dart';
 import 'package:quizletapp/widgets/button_listtile.dart';
@@ -468,8 +466,16 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                                 height: 12,
                               ),
                               InkWell(
-                                onTap: () {
-                                  print('clicked');
+                                onTap: () async {
+                                  if (_currentPicked == 0) {
+                                    await Navigator.pushNamed(
+                                        context, '/learn/flashcards',
+                                        arguments: topic!.listCard);
+                                  } else {
+                                    await Navigator.pushNamed(
+                                        context, '/learn/flashcards',
+                                        arguments: listCardPicked);
+                                  }
                                 },
                                 borderRadius: BorderRadius.circular(8),
                                 child: ButtonListTile(

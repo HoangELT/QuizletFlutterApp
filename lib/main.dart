@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quizletapp/models/card.dart';
 import 'package:quizletapp/models/folder.dart';
 import 'package:quizletapp/models/topic.dart';
 import 'package:quizletapp/pages/add_to_folder_page.dart';
@@ -11,6 +12,7 @@ import 'package:quizletapp/pages/create_topic_page.dart';
 import 'package:quizletapp/pages/edit_folder.dart';
 import 'package:quizletapp/pages/edit_topic_page.dart';
 import 'package:quizletapp/pages/folder_detail_page.dart';
+import 'package:quizletapp/pages/learn_flash_cards.dart';
 import 'package:quizletapp/pages/library_page.dart';
 import 'package:quizletapp/pages/search_topic.dart';
 import 'package:quizletapp/pages/intro_page.dart';
@@ -166,6 +168,12 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute(
               builder: (context) => EditFolderPage(
                 folder: args as FolderModel,
+              ),
+            );
+          case '/learn/flashcards':
+            return MaterialPageRoute(
+              builder: (context) => LearnFlashCards(
+                listCard: args as List<CardModel>,
               ),
             );
           default:
