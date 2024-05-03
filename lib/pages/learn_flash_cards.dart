@@ -1,15 +1,14 @@
 import 'package:appinio_swiper/appinio_swiper.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flip_card/flip_card.dart';
-import 'package:flip_card/flip_card_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:quizletapp/enums/setting_learn_flashcards_enum.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
 import 'package:quizletapp/models/card.dart';
 import 'package:quizletapp/utils/app_theme.dart';
 import 'package:quizletapp/widgets/button_active.dart';
+import 'package:quizletapp/widgets/flipcards_with_keep_alive.dart';
 import 'package:quizletapp/widgets/text.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toggle_switch/toggle_switch.dart';
@@ -28,8 +27,9 @@ class LearnFlashCards extends StatefulWidget {
 class _LearnFlashCardsState extends State<LearnFlashCards> {
   final FlutterTts flutterTts = FlutterTts();
 
-  final appinioSwiperController = AppinioSwiperController();
-  final _flipController = FlipCardController();
+  late AppinioSwiperController appinioSwiperController;
+  var cardKeys = <int, GlobalKey<FlipCardState>>{};
+  late GlobalKey<FlipCardState> lastFlipped;
 
   int _settingIndex = 1;
   bool isMix = false;
@@ -46,9 +46,11 @@ class _LearnFlashCardsState extends State<LearnFlashCards> {
   List<CardModel> listRight = [];
   List<CardModel> listShow = [];
 
+  int currentCardIndex = 0;
+  bool cardIsFlipped = false;
+
   @override
   void dispose() {
-    // TODO: implement dispose
     appinioSwiperController.dispose();
     autoPlayFocus.dispose();
     super.dispose();
@@ -56,33 +58,38 @@ class _LearnFlashCardsState extends State<LearnFlashCards> {
 
   @override
   void initState() {
-    initValueState();
     super.initState();
+    initValueState();
+    appinioSwiperController = AppinioSwiperController();
   }
 
-  initValueState() async {
-    final prefs = await SharedPreferences.getInstance();
-    bool? mix = prefs.getBool('isMix');
-    bool? volume = prefs.getBool('isVolume');
-    int? index = prefs.getInt('settingIndex');
-    setState(() {
-      isMix = mix ?? false;
-      isVolume = volume ?? false;
-      _settingIndex = index ?? 1;
-    });
-    if (isVolume) {
-      if (_settingIndex == 0) {
-        speak(widget.listCard[appinioSwiperController.cardIndex!].term);
-      } else {
-        speak(widget.listCard[appinioSwiperController.cardIndex!].define);
+  Future<void> initValueState() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final bool mix =
+          prefs.getBool(SettingLearnFlashCardEnum.isMix.name) ?? false;
+      final bool volume =
+          prefs.getBool(SettingLearnFlashCardEnum.isVolume.name) ?? false;
+      final int index =
+          prefs.getInt(SettingLearnFlashCardEnum.indexFront.name) ?? 1;
+
+      setState(() {
+        isMix = mix;
+        isVolume = volume;
+        _settingIndex = index;
+      });
+
+      if (isVolume &&
+          appinioSwiperController.cardIndex != null &&
+          appinioSwiperController.cardIndex! < widget.listCard.length) {
+        final String textToSpeak = _settingIndex == 0
+            ? widget.listCard[appinioSwiperController.cardIndex!].term
+            : widget.listCard[appinioSwiperController.cardIndex!].define;
+        await speak(textToSpeak);
       }
+    } catch (e) {
+      print('Lỗi init: $e');
     }
-  }
-
-  initListShow() {
-    setState(() {
-      listShow = List.from(widget.listCard);
-    });
   }
 
   void rollBack(CardModel itemRollBack) {
@@ -97,15 +104,13 @@ class _LearnFlashCardsState extends State<LearnFlashCards> {
       });
       print('remove right');
     }
-    setState(() {
-      appinioSwiperController.setCardIndex(appinioSwiperController.cardIndex!);
-    });
   }
 
-  void setSettingIndex(int index) {
+  void setSettingIndex(int index) async {
     setState(() {
       _settingIndex = index;
     });
+    print('change index: $_settingIndex');
   }
 
   double getOpacity(double position) {
@@ -118,8 +123,6 @@ class _LearnFlashCardsState extends State<LearnFlashCards> {
     if (absPosition < 0.1) {
       return 0.0;
     }
-
-    // if (absPosition < 0.6) return 0.3;
 
     return (absPosition - 0.1) / (2.4);
   }
@@ -143,27 +146,138 @@ class _LearnFlashCardsState extends State<LearnFlashCards> {
   Future<void> speak(String textToSpeech, {String language = 'en-US'}) async {
     try {
       // Set language to English (US)
-      var resultLanguage = await flutterTts.setLanguage(language);
-      if (resultLanguage == 1) {
-      } else {
-        return;
-      }
-      // Set pitch level
-      var resultPitch = await flutterTts.setPitch(0.8);
-      if (resultPitch == 1) {
-      } else {
+      int resultLanguage = await flutterTts.setLanguage(language);
+      if (resultLanguage != 1) {
+        print('Failed to set language');
         return;
       }
 
-      // Start speaking
-      var resultSpeak = await flutterTts.speak(textToSpeech);
-      if (resultSpeak == 1) {
-      } else {
-        print('Failed to speak');
+      // Set pitch level
+      int resultPitch = await flutterTts.setPitch(0.8);
+      if (resultPitch != 1) {
+        print('Failed to set pitch');
         return;
+      }
+
+      // Ensures that the speak completion is awaited
+      await flutterTts.awaitSpeakCompletion(true);
+
+      // Start speaking
+      int resultSpeak = await flutterTts.speak(textToSpeech);
+      if (resultSpeak != 1) {
+        print('Failed to speak');
       }
     } catch (e) {
       print('Error occurred in TTS operation: $e');
+    }
+  }
+
+  Future<void> _onSpeak() async {
+    bool readTermFirst = _settingIndex == 0;
+
+    if (readTermFirst) {
+      await _readTermFirst();
+    } else {
+      await _readDefinitionFirst();
+    }
+  }
+
+  Future<void> _readTermFirst() async {
+    if (cardKeys[currentCardIndex]!.currentState?.isFront ?? false) {
+      await flutterTts.speak(widget.listCard[currentCardIndex].term);
+      await Future.delayed(const Duration(seconds: 2));
+      await cardKeys[currentCardIndex]!
+          .currentState!
+          .toggleCard()
+          .whenComplete(() => Future.delayed(Durations.extralong2));
+    }
+    await flutterTts.speak(widget.listCard[currentCardIndex].define);
+    await Future.delayed(const Duration(seconds: 2));
+  }
+
+  Future<void> _readDefinitionFirst() async {
+    if (cardKeys[currentCardIndex]!.currentState?.isFront ?? false) {
+      await flutterTts.speak(widget.listCard[currentCardIndex].define);
+      await Future.delayed(const Duration(seconds: 2));
+      await cardKeys[currentCardIndex]
+          ?.currentState
+          ?.toggleCard()
+          .whenComplete(() => Future.delayed(Durations.extralong2));
+    }
+    await flutterTts.speak(widget.listCard[currentCardIndex].term);
+    await Future.delayed(const Duration(seconds: 2));
+  }
+
+  void updateCardIsFlipped() => cardIsFlipped = !cardIsFlipped;
+
+  void _autoPlay() {
+    if (!isAutoPlay) {
+      setState(() => isAutoPlay = true);
+      _playCards();
+    } else {
+      setState(() => isAutoPlay = false);
+      flutterTts.stop();
+    }
+  }
+
+  Future<void> _playCards() async {
+    for (int i = currentCardIndex; i < widget.listCard.length; i++) {
+      if (!isAutoPlay) break;
+      await _onSpeak();
+      if (!isAutoPlay) break;
+      await appinioSwiperController
+          .swipeLeft()
+          .whenComplete(() => Future.delayed(Durations.extralong2));
+    }
+    setState(() => isAutoPlay = false);
+  }
+
+  void _onSwipeEnd(
+      int previousIndex, int targetIndex, SwiperActivity activity) {
+    print(
+        'onSwipeEnd: previousIndex: $previousIndex, targetIndex: $targetIndex, possition: ${activity.currentOffset.dx}');
+    if (previousIndex == targetIndex) return;
+    speakIfIsVolume();
+    if (previousIndex > targetIndex) {
+      rollBack(widget.listCard[targetIndex]);
+    } else {
+      if (activity.currentOffset.dx < 0) {
+        setState(() {
+          listLeft.add(widget.listCard[previousIndex]);
+        });
+      } else {
+        setState(() {
+          listRight.add(widget.listCard[previousIndex]);
+        });
+      }
+    }
+
+    setState(() {
+      positionValueChanges = 0;
+    });
+    print('prossiton: $positionValueChanges');
+  }
+
+  Future<void> speakIfIsVolume() async {
+    if (isVolume) {
+      if (_settingIndex == 0 &&
+              cardKeys[currentCardIndex]!.currentState?.isFront == true ||
+          _settingIndex != 0 &&
+              cardKeys[currentCardIndex]!.currentState?.isFront == false) {
+        await flutterTts.speak(widget.listCard[currentCardIndex].term);
+        return;
+      }
+      await flutterTts.speak(widget.listCard[currentCardIndex].define);
+    }
+  }
+
+  Future<void> _onFlipDone(bool isFront) async {
+    if (isVolume) {
+      if (_settingIndex == 0 && isFront || _settingIndex != 0 && !isFront) {
+        await flutterTts.speak(widget.listCard[currentCardIndex].define);
+        return;
+      }
+      await flutterTts.speak(widget.listCard[currentCardIndex].term);
     }
   }
 
@@ -276,7 +390,10 @@ class _LearnFlashCardsState extends State<LearnFlashCards> {
                                             final SharedPreferences prefs =
                                                 await SharedPreferences
                                                     .getInstance();
-                                            await prefs.setBool('isMix', state);
+                                            await prefs.setBool(
+                                                SettingLearnFlashCardEnum
+                                                    .isMix.name,
+                                                state);
                                           },
                                         ),
                                         ButtonActive(
@@ -291,7 +408,9 @@ class _LearnFlashCardsState extends State<LearnFlashCards> {
                                                 await SharedPreferences
                                                     .getInstance();
                                             await prefs.setBool(
-                                                'isVolume', state);
+                                                SettingLearnFlashCardEnum
+                                                    .isVolume.name,
+                                                state);
                                           },
                                         ),
                                       ],
@@ -343,13 +462,16 @@ class _LearnFlashCardsState extends State<LearnFlashCards> {
                                                   .getInstance();
                                           if (index == 0) {
                                             setSettingIndex(0);
-
                                             await prefs.setInt(
-                                                'settingIndex', 0);
+                                                SettingLearnFlashCardEnum
+                                                    .indexFront.name,
+                                                0);
                                           } else {
                                             setSettingIndex(1);
                                             await prefs.setInt(
-                                                'settingIndex', 1);
+                                                SettingLearnFlashCardEnum
+                                                    .indexFront.name,
+                                                1);
                                           }
                                         },
                                       ),
@@ -534,48 +656,30 @@ class _LearnFlashCardsState extends State<LearnFlashCards> {
                     positionValueChanges = 0;
                   });
                 },
-                onSwipeEnd: (previousIndex, targetIndex, activity) {
-                  try {
-                    if (previousIndex == targetIndex) return;
-                    if (previousIndex > targetIndex) {
-                      rollBack(widget.listCard[targetIndex]);
-                    } else {
-                      if (activity.currentOffset.dx < 0) {
-                        setState(() {
-                          listLeft.add(widget.listCard[previousIndex]);
-                        });
-                      } else {
-                        setState(() {
-                          listRight.add(widget.listCard[previousIndex]);
-                        });
-                      }
-                    }
+                onSwipeBegin: (previousIndex, targetIndex, activity) {
+                  print(
+                      'onSwipeBegin: previousIndex: $previousIndex, targetIndex: $targetIndex, possition: ${activity.currentOffset.dx}');
+
+                  if (previousIndex != targetIndex) {
                     setState(() {
-                      positionValueChanges = 0;
+                      currentCardIndex = targetIndex;
                     });
-                    if (isVolume &&
-                        appinioSwiperController.cardIndex != null &&
-                        appinioSwiperController.cardIndex! <
-                            widget.listCard.length) {
-                      if (_settingIndex == 0) {
-                        speak(widget
-                            .listCard[appinioSwiperController.cardIndex!].term);
-                      } else {
-                        speak(widget
-                            .listCard[appinioSwiperController.cardIndex!]
-                            .define);
-                      }
-                    }
-                  } catch (e) {
-                    print('lỗi dòng 476: $e');
                   }
                 },
+                onSwipeEnd: (previousIndex, targetIndex, activity) {
+                  _onSwipeEnd(previousIndex, targetIndex, activity);
+                },
                 cardBuilder: (context, index) {
+                  cardKeys.putIfAbsent(index, () => GlobalKey<FlipCardState>());
+                  GlobalKey<FlipCardState> thisCard = cardKeys[index]!;
                   return FlipCard(
+                    key: thisCard,
                     fill: Fill.fillBack,
-                    direction: FlipDirection.HORIZONTAL,
-                    side: listCardSide[_settingIndex],
-                    controller: _flipController,
+                    side: CardSide.FRONT,
+                    flipOnTouch: true,
+                    onFlipDone: (isFront) {
+                      _onFlipDone(isFront);
+                    },
                     front: Stack(
                       children: [
                         Card(
@@ -602,9 +706,13 @@ class _LearnFlashCardsState extends State<LearnFlashCards> {
                               borderRadius: BorderRadius.circular(16),
                             ),
                             child: AutoSizeText(
-                              (widget.listCard[index].term.isEmpty)
-                                  ? '...'
-                                  : widget.listCard[index].term,
+                              (_settingIndex == 0)
+                                  ? (widget.listCard[index].term.isEmpty)
+                                      ? '...'
+                                      : widget.listCard[index].term
+                                  : (widget.listCard[index].define.isEmpty)
+                                      ? '...'
+                                      : widget.listCard[index].define,
                               style: TextStyle(
                                   color: Colors.white.withOpacity(
                                       1 - getOpacity(positionValueChanges)),
@@ -616,9 +724,12 @@ class _LearnFlashCardsState extends State<LearnFlashCards> {
                           left: 16,
                           top: 16,
                           child: IconButton(
-                            onPressed: () {
-                              speak(widget.listCard[index].term);
-                              print('index: $_settingIndex');
+                            onPressed: () async {
+                              if (_settingIndex == 0) {
+                                await speak(widget.listCard[index].term);
+                                return;
+                              }
+                              await speak(widget.listCard[index].define);
                             },
                             icon: const Icon(
                               Icons.volume_up_outlined,
@@ -683,9 +794,13 @@ class _LearnFlashCardsState extends State<LearnFlashCards> {
                               borderRadius: BorderRadius.circular(16),
                             ),
                             child: AutoSizeText(
-                              (widget.listCard[index].define.isEmpty)
-                                  ? '...'
-                                  : widget.listCard[index].define,
+                              (_settingIndex == 0)
+                                  ? (widget.listCard[index].define.isEmpty)
+                                      ? '...'
+                                      : widget.listCard[index].define
+                                  : (widget.listCard[index].term.isEmpty)
+                                      ? '...'
+                                      : widget.listCard[index].term,
                               style: TextStyle(
                                   color: Colors.white.withOpacity(
                                       1 - getOpacity(positionValueChanges)),
@@ -697,8 +812,12 @@ class _LearnFlashCardsState extends State<LearnFlashCards> {
                           left: 16,
                           top: 16,
                           child: IconButton(
-                            onPressed: () {
-                              speak(widget.listCard[index].define);
+                            onPressed: () async {
+                              if (_settingIndex == 1) {
+                                await speak(widget.listCard[index].term);
+                                return;
+                              }
+                              await speak(widget.listCard[index].define);
                             },
                             icon: const Icon(
                               Icons.volume_up_outlined,
@@ -765,27 +884,8 @@ class _LearnFlashCardsState extends State<LearnFlashCards> {
                 IconButton(
                   focusNode: autoPlayFocus,
                   focusColor: Colors.grey,
-                  onPressed: () async {
-                    try {
-                      setState(() {
-                        isAutoPlay = !isAutoPlay;
-                      });
-                      while (appinioSwiperController.cardIndex! <=
-                              widget.listCard.length - 1 &&
-                          isAutoPlay) {
-                        await Future.delayed(const Duration(seconds: 1));
-                        if (appinioSwiperController.cardIndex! <
-                            widget.listCard.length) {
-                          await appinioSwiperController.swipeLeft();
-                        }
-                      }
-                      setState(() {
-                        isAutoPlay = false;
-                        autoPlayFocus.unfocus();
-                      });
-                    } catch (e) {
-                      print('error nè $e');
-                    }
+                  onPressed: () {
+                    _autoPlay();
                   },
                   icon: Icon(
                     (isAutoPlay) ? Icons.pause : Icons.play_arrow,
