@@ -8,13 +8,17 @@ class CustomButton extends StatelessWidget {
   final double? width;
   final TextStyle? textStyle;
   final String text;
+  Widget? iconLeft;
+  Widget? iconRight;
 
-  const CustomButton({
+  CustomButton({
     Key? key,
     this.onTap,
     this.backgroundColor = AppTheme.primaryColor,
     this.height = 50.0,
     this.width = double.infinity,
+    this.iconLeft,
+    this.iconRight,
     this.textStyle = const TextStyle(
         color: Colors.white, fontWeight: FontWeight.w500, fontSize: 18),
     required this.text,
@@ -32,9 +36,22 @@ class CustomButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(8.0),
         ),
         alignment: Alignment.center,
-        child: Text(
-          text,
-          style: textStyle,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (iconLeft != null) iconLeft!,
+            const SizedBox(
+              width: 8,
+            ),
+            Text(
+              text,
+              style: textStyle,
+            ),
+            const SizedBox(
+              width: 8,
+            ),
+            if (iconRight != null) iconRight!,
+          ],
         ),
       ),
     );

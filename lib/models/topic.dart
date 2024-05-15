@@ -1,6 +1,5 @@
 import 'package:quizletapp/models/card.dart';
 import 'package:quizletapp/models/user.dart';
-import 'package:quizletapp/services/models_services/user_service.dart';
 
 class TopicModel {
   String id;

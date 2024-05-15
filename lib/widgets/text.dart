@@ -7,7 +7,9 @@ class CustomText extends StatelessWidget {
   TextStyle? style;
   TextAlign? textAlign;
   int? maxLines;
+  bool? softWrap;
   TextOverflow? overflow;
+
 
   CustomText({
     required this.text,
@@ -15,6 +17,7 @@ class CustomText extends StatelessWidget {
     this.type = TextStyleEnum.normal,
     this.textAlign,
     this.maxLines,
+    this.softWrap,
     this.overflow,
     super.key,
   });
@@ -28,6 +31,7 @@ class CustomText extends StatelessWidget {
       textAlign: textAlign,
       maxLines: maxLines, 
       overflow: overflow,
+      softWrap: softWrap,
     );
   }
 

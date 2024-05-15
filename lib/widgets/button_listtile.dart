@@ -7,6 +7,7 @@ class ButtonListTile extends StatelessWidget {
   final double borderRadius;
   final BoxDecoration? boxDecoration;
   final EdgeInsets? padding;
+  final Alignment? alignment;
   final Function()? onTap;
   ButtonListTile({
     this.title,
@@ -15,6 +16,7 @@ class ButtonListTile extends StatelessWidget {
     this.boxDecoration,
     this.padding,
     this.borderRadius = 16,
+    this.alignment,
     this.onTap,
     super.key,
   });
@@ -25,6 +27,7 @@ class ButtonListTile extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: padding,
+        alignment: alignment,
         decoration: (boxDecoration == null)
             ? BoxDecoration(
                 borderRadius: BorderRadius.all(
