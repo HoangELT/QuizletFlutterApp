@@ -3,16 +3,13 @@ class CardModel {
   String term;
   String define;
 
-  // Standard constructor
   CardModel(this.cardId, this.term, this.define);
 
-  // Copy constructor
   CardModel.copy(CardModel source)
       : cardId = source.cardId,
         term = source.term,
         define = source.define;
 
-  // Method to convert a CardModel object into a Map
   Map<String, dynamic> toMap() {
     return {
       'cardId': cardId,
@@ -38,5 +35,9 @@ class CardModel {
   // Static method to convert a list of CardModel objects into a list of maps
   static List<Map<String, dynamic>> cardsToMapList(List<CardModel> cards) {
     return cards.map((card) => card.toMap()).toList();
+  }
+
+  String toString() {
+    return 'CardModel: { define: $define, term: $term}';
   }
 }

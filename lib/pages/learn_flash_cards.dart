@@ -3,27 +3,26 @@ import 'dart:math';
 import 'package:appinio_swiper/appinio_swiper.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flip_card/flip_card.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:pie_chart/pie_chart.dart';
 import 'package:quizletapp/enums/setting_learn_flashcards_enum.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
 import 'package:quizletapp/models/card.dart';
+import 'package:quizletapp/models/topic.dart';
 import 'package:quizletapp/utils/app_theme.dart';
 import 'package:quizletapp/widgets/button.dart';
 import 'package:quizletapp/widgets/button_active.dart';
-import 'package:quizletapp/widgets/button_listtile.dart';
-import 'package:quizletapp/widgets/flipcards_with_keep_alive.dart';
 import 'package:quizletapp/widgets/text.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
 class LearnFlashCards extends StatefulWidget {
   List<CardModel> listCard;
+  TopicModel topic;
   LearnFlashCards({
     required this.listCard,
+    required this.topic,
     super.key,
   });
 
@@ -951,7 +950,7 @@ class _LearnFlashCardsState extends State<LearnFlashCards> {
                 Container(
                   margin: const EdgeInsets.symmetric(vertical: 16),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       IconButton(
                         onPressed: () async {
@@ -967,6 +966,7 @@ class _LearnFlashCardsState extends State<LearnFlashCards> {
                           size: 28,
                         ),
                       ),
+                      CustomText(text: 'Chạm vào thẻ để lật'),
                       IconButton(
                         focusNode: autoPlayFocus,
                         focusColor: Colors.grey,
@@ -1147,7 +1147,9 @@ class _LearnFlashCardsState extends State<LearnFlashCards> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         CustomButton(
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.popAndPushNamed(context, '/learn/quiz/settings', arguments: widget.topic);
+                          },
                           text: 'Làm bài kiểm tra thử',
                           iconLeft: const Icon(
                             Icons.edit_document,

@@ -328,7 +328,15 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                                           right: 0,
                                           bottom: 0,
                                           child: IconButton(
-                                            onPressed: () {},
+                                            onPressed: () {
+                                              List<CardModel> listACard = List.empty(growable: true);
+                                              listACard.add(listSort[0][index]);
+                                              TopicModel topicACard = TopicModel.copy(topic!);
+                                              topicACard.listCard = listACard;
+                                              Navigator.pushNamed(
+                                                  context, '/learn/flashcards',
+                                                  arguments: {'listCard': listACard, 'topic': topicACard});
+                                            },
                                             icon: const Icon(
                                               FontAwesomeIcons.expand,
                                               color: Colors.white,
@@ -362,7 +370,15 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                                           right: 0,
                                           bottom: 0,
                                           child: IconButton(
-                                            onPressed: () {},
+                                            onPressed: () {
+                                              List<CardModel> listACard = List.empty(growable: true);
+                                              listACard.add(listSort[0][index]);
+                                              TopicModel topicACard = TopicModel.copy(topic!);
+                                              topicACard.listCard = listACard;
+                                              Navigator.pushNamed(
+                                                  context, '/learn/flashcards',
+                                                  arguments: {'listCard': listACard, 'topic': topicACard});
+                                            },
                                             icon: const Icon(
                                               FontAwesomeIcons.expand,
                                               color: Colors.white,
@@ -470,11 +486,11 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                                   if (_currentPicked == 0) {
                                     await Navigator.pushNamed(
                                         context, '/learn/flashcards',
-                                        arguments: topic!.listCard);
+                                        arguments: {'listCard': topic!.listCard, 'topic': topic});
                                   } else {
                                     await Navigator.pushNamed(
                                         context, '/learn/flashcards',
-                                        arguments: listCardPicked);
+                                        arguments: {'listCard': listCardPicked, 'topic': topic});
                                   }
                                 },
                                 borderRadius: BorderRadius.circular(8),
@@ -499,7 +515,9 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                               InkWell(
                                 borderRadius: BorderRadius.circular(8),
                                 onTap: () {
-                                  print('clicked');
+                                  Navigator.pushNamed(
+                                      context, '/learn/quiz/settings',
+                                      arguments: topic);
                                 },
                                 child: ButtonListTile(
                                   padding: const EdgeInsets.only(left: 8),
@@ -548,8 +566,8 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                                     minWidth: double.infinity,
                                     cornerRadius: 20.0,
                                     activeBgColors: [
-                                      [Colors.green[800]!],
-                                      [Colors.red[800]!]
+                                      [Colors.grey.withOpacity(0.7)],
+                                      [Colors.grey.withOpacity(0.7)]
                                     ],
                                     activeFgColor: Colors.white,
                                     inactiveBgColor:

@@ -10,6 +10,7 @@ class CustomButton extends StatelessWidget {
   final String text;
   Widget? iconLeft;
   Widget? iconRight;
+  bool? disable;
 
   CustomButton({
     Key? key,
@@ -19,6 +20,7 @@ class CustomButton extends StatelessWidget {
     this.width = double.infinity,
     this.iconLeft,
     this.iconRight,
+    this.disable,
     this.textStyle = const TextStyle(
         color: Colors.white, fontWeight: FontWeight.w500, fontSize: 18),
     required this.text,
@@ -32,7 +34,7 @@ class CustomButton extends StatelessWidget {
         height: height,
         width: width,
         decoration: BoxDecoration(
-          color: backgroundColor,
+          color: (disable == true)? Colors.grey.withOpacity(0.6) : backgroundColor,
           borderRadius: BorderRadius.circular(8.0),
         ),
         alignment: Alignment.center,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quizletapp/enums/setting_learn_quiz.dart';
 import 'package:quizletapp/models/card.dart';
 import 'package:quizletapp/models/folder.dart';
 import 'package:quizletapp/models/topic.dart';
@@ -13,7 +14,9 @@ import 'package:quizletapp/pages/edit_folder.dart';
 import 'package:quizletapp/pages/edit_topic_page.dart';
 import 'package:quizletapp/pages/folder_detail_page.dart';
 import 'package:quizletapp/pages/learn_flash_cards.dart';
+import 'package:quizletapp/pages/learn_quiz_page.dart';
 import 'package:quizletapp/pages/library_page.dart';
+import 'package:quizletapp/pages/quiz_page.dart';
 import 'package:quizletapp/pages/search_topic.dart';
 import 'package:quizletapp/pages/intro_page.dart';
 import 'package:quizletapp/pages/login_page.dart';
@@ -173,9 +176,26 @@ class MyApp extends StatelessWidget {
           case '/learn/flashcards':
             return MaterialPageRoute(
               builder: (context) => LearnFlashCards(
-                listCard: args as List<CardModel>,
+                listCard: (args as Map<String, dynamic>)['listCard'] as List<CardModel>,
+                topic: args['topic'] as TopicModel,
               ),
             );
+          case '/learn/quiz/settings':
+            return MaterialPageRoute(
+              builder: (context) => LearnQuizPage(
+                topic: args as TopicModel,
+              ),
+            );
+          case '/learn/quiz':
+            return MaterialPageRoute(
+              builder: (context) => QuizPage(
+                listCard: (args as Map<String, dynamic>)['listCard'] as List<CardModel>,
+                sumLearnNumber: (args)[SettingLearnQuizEnum.sumLearnNumber.name] as int,
+                isAnswerByTerm: (args)[SettingLearnQuizEnum.isAnswerByTerm.name] as bool,
+                isShowResult: (args)[SettingLearnQuizEnum.isShowResult.name] as bool,
+              ),
+            );
+
           default:
             return MaterialPageRoute(
               builder: (context) => const NotFoundPage(),

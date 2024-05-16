@@ -121,63 +121,67 @@ class _TopicInfoPageState extends State<TopicInfoPage> {
                 const SizedBox(
                   height: 24,
                 ),
-                if(listFolderOfThisTopic.isNotEmpty) ...List.generate(listFolderOfThisTopic.length, (index) {
-                  return Container(
-                    margin: (index % 2 != 0) ? const EdgeInsets.symmetric(vertical: 16) : null,
-                    child: ItemList(
-                      onTap: () {
-                        print(
-                            'tap in item id: ${listFolderOfThisTopic[index].id}');
-                      },
-                      height: null,
-                      width: double.infinity,
-                      head: Row(
-                        children: [
-                          Icon(
-                            Icons.folder_outlined,
-                            color: Colors.grey.withOpacity(0.6),
-                            size: 28,
-                          ),
-                          const SizedBox(
-                            width: 12,
-                          ),
-                          CustomText(
-                            text: listFolderOfThisTopic[index].title,
-                            type: TextStyleEnum.large,
-                          ),
-                        ],
-                      ),
-                      body: Container(
-                        margin: const EdgeInsets.only(top: 12),
-                        child: Row(
+                if (listFolderOfThisTopic.isNotEmpty)
+                  ...List.generate(listFolderOfThisTopic.length, (index) {
+                    return Container(
+                      margin: (index % 2 != 0)
+                          ? const EdgeInsets.symmetric(vertical: 16)
+                          : null,
+                      child: ItemList(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/folder/detail',
+                              arguments: listFolderOfThisTopic[index].id);
+                        },
+                        height: null,
+                        width: double.infinity,
+                        head: Row(
                           children: [
-                            CustomText(
-                                text:
-                                    '${listFolderOfThisTopic[index].listTopic.length} học phần'),
-                            Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 16),
-                              color: Colors.grey.shade600.withOpacity(0.5),
-                              width: 1,
-                              height: 18,
-                            ),
-                            const CircleAvatar(
-                              backgroundImage: AppTheme.defaultAvatar,
-                              backgroundColor: Colors.grey,
-                              radius: 14,
+                            Icon(
+                              Icons.folder_outlined,
+                              color: Colors.grey.withOpacity(0.6),
+                              size: 28,
                             ),
                             const SizedBox(
-                              width: 8,
+                              width: 12,
                             ),
                             CustomText(
-                                text: listFolderOfThisTopic[index]
-                                    .userCreate!
-                                    .username)
+                              text: listFolderOfThisTopic[index].title,
+                              type: TextStyleEnum.large,
+                            ),
                           ],
                         ),
+                        body: Container(
+                          margin: const EdgeInsets.only(top: 12),
+                          child: Row(
+                            children: [
+                              CustomText(
+                                  text:
+                                      '${listFolderOfThisTopic[index].listTopic.length} học phần'),
+                              Container(
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 16),
+                                color: Colors.grey.shade600.withOpacity(0.5),
+                                width: 1,
+                                height: 18,
+                              ),
+                              const CircleAvatar(
+                                backgroundImage: AppTheme.defaultAvatar,
+                                backgroundColor: Colors.grey,
+                                radius: 14,
+                              ),
+                              const SizedBox(
+                                width: 8,
+                              ),
+                              CustomText(
+                                  text: listFolderOfThisTopic[index]
+                                      .userCreate!
+                                      .username)
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                  );
-                }),
+                    );
+                  }),
               ],
             ),
           ),

@@ -61,6 +61,7 @@ dependencies:
   toggle_switch: ^2.3.0
   appinio_swiper: ^2.1.1
   pie_chart: ^5.4.0
+  numberpicker: ^2.1.2
 
 dev_dependencies:
   flutter_test:
