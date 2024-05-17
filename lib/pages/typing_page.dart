@@ -1,30 +1,26 @@
 import 'dart:math';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
-import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:pie_chart/pie_chart.dart';
-import 'package:provider/provider.dart';
 import 'package:quizletapp/enums/setting_learn_quiz.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
 import 'package:quizletapp/models/card.dart';
-import 'package:quizletapp/models/exam_result.dart';
 import 'package:quizletapp/models/result.dart';
 import 'package:quizletapp/models/topic.dart';
-import 'package:quizletapp/models/user.dart';
-import 'package:quizletapp/services/models_services/exam_result_service.dart';
-import 'package:quizletapp/services/providers/current_user_provider.dart';
 import 'package:quizletapp/utils/app_theme.dart';
 import 'package:quizletapp/widgets/button.dart';
 import 'package:quizletapp/widgets/text.dart';
 
-class QuizPage extends StatefulWidget {
+class TypingPage extends StatefulWidget {
   final TopicModel topic;
   final List<CardModel> listCard;
   final int sumLearnNumber;
   final bool isShowResult;
   final bool isAnswerByTerm;
-  const QuizPage({
+  const TypingPage({
     required this.topic,
     required this.listCard,
     required this.sumLearnNumber,
@@ -34,16 +30,13 @@ class QuizPage extends StatefulWidget {
   });
 
   @override
-  State<QuizPage> createState() => _QuizPageState();
+  State<TypingPage> createState() => _TypingPageState();
 }
 
-class _QuizPageState extends State<QuizPage> {
+class _TypingPageState extends State<TypingPage> {
   late List<CardModel> listCard;
-  ExamResultService examResultService = ExamResultService();
   List<ResultModel> listResult = [];
   int currentLearnIndex = 0;
-
-  Stopwatch timeTest = Stopwatch();
 
   Map<String, double> dataChart = {
     'Đúng': 0,
@@ -55,17 +48,35 @@ class _QuizPageState extends State<QuizPage> {
     Colors.orangeAccent,
   ];
 
+  final TextEditingController _textResultController = TextEditingController();
+  final FocusNode _inputAnswerFocus = FocusNode();
+  bool isHasAnswer = false;
+
   @override
   void initState() {
     listCard = List.from(widget.listCard);
     listCard.shuffle(Random());
     _initValue();
+    _textResultController.addListener(_onTextChange);
     super.initState();
   }
 
+  @override
+  void dispose() {
+    _textResultController.dispose();
+    _inputAnswerFocus.dispose();
+    _textResultController.removeListener(_onTextChange);
+    super.dispose();
+  }
+
   void _initValue() {
-    timeTest.reset();
-    timeTest.start();
+    _inputAnswerFocus.requestFocus();
+  }
+
+  void _onTextChange() {
+    setState(() {
+      isHasAnswer = _textResultController.text.trim().isNotEmpty;
+    });
   }
 
   int getSumCorrect() {
@@ -76,10 +87,19 @@ class _QuizPageState extends State<QuizPage> {
     return listResult.where((element) => element.correct == false).length;
   }
 
-  Future<void> _handleChooseAnswer(CardModel answerCardModel) async {
-    if (listCard[currentLearnIndex] == answerCardModel) {
-      var answer =
-          ResultModel(true, listCard[currentLearnIndex], answerCardModel);
+  bool _checkAnswer(String answer) {
+    String result = widget.isAnswerByTerm
+        ? listCard[currentLearnIndex].term
+        : listCard[currentLearnIndex].define;
+
+    return result.trim().toLowerCase() == answer.trim().toLowerCase();
+  }
+
+  Future<void> _handleSubmitAnswer() async {
+    String answer = _textResultController.text;
+    if (_checkAnswer(answer)) {
+      var answerModel = ResultModel(
+          true, listCard[currentLearnIndex], CardModel('', answer, answer));
 
       if (widget.isShowResult) {
         await showDialog(
@@ -160,12 +180,14 @@ class _QuizPageState extends State<QuizPage> {
         );
       }
       setState(() {
+        listResult.add(answerModel);
+        _textResultController.text = '';
+        _inputAnswerFocus.requestFocus();
         currentLearnIndex++;
-        listResult.add(answer);
       });
     } else {
-      var answer =
-          ResultModel(false, listCard[currentLearnIndex], answerCardModel);
+      var answerModel = ResultModel(
+          false, listCard[currentLearnIndex], CardModel('', answer, answer));
       if (widget.isShowResult) {
         await showDialog(
           context: context,
@@ -242,9 +264,7 @@ class _QuizPageState extends State<QuizPage> {
                       height: 4,
                     ),
                     CustomText(
-                      text: (widget.isAnswerByTerm)
-                          ? answerCardModel.term
-                          : answerCardModel.define,
+                      text: answer,
                       type: TextStyleEnum.large,
                     ),
                     const SizedBox(
@@ -270,108 +290,112 @@ class _QuizPageState extends State<QuizPage> {
         );
       }
       setState(() {
+        listResult.add(answerModel);
+        _textResultController.text = '';
+        _inputAnswerFocus.requestFocus();
         currentLearnIndex++;
-        listResult.add(answer);
       });
     }
 
     if (currentLearnIndex == widget.sumLearnNumber) {
-      _handleFinish();
+      double sumCorrect = getSumCorrect() * 1.0;
+      double sumDefect = getSumDefect() * 1.0;
+      setState(() {
+        dataChart = {
+          'Đúng': sumCorrect,
+          'Sai': sumDefect,
+        };
+      });
     }
   }
 
-  _handleFinish() async {
-    timeTest.stop();
-    int timeTestInSeconds = timeTest.elapsed.inSeconds;
-
-    double sumCorrect = getSumCorrect() * 1.0;
-    double sumDefect = getSumDefect() * 1.0;
-
-    // save result
-    UserModel currentUser = context.read<CurrentUserProvider>().currentUser!;
-    ExamResultModel result = ExamResultModel(
-      '',
-      widget.topic.id,
-      currentUser.userId,
-      null,
-      timeTestInSeconds,
-      getSumCorrect(),
-      null,
-    );
-
-    setState(() {
-      dataChart = {
-        'Đúng': sumCorrect,
-        'Sai': sumDefect,
-      };
-    });
-
-    var idResult = await examResultService.addResult(result);
-    print('Lưu thành công: $idResult');
-  }
-
-  List<CardModel> getRandomAnswers(
-      List<CardModel> list, CardModel exclude, int count) {
-    List<CardModel> filteredList = List.from(list)..remove(exclude);
-
-    filteredList.shuffle(Random());
-
-    return filteredList.take(count).toList();
-  }
-
-  List<Widget> _buildViewResult() {
-    int numberQuestion = 4;
-    if (listCard.length < 4) {
-      numberQuestion = 2;
-    }
-
-    List<CardModel> listResultOfThisQuestion = getRandomAnswers(
-        listCard, listCard[currentLearnIndex], numberQuestion - 1);
-    listResultOfThisQuestion.add(listCard[currentLearnIndex]);
-    listResultOfThisQuestion.shuffle(Random());
-    // for (var i in listResultOfThisQuestion) {
-    //   print('card: ${i.toString()}');
-    // }
-    return listResultOfThisQuestion.map((e) {
-      return Container(
-        margin: const EdgeInsets.symmetric(vertical: 8),
-        child: GestureDetector(
-          onTap: () {
-            _handleChooseAnswer(e);
-          },
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 10,
-            ),
-            decoration: BoxDecoration(
-              color: AppTheme.primaryBackgroundColor,
-              border: Border.all(
-                width: 2,
-                color: Colors.grey.withOpacity(0.5),
+  Widget _buildViewResult() {
+    return Row(
+      children: [
+        Expanded(
+          child: Stack(
+            children: [
+              TextField(
+                controller: _textResultController,
+                focusNode: _inputAnswerFocus,
+                textInputAction: TextInputAction.done,
+                onSubmitted: (value) {
+                  if (!isHasAnswer) return;
+                  _handleSubmitAnswer();
+                },
+                cursorColor: Colors.white,
+                maxLines: null,
+                style: const TextStyle(
+                  fontSize: 20,
+                  color: Colors.white,
+                ),
+                decoration: InputDecoration(
+                  hintText: (widget.isAnswerByTerm)
+                      ? 'Điền thuật ngữ'
+                      : 'Điền định nghĩa',
+                  hintStyle: const TextStyle(
+                    color: Colors.grey,
+                    fontSize: 20,
+                  ),
+                  focusedBorder: const UnderlineInputBorder(
+                    borderSide: BorderSide(width: 4.0, color: Colors.white),
+                  ),
+                  enabledBorder: const UnderlineInputBorder(
+                    borderSide: BorderSide(width: 2.0, color: Colors.white),
+                  ),
+                ),
               ),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: AutoSizeText(
-              (widget.isAnswerByTerm) ? e.term : e.define,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-              ),
-            ),
+              if (!isHasAnswer)
+                Positioned(
+                  right: -4,
+                  top: 0,
+                  bottom: 0,
+                  child: TextButton(
+                    onPressed: () {
+                      _handleSubmitAnswer();
+                    },
+                    child: CustomText(
+                      text: 'Không biết',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: Color.fromARGB(255, 168, 137, 219),
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
-      );
-    }).toList();
+        const SizedBox(
+          width: 12,
+        ),
+        IconButton(
+          style: ButtonStyle(
+            backgroundColor: isHasAnswer
+                ? const MaterialStatePropertyAll(AppTheme.primaryColor)
+                : const MaterialStatePropertyAll(Colors.grey),
+          ),
+          onPressed: () {
+            if (!isHasAnswer) return;
+            _handleSubmitAnswer();
+          },
+          icon: Icon(
+            Icons.arrow_upward_rounded,
+            color: isHasAnswer ? Colors.white : Colors.white60,
+          ),
+        ),
+      ],
+    );
   }
 
   _handleResetLearn() {
     setState(() {
       currentLearnIndex = 0;
       listResult.clear();
+      _textResultController.text = '';
+      _inputAnswerFocus.requestFocus();
     });
-    _initValue();
   }
 
   String _getTitleResult() {
@@ -472,11 +496,7 @@ class _QuizPageState extends State<QuizPage> {
                   ),
                   Container(
                     margin: const EdgeInsets.symmetric(vertical: 8),
-                    child: Column(
-                      children: [
-                        ..._buildViewResult(),
-                      ],
-                    ),
+                    child: _buildViewResult(),
                   ),
                 ],
               ),
@@ -621,41 +641,35 @@ class _QuizPageState extends State<QuizPage> {
                     borderRadius: BorderRadius.circular(8.0),
                     onTap: () {
                       //navigator to lean other
-                      Map<String, dynamic> object = {
-                        'listCard': widget.listCard,
-                        'topic': widget.topic,
-                        SettingLearnQuizEnum.sumLearnNumber.name:
-                            widget.sumLearnNumber,
-                        SettingLearnQuizEnum.isShowResult.name:
-                            widget.isShowResult,
-                        SettingLearnQuizEnum.isAnswerByTerm.name:
-                            widget.isAnswerByTerm,
-                      };
-                      Navigator.popAndPushNamed(context, '/learn/typing',
-                          arguments: object);
+                      Navigator.popAndPushNamed(context, '/learn/flashcards',
+                          arguments: {
+                            'listCard': widget.topic.listCard,
+                            'topic': widget.topic,
+                          });
                     },
                     child: Container(
                       height: 50,
                       decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          borderRadius: BorderRadius.circular(8.0),
-                          border: Border.all(
-                            width: 2,
-                            color: Colors.grey.withOpacity(0.5),
-                          )),
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(8.0),
+                        border: Border.all(
+                          width: 2,
+                          color: Colors.grey.withOpacity(0.5),
+                        ),
+                      ),
                       alignment: Alignment.center,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Icon(
-                            Icons.edit,
+                            Icons.filter_none_rounded,
                             color: AppTheme.primaryColor,
                           ),
                           const SizedBox(
                             width: 8,
                           ),
                           CustomText(
-                            text: 'Ôn luyện bằng chế độ gõ từ',
+                            text: 'Ôn luyện bằng thẻ ghi nhớ',
                             type: TextStyleEnum.large,
                           ),
                         ],

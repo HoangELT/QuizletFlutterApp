@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:quizletapp/enums/setting_learn_quiz.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
@@ -11,18 +9,18 @@ import 'package:quizletapp/widgets/text.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-class LearnQuizPage extends StatefulWidget {
+class LearnTypingPracticePage extends StatefulWidget {
   final TopicModel topic;
-  const LearnQuizPage({
+  const LearnTypingPracticePage({
     required this.topic,
     super.key,
   });
 
   @override
-  State<LearnQuizPage> createState() => _LearnQuizPageState();
+  State<LearnTypingPracticePage> createState() => _LearnTypingPracticePageState();
 }
 
-class _LearnQuizPageState extends State<LearnQuizPage> {
+class _LearnTypingPracticePageState extends State<LearnTypingPracticePage> {
   late TopicModel currentTopic;
   bool isShowResult = false;
   bool isAnswerByTerm = false;
@@ -97,7 +95,7 @@ class _LearnQuizPageState extends State<LearnQuizPage> {
                           children: [
                             CustomText(text: currentTopic.title),
                             CustomText(
-                              text: 'Thiết lập bài kiểm tra',
+                              text: 'Thiết lập gõ từ',
                               type: TextStyleEnum.xl,
                             ),
                           ],
@@ -283,18 +281,18 @@ class _LearnQuizPageState extends State<LearnQuizPage> {
                 ),
               ),
               CustomButton(
-                disable: (widget.topic.listCard.length < 3)? true : false,
+                disable: (widget.topic.listCard.isEmpty)? true : false,
                 text: 'Bắt đầu làm kiểm tra',
                 onTap: () {
-                  if(widget.topic.listCard.length < 3) return;
+                  if(widget.topic.listCard.isEmpty) return;
                   Map<String, dynamic> object = {
-                    'listCard': widget.topic.listCard,
                     'topic': widget.topic,
+                    'listCard': widget.topic.listCard,
                     SettingLearnQuizEnum.sumLearnNumber.name: countCardToLearn,
                     SettingLearnQuizEnum.isShowResult.name: isShowResult,
                     SettingLearnQuizEnum.isAnswerByTerm.name: isAnswerByTerm,
                   };
-                  Navigator.popAndPushNamed(context, '/learn/quiz',
+                  Navigator.popAndPushNamed(context, '/learn/typing',
                       arguments: object);
                 },
               ),

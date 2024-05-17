@@ -329,13 +329,18 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                                           bottom: 0,
                                           child: IconButton(
                                             onPressed: () {
-                                              List<CardModel> listACard = List.empty(growable: true);
+                                              List<CardModel> listACard =
+                                                  List.empty(growable: true);
                                               listACard.add(listSort[0][index]);
-                                              TopicModel topicACard = TopicModel.copy(topic!);
+                                              TopicModel topicACard =
+                                                  TopicModel.copy(topic!);
                                               topicACard.listCard = listACard;
                                               Navigator.pushNamed(
                                                   context, '/learn/flashcards',
-                                                  arguments: {'listCard': listACard, 'topic': topicACard});
+                                                  arguments: {
+                                                    'listCard': listACard,
+                                                    'topic': topicACard
+                                                  });
                                             },
                                             icon: const Icon(
                                               FontAwesomeIcons.expand,
@@ -371,13 +376,18 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                                           bottom: 0,
                                           child: IconButton(
                                             onPressed: () {
-                                              List<CardModel> listACard = List.empty(growable: true);
+                                              List<CardModel> listACard =
+                                                  List.empty(growable: true);
                                               listACard.add(listSort[0][index]);
-                                              TopicModel topicACard = TopicModel.copy(topic!);
+                                              TopicModel topicACard =
+                                                  TopicModel.copy(topic!);
                                               topicACard.listCard = listACard;
                                               Navigator.pushNamed(
                                                   context, '/learn/flashcards',
-                                                  arguments: {'listCard': listACard, 'topic': topicACard});
+                                                  arguments: {
+                                                    'listCard': listACard,
+                                                    'topic': topicACard
+                                                  });
                                             },
                                             icon: const Icon(
                                               FontAwesomeIcons.expand,
@@ -486,11 +496,17 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                                   if (_currentPicked == 0) {
                                     await Navigator.pushNamed(
                                         context, '/learn/flashcards',
-                                        arguments: {'listCard': topic!.listCard, 'topic': topic});
+                                        arguments: {
+                                          'listCard': topic!.listCard,
+                                          'topic': topic
+                                        });
                                   } else {
                                     await Navigator.pushNamed(
                                         context, '/learn/flashcards',
-                                        arguments: {'listCard': listCardPicked, 'topic': topic});
+                                        arguments: {
+                                          'listCard': listCardPicked,
+                                          'topic': topic
+                                        });
                                   }
                                 },
                                 borderRadius: BorderRadius.circular(8),
@@ -516,8 +532,10 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                                 borderRadius: BorderRadius.circular(8),
                                 onTap: () {
                                   Navigator.pushNamed(
-                                      context, '/learn/quiz/settings',
-                                      arguments: topic);
+                                    context,
+                                    '/learn/quiz/settings',
+                                    arguments: topic,
+                                  );
                                 },
                                 child: ButtonListTile(
                                   padding: const EdgeInsets.only(left: 8),
@@ -540,13 +558,44 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                               InkWell(
                                 borderRadius: BorderRadius.circular(8),
                                 onTap: () {
-                                  print('clicked');
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/learn/typing/settings',
+                                    arguments: topic,
+                                  );
                                 },
                                 child: ButtonListTile(
                                   padding: const EdgeInsets.only(left: 8),
                                   borderRadius: 8,
                                   title: CustomText(
                                     text: 'Gõ từ',
+                                    type: TextStyleEnum.large,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                  icon: const Icon(
+                                    Icons.keyboard,
+                                    color: Color.fromARGB(255, 105, 70, 245),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 8,
+                              ),
+                              InkWell(
+                                borderRadius: BorderRadius.circular(8),
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/topic/ranking',
+                                    arguments: topic,
+                                  );
+                                },
+                                child: ButtonListTile(
+                                  padding: const EdgeInsets.only(left: 8),
+                                  borderRadius: 8,
+                                  title: CustomText(
+                                    text: 'Bảng xếp hạng',
                                     type: TextStyleEnum.large,
                                     style: const TextStyle(
                                         fontWeight: FontWeight.w500),
@@ -977,6 +1026,23 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                                 borderRadius: 8,
                                 title: CustomText(
                                   text: 'Gõ từ',
+                                  type: TextStyleEnum.large,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w500),
+                                ),
+                                icon: const Icon(
+                                  Icons.keyboard,
+                                  color: Color.fromARGB(255, 96, 30, 202),
+                                ),
+                                onTap: () {
+                                  print('clicked');
+                                },
+                              ),
+                              ButtonListTile(
+                                padding: const EdgeInsets.only(left: 8),
+                                borderRadius: 8,
+                                title: CustomText(
+                                  text: 'Bảng xếp hạng',
                                   type: TextStyleEnum.large,
                                   style: const TextStyle(
                                       fontWeight: FontWeight.w500),

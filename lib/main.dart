@@ -15,8 +15,10 @@ import 'package:quizletapp/pages/edit_topic_page.dart';
 import 'package:quizletapp/pages/folder_detail_page.dart';
 import 'package:quizletapp/pages/learn_flash_cards.dart';
 import 'package:quizletapp/pages/learn_quiz_page.dart';
+import 'package:quizletapp/pages/learn_typing_practice.dart';
 import 'package:quizletapp/pages/library_page.dart';
 import 'package:quizletapp/pages/quiz_page.dart';
+import 'package:quizletapp/pages/ranking_page.dart';
 import 'package:quizletapp/pages/search_topic.dart';
 import 'package:quizletapp/pages/intro_page.dart';
 import 'package:quizletapp/pages/login_page.dart';
@@ -25,6 +27,7 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:quizletapp/pages/topic_detail_page.dart';
 import 'package:quizletapp/pages/topic_info_page.dart';
+import 'package:quizletapp/pages/typing_page.dart';
 import 'package:quizletapp/services/firebase_auth.dart';
 import 'package:quizletapp/services/providers/current_user_provider.dart';
 import 'package:quizletapp/services/providers/folder_provider.dart';
@@ -144,6 +147,14 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute(
               builder: (context) => TopicInfoPage(topic: args as TopicModel),
             );
+          case '/topic/ranking':
+            {
+              return MaterialPageRoute(
+                builder: (context) => RankingPage(
+                  topic: args as TopicModel,
+                ),
+              );
+            }
           case '/folder':
             context.read<IndexOfLibraryProvider>().changeIndex(1);
             return MaterialPageRoute(
@@ -176,7 +187,8 @@ class MyApp extends StatelessWidget {
           case '/learn/flashcards':
             return MaterialPageRoute(
               builder: (context) => LearnFlashCards(
-                listCard: (args as Map<String, dynamic>)['listCard'] as List<CardModel>,
+                listCard: (args as Map<String, dynamic>)['listCard']
+                    as List<CardModel>,
                 topic: args['topic'] as TopicModel,
               ),
             );
@@ -189,10 +201,35 @@ class MyApp extends StatelessWidget {
           case '/learn/quiz':
             return MaterialPageRoute(
               builder: (context) => QuizPage(
-                listCard: (args as Map<String, dynamic>)['listCard'] as List<CardModel>,
-                sumLearnNumber: (args)[SettingLearnQuizEnum.sumLearnNumber.name] as int,
-                isAnswerByTerm: (args)[SettingLearnQuizEnum.isAnswerByTerm.name] as bool,
-                isShowResult: (args)[SettingLearnQuizEnum.isShowResult.name] as bool,
+                listCard: (args as Map<String, dynamic>)['listCard']
+                    as List<CardModel>,
+                topic: args['topic'] as TopicModel,
+                sumLearnNumber:
+                    (args)[SettingLearnQuizEnum.sumLearnNumber.name] as int,
+                isAnswerByTerm:
+                    (args)[SettingLearnQuizEnum.isAnswerByTerm.name] as bool,
+                isShowResult:
+                    (args)[SettingLearnQuizEnum.isShowResult.name] as bool,
+              ),
+            );
+          case '/learn/typing/settings':
+            return MaterialPageRoute(
+              builder: (context) => LearnTypingPracticePage(
+                topic: args as TopicModel,
+              ),
+            );
+          case '/learn/typing':
+            return MaterialPageRoute(
+              builder: (context) => TypingPage(
+                listCard: (args as Map<String, dynamic>)['listCard']
+                    as List<CardModel>,
+                topic: args['topic'] as TopicModel,
+                sumLearnNumber:
+                    (args)[SettingLearnQuizEnum.sumLearnNumber.name] as int,
+                isAnswerByTerm:
+                    (args)[SettingLearnQuizEnum.isAnswerByTerm.name] as bool,
+                isShowResult:
+                    (args)[SettingLearnQuizEnum.isShowResult.name] as bool,
               ),
             );
 

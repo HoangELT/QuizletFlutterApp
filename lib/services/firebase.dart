@@ -125,4 +125,21 @@ class FirebaseService {
       throw e;
     }
   }
+
+  Future<List<Map<String, dynamic>>> getDocumentsByFields(
+      String collectionName, Map<String, dynamic> fieldValues) async {
+    try {
+      Query query = _firestore.collection(collectionName);
+      fieldValues.forEach((field, value) {
+        query = query.where(field, isEqualTo: value);
+      });
+      QuerySnapshot querySnapshot = await query.get();
+      return querySnapshot.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
+    } catch (error) {
+      print('Error getting documents by fields: $error');
+      throw error;
+    }
+  }
 }

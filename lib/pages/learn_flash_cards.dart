@@ -6,10 +6,14 @@ import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:pie_chart/pie_chart.dart';
+import 'package:provider/provider.dart';
 import 'package:quizletapp/enums/setting_learn_flashcards_enum.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
 import 'package:quizletapp/models/card.dart';
+import 'package:quizletapp/models/exam_result.dart';
 import 'package:quizletapp/models/topic.dart';
+import 'package:quizletapp/models/user.dart';
+import 'package:quizletapp/services/providers/current_user_provider.dart';
 import 'package:quizletapp/utils/app_theme.dart';
 import 'package:quizletapp/widgets/button.dart';
 import 'package:quizletapp/widgets/button_active.dart';
@@ -1148,7 +1152,9 @@ class _LearnFlashCardsState extends State<LearnFlashCards> {
                       children: [
                         CustomButton(
                           onTap: () {
-                            Navigator.popAndPushNamed(context, '/learn/quiz/settings', arguments: widget.topic);
+                            Navigator.popAndPushNamed(
+                                context, '/learn/quiz/settings',
+                                arguments: widget.topic);
                           },
                           text: 'Làm bài kiểm tra thử',
                           iconLeft: const Icon(
