@@ -82,7 +82,6 @@ class ExamResultService {
 
   Future<List<RankingModel>> getListRankingModel(String topicId) async {
     var mapRanking = await groupResultsByUserId(topicId);
-    print('mapRanking: $mapRanking');
     List<RankingModel> listRankingModel = [];
     for (var listExamResult in mapRanking.values) {
       ExamResultModel maxQuantityCorrect =
