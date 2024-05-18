@@ -4,6 +4,7 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:pie_chart/pie_chart.dart';
 import 'package:quizletapp/enums/setting_learn_quiz.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
@@ -52,6 +53,8 @@ class _TypingPageState extends State<TypingPage> {
   final FocusNode _inputAnswerFocus = FocusNode();
   bool isHasAnswer = false;
 
+  final FlutterTts flutterTts = FlutterTts();
+
   @override
   void initState() {
     listCard = List.from(widget.listCard);
@@ -71,6 +74,35 @@ class _TypingPageState extends State<TypingPage> {
 
   void _initValue() {
     _inputAnswerFocus.requestFocus();
+  }
+
+  Future<void> speak(String textToSpeech, {String language = 'en-US'}) async {
+    try {
+      // Set language to English (US)
+      int resultLanguage = await flutterTts.setLanguage(language);
+      if (resultLanguage != 1) {
+        print('Failed to set language');
+        return;
+      }
+
+      // Set pitch level
+      int resultPitch = await flutterTts.setPitch(0.8);
+      if (resultPitch != 1) {
+        print('Failed to set pitch');
+        return;
+      }
+
+      // Ensures that the speak completion is awaited
+      await flutterTts.awaitSpeakCompletion(true);
+
+      // Start speaking
+      int resultSpeak = await flutterTts.speak(textToSpeech);
+      if (resultSpeak != 1) {
+        print('Failed to speak');
+      }
+    } catch (e) {
+      print('Error occurred in TTS operation: $e');
+    }
   }
 
   void _onTextChange() {
@@ -132,11 +164,19 @@ class _TypingPageState extends State<TypingPage> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomText(
-                      text: (widget.isAnswerByTerm)
-                          ? listCard[currentLearnIndex].define
-                          : listCard[currentLearnIndex].term,
-                      type: TextStyleEnum.large,
+                    GestureDetector(
+                      onTap: () async {
+                        String question = (widget.isAnswerByTerm)
+                            ? listCard[currentLearnIndex].define
+                            : listCard[currentLearnIndex].term;
+                        await speak(question);
+                      },
+                      child: CustomText(
+                        text: (widget.isAnswerByTerm)
+                            ? listCard[currentLearnIndex].define
+                            : listCard[currentLearnIndex].term,
+                        type: TextStyleEnum.large,
+                      ),
                     ),
                     const SizedBox(
                       height: 12,
@@ -151,11 +191,19 @@ class _TypingPageState extends State<TypingPage> {
                     const SizedBox(
                       height: 4,
                     ),
-                    CustomText(
-                      text: (widget.isAnswerByTerm)
-                          ? listCard[currentLearnIndex].term
-                          : listCard[currentLearnIndex].define,
-                      type: TextStyleEnum.large,
+                    GestureDetector(
+                      onTap: () async {
+                        String question = (widget.isAnswerByTerm)
+                            ? listCard[currentLearnIndex].term
+                            : listCard[currentLearnIndex].define;
+                        await speak(question);
+                      },
+                      child: CustomText(
+                        text: (widget.isAnswerByTerm)
+                            ? listCard[currentLearnIndex].term
+                            : listCard[currentLearnIndex].define,
+                        type: TextStyleEnum.large,
+                      ),
                     ),
                     const SizedBox(
                       height: 32,
@@ -219,11 +267,19 @@ class _TypingPageState extends State<TypingPage> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomText(
-                      text: (widget.isAnswerByTerm)
-                          ? listCard[currentLearnIndex].define
-                          : listCard[currentLearnIndex].term,
-                      type: TextStyleEnum.large,
+                    GestureDetector(
+                      onTap: () async {
+                        String question = (widget.isAnswerByTerm)
+                            ? listCard[currentLearnIndex].define
+                            : listCard[currentLearnIndex].term;
+                        await speak(question);
+                      },
+                      child: CustomText(
+                        text: (widget.isAnswerByTerm)
+                            ? listCard[currentLearnIndex].define
+                            : listCard[currentLearnIndex].term,
+                        type: TextStyleEnum.large,
+                      ),
                     ),
                     const SizedBox(
                       height: 12,
@@ -239,11 +295,19 @@ class _TypingPageState extends State<TypingPage> {
                     const SizedBox(
                       height: 4,
                     ),
-                    CustomText(
-                      text: (widget.isAnswerByTerm)
-                          ? listCard[currentLearnIndex].term
-                          : listCard[currentLearnIndex].define,
-                      type: TextStyleEnum.large,
+                    GestureDetector(
+                      onTap: () async {
+                        String question = (widget.isAnswerByTerm)
+                            ? listCard[currentLearnIndex].term
+                            : listCard[currentLearnIndex].define;
+                        await speak(question);
+                      },
+                      child: CustomText(
+                        text: (widget.isAnswerByTerm)
+                            ? listCard[currentLearnIndex].term
+                            : listCard[currentLearnIndex].define,
+                        type: TextStyleEnum.large,
+                      ),
                     ),
                     const SizedBox(
                       height: 12,
@@ -263,9 +327,14 @@ class _TypingPageState extends State<TypingPage> {
                     const SizedBox(
                       height: 4,
                     ),
-                    CustomText(
-                      text: answer,
-                      type: TextStyleEnum.large,
+                    GestureDetector(
+                      onTap: () async {
+                        await speak(answer);
+                      },
+                      child: CustomText(
+                        text: answer,
+                        type: TextStyleEnum.large,
+                      ),
                     ),
                     const SizedBox(
                       height: 32,
@@ -481,16 +550,24 @@ class _TypingPageState extends State<TypingPage> {
                   Expanded(
                     child: Container(
                       alignment: Alignment.centerLeft,
-                      child: CustomText(
-                        text: (widget.isAnswerByTerm)
-                            ? listCard[currentLearnIndex].define
-                            : listCard[currentLearnIndex].term,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w500,
+                      child: GestureDetector(
+                        onTap: () async {
+                          String question = (widget.isAnswerByTerm)
+                              ? listCard[currentLearnIndex].define
+                              : listCard[currentLearnIndex].term;
+                          await speak(question);
+                        },
+                        child: CustomText(
+                          text: (widget.isAnswerByTerm)
+                              ? listCard[currentLearnIndex].define
+                              : listCard[currentLearnIndex].term,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          overflow: TextOverflow.visible,
                         ),
-                        overflow: TextOverflow.visible,
                       ),
                     ),
                   ),

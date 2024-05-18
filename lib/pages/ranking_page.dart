@@ -1,8 +1,7 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
-import 'package:quizletapp/models/exam_result.dart';
 import 'package:quizletapp/models/ranking.dart';
 import 'package:quizletapp/models/topic.dart';
 import 'package:quizletapp/services/models_services/exam_result_service.dart';
@@ -31,18 +30,12 @@ class _RankingPageState extends State<RankingPage>
 
   late TopicModel topic;
 
-  late Future<List<RankingModel>> dataRankingOfQuantityCorrect;
-  late Future<List<RankingModel>> dataRankingOfTimeTest;
-  late Future<List<RankingModel>> dataRankingOfAttempts;
-
   @override
   void initState() {
     super.initState();
 
     _tabController = TabController(length: 3, vsync: this);
     topic = TopicModel.copy(widget.topic);
-
-    _initValue();
   }
 
   @override
@@ -51,13 +44,16 @@ class _RankingPageState extends State<RankingPage>
     super.dispose();
   }
 
-  void _initValue() {
-    dataRankingOfQuantityCorrect =
-        examResultService.getTop20ByQuantityCorrect(widget.topic.id);
-    dataRankingOfTimeTest =
-        examResultService.getTop20ByTimeTest(widget.topic.id);
-    dataRankingOfAttempts =
-        examResultService.getTop20ByAttempts(widget.topic.id);
+  Future<List<RankingModel>> fetchTopQuantityCorrect() {
+    return examResultService.getTop20ByQuantityCorrect(widget.topic.id);
+  }
+
+  Future<List<RankingModel>> fetchTopTimeTest() {
+    return examResultService.getTop20ByTimeTest(widget.topic.id);
+  }
+
+  Future<List<RankingModel>> fetchTopAttempts() {
+    return examResultService.getTop20ByAttempts(widget.topic.id);
   }
 
   String formatDuration(int seconds) {
@@ -125,7 +121,7 @@ class _RankingPageState extends State<RankingPage>
         controller: _tabController,
         children: [
           FutureBuilder(
-            future: dataRankingOfQuantityCorrect,
+            future: fetchTopQuantityCorrect(),
             builder: (context, snapshot) {
               if (snapshot.hasData && snapshot.data!.isEmpty) {
                 return Container(
@@ -523,7 +519,7 @@ class _RankingPageState extends State<RankingPage>
             },
           ),
           FutureBuilder(
-            future: dataRankingOfTimeTest,
+            future: fetchTopTimeTest(),
             builder: (context, snapshot) {
               if (snapshot.hasData && snapshot.data!.isEmpty) {
                 return Container(
@@ -921,7 +917,7 @@ class _RankingPageState extends State<RankingPage>
             },
           ),
           FutureBuilder(
-            future: dataRankingOfAttempts,
+            future: fetchTopAttempts(),
             builder: (context, snapshot) {
               if (snapshot.hasData && snapshot.data!.isEmpty) {
                 return Container(

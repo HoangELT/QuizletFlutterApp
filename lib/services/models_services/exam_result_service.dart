@@ -40,9 +40,9 @@ class ExamResultService {
       );
       List<ExamResultModel> listResult =
           ExamResultModel.fromListMap(listMapResult);
+      var currentTopic = await topicService.getTopicById(listResult[0].topicId);
       for (var i in listResult) {
         var currentUser = await userService.getUserByUid(i.userId);
-        var currentTopic = await topicService.getTopicById(i.topicId);
         i.userCreate = currentUser;
         i.topic = currentTopic;
       }
@@ -98,8 +98,7 @@ class ExamResultService {
     return listRankingModel;
   }
 
-  Future<List<RankingModel>> getTop20ByQuantityCorrect(
-      String topicId) async {
+  Future<List<RankingModel>> getTop20ByQuantityCorrect(String topicId) async {
     var listResult = await getListRankingModel(topicId);
     listResult.sort((a, b) => b.quantityCorrect.compareTo(a.quantityCorrect));
     return listResult.take(20).toList();

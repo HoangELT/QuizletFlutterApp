@@ -18,6 +18,7 @@ import 'package:quizletapp/widgets/text.dart';
 import 'package:quizletapp/widgets/group_list.dart';
 import 'package:quizletapp/widgets/item_list.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:toastification/toastification.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -118,14 +119,19 @@ class _HomePageState extends State<HomePage> {
                   backgroundColor: MaterialStatePropertyAll<Color>(
                       AppTheme.primaryButtonColor),
                 ),
-                onPressed: () async {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => TopicDetailPage(
-                        topicId: 'jPqwQ8p2bmcLAd8mHzo3',
-                      ),
+                onPressed: () {
+                  toastification.show(
+                    context: context,
+                    title: CustomText(
+                      text:
+                          'Tính năng đang được bảo trì.\n Xin lỗi vì sự bất tiện này.',
+                      type: TextStyleEnum.large,
                     ),
+                    style: ToastificationStyle.fillColored,
+                    foregroundColor: Colors.white,
+                    showProgressBar: false,
+                    type: ToastificationType.warning,
+                    autoCloseDuration: const Duration(seconds: 3),
                   );
                 },
                 child: CustomText(
@@ -140,12 +146,20 @@ class _HomePageState extends State<HomePage> {
                 Stack(
                   children: [
                     IconButton(
-                      onPressed: () async {
-                        //test get all topic
-                        TopicService topicService = TopicService();
-                        var listAllTopic =
-                            await topicService.getTopicsWithUsers();
-                        topicService.printListTopics(listAllTopic);
+                      onPressed: () {
+                        toastification.show(
+                          context: context,
+                          title: CustomText(
+                            text:
+                                'Tính năng đang được bảo trì.\n Xin lỗi vì sự bất tiện này.',
+                            type: TextStyleEnum.large,
+                          ),
+                          style: ToastificationStyle.fillColored,
+                          foregroundColor: Colors.white,
+                          showProgressBar: false,
+                          type: ToastificationType.warning,
+                          autoCloseDuration: const Duration(seconds: 3),
+                        );
                       },
                       icon: const Icon(
                         Icons.notifications_outlined,
@@ -182,6 +196,7 @@ class _HomePageState extends State<HomePage> {
                 child: TextField(
                   controller: _textEditingController,
                   onSubmitted: (value) {
+                    if (value.trim().isEmpty) return;
                     Navigator.pushNamed(context, '/search-topic', arguments: {
                       'code': 0,
                       'key': _textEditingController.text
@@ -377,8 +392,12 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                           Expanded(
                                             child: CustomText(
-                                              text:
-                                                  folderProvider.listFolderOfCurrentUser[index].title.replaceAll('\n', ' ').replaceAll('\r', ' '),
+                                              text: folderProvider
+                                                  .listFolderOfCurrentUser[
+                                                      index]
+                                                  .title
+                                                  .replaceAll('\n', ' ')
+                                                  .replaceAll('\r', ' '),
                                               type: TextStyleEnum.large,
                                               style: const TextStyle(
                                                 overflow: TextOverflow.ellipsis,

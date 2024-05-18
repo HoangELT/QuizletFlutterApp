@@ -5,7 +5,7 @@ import 'package:quizletapp/pages/home_page.dart';
 import 'package:quizletapp/pages/library_page.dart';
 import 'package:quizletapp/pages/multifunction_page.dart';
 import 'package:quizletapp/pages/profile_page.dart';
-import 'package:quizletapp/pages/solution_page.dart';
+import 'package:quizletapp/pages/forum_page.dart';
 import 'package:quizletapp/services/firebase.dart';
 import 'package:quizletapp/services/firebase_auth.dart';
 import 'package:quizletapp/services/providers/index_of_app_provider.dart';
@@ -126,7 +126,7 @@ class _AppPageState extends State<AppPage> {
                   icon: Icon(Icons.search_rounded),
                 ),
                 BottomNavigationBarItem(
-                  label: 'Lời giải',
+                  label: 'Diễn đàn',
                   icon: Icon(Icons.my_library_books_outlined),
                 ),
                 BottomNavigationBarItem(
@@ -148,7 +148,7 @@ class _AppPageState extends State<AppPage> {
             index: indexOfAppProvider.indexSelected,
             children: [
               const HomePage(),
-              const SolutionPage(),
+              const ForumPage(),
               const MultifunctionPage(),
               LibraryPage(),
               const ProfilePage(),

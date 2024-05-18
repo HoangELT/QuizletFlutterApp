@@ -2,7 +2,10 @@ import 'dart:math';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:pie_chart/pie_chart.dart';
 import 'package:provider/provider.dart';
 import 'package:quizletapp/enums/setting_learn_quiz.dart';
@@ -55,6 +58,8 @@ class _QuizPageState extends State<QuizPage> {
     Colors.orangeAccent,
   ];
 
+  final FlutterTts flutterTts = FlutterTts();
+
   @override
   void initState() {
     listCard = List.from(widget.listCard);
@@ -63,9 +68,43 @@ class _QuizPageState extends State<QuizPage> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   void _initValue() {
     timeTest.reset();
     timeTest.start();
+  }
+
+  Future<void> speak(String textToSpeech, {String language = 'en-US'}) async {
+    try {
+      // Set language to English (US)
+      int resultLanguage = await flutterTts.setLanguage(language);
+      if (resultLanguage != 1) {
+        print('Failed to set language');
+        return;
+      }
+
+      // Set pitch level
+      int resultPitch = await flutterTts.setPitch(0.8);
+      if (resultPitch != 1) {
+        print('Failed to set pitch');
+        return;
+      }
+
+      // Ensures that the speak completion is awaited
+      await flutterTts.awaitSpeakCompletion(true);
+
+      // Start speaking
+      int resultSpeak = await flutterTts.speak(textToSpeech);
+      if (resultSpeak != 1) {
+        print('Failed to speak');
+      }
+    } catch (e) {
+      print('Error occurred in TTS operation: $e');
+    }
   }
 
   int getSumCorrect() {
@@ -112,11 +151,19 @@ class _QuizPageState extends State<QuizPage> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomText(
-                      text: (widget.isAnswerByTerm)
-                          ? listCard[currentLearnIndex].define
-                          : listCard[currentLearnIndex].term,
-                      type: TextStyleEnum.large,
+                    GestureDetector(
+                      onTap: () async {
+                        String question = (widget.isAnswerByTerm)
+                            ? listCard[currentLearnIndex].define
+                            : listCard[currentLearnIndex].term;
+                        await speak(question);
+                      },
+                      child: CustomText(
+                        text: (widget.isAnswerByTerm)
+                            ? listCard[currentLearnIndex].define
+                            : listCard[currentLearnIndex].term,
+                        type: TextStyleEnum.large,
+                      ),
                     ),
                     const SizedBox(
                       height: 12,
@@ -131,11 +178,19 @@ class _QuizPageState extends State<QuizPage> {
                     const SizedBox(
                       height: 4,
                     ),
-                    CustomText(
-                      text: (widget.isAnswerByTerm)
-                          ? listCard[currentLearnIndex].term
-                          : listCard[currentLearnIndex].define,
-                      type: TextStyleEnum.large,
+                    GestureDetector(
+                      onTap: () async {
+                        String question = (widget.isAnswerByTerm)
+                            ? listCard[currentLearnIndex].term
+                            : listCard[currentLearnIndex].define;
+                        await speak(question);
+                      },
+                      child: CustomText(
+                        text: (widget.isAnswerByTerm)
+                            ? listCard[currentLearnIndex].term
+                            : listCard[currentLearnIndex].define,
+                        type: TextStyleEnum.large,
+                      ),
                     ),
                     const SizedBox(
                       height: 32,
@@ -197,11 +252,19 @@ class _QuizPageState extends State<QuizPage> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomText(
-                      text: (widget.isAnswerByTerm)
-                          ? listCard[currentLearnIndex].define
-                          : listCard[currentLearnIndex].term,
-                      type: TextStyleEnum.large,
+                    GestureDetector(
+                      onTap: () async {
+                        String question = (widget.isAnswerByTerm)
+                            ? listCard[currentLearnIndex].define
+                            : listCard[currentLearnIndex].term;
+                        await speak(question);
+                      },
+                      child: CustomText(
+                        text: (widget.isAnswerByTerm)
+                            ? listCard[currentLearnIndex].define
+                            : listCard[currentLearnIndex].term,
+                        type: TextStyleEnum.large,
+                      ),
                     ),
                     const SizedBox(
                       height: 12,
@@ -217,11 +280,19 @@ class _QuizPageState extends State<QuizPage> {
                     const SizedBox(
                       height: 4,
                     ),
-                    CustomText(
-                      text: (widget.isAnswerByTerm)
-                          ? listCard[currentLearnIndex].term
-                          : listCard[currentLearnIndex].define,
-                      type: TextStyleEnum.large,
+                    GestureDetector(
+                      onTap: () async {
+                        String question = (widget.isAnswerByTerm)
+                            ? listCard[currentLearnIndex].term
+                            : listCard[currentLearnIndex].define;
+                        await speak(question);
+                      },
+                      child: CustomText(
+                        text: (widget.isAnswerByTerm)
+                            ? listCard[currentLearnIndex].term
+                            : listCard[currentLearnIndex].define,
+                        type: TextStyleEnum.large,
+                      ),
                     ),
                     const SizedBox(
                       height: 12,
@@ -241,11 +312,19 @@ class _QuizPageState extends State<QuizPage> {
                     const SizedBox(
                       height: 4,
                     ),
-                    CustomText(
-                      text: (widget.isAnswerByTerm)
-                          ? answerCardModel.term
-                          : answerCardModel.define,
-                      type: TextStyleEnum.large,
+                    GestureDetector(
+                      onTap: () async {
+                        String question = (widget.isAnswerByTerm)
+                            ? answerCardModel.term
+                            : answerCardModel.define;
+                        await speak(question);
+                      },
+                      child: CustomText(
+                        text: (widget.isAnswerByTerm)
+                            ? answerCardModel.term
+                            : answerCardModel.define,
+                        type: TextStyleEnum.large,
+                      ),
                     ),
                     const SizedBox(
                       height: 32,
@@ -457,16 +536,24 @@ class _QuizPageState extends State<QuizPage> {
                   Expanded(
                     child: Container(
                       alignment: Alignment.centerLeft,
-                      child: CustomText(
-                        text: (widget.isAnswerByTerm)
-                            ? listCard[currentLearnIndex].define
-                            : listCard[currentLearnIndex].term,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w500,
+                      child: GestureDetector(
+                        onTap: () async {
+                          String question = (widget.isAnswerByTerm)
+                              ? listCard[currentLearnIndex].define
+                              : listCard[currentLearnIndex].term;
+                          await speak(question);
+                        },
+                        child: CustomText(
+                          text: (widget.isAnswerByTerm)
+                              ? listCard[currentLearnIndex].define
+                              : listCard[currentLearnIndex].term,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          overflow: TextOverflow.visible,
                         ),
-                        overflow: TextOverflow.visible,
                       ),
                     ),
                   ),

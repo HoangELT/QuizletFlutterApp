@@ -1,10 +1,15 @@
+import 'dart:io';
+
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:csv/csv.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
 import 'package:quizletapp/models/card.dart';
 import 'package:quizletapp/models/topic.dart';
@@ -14,7 +19,9 @@ import 'package:quizletapp/widgets/button_listtile.dart';
 import 'package:quizletapp/widgets/text.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:toastification/toastification.dart';
 import 'package:toggle_switch/toggle_switch.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class TopicDetailPage extends StatefulWidget {
   final String topicId;
@@ -45,6 +52,111 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
   void initState() {
     _fetchTopic();
     super.initState();
+  }
+
+  String removeDiacritics(String input) {
+    String result = input.toLowerCase();
+
+    result = result.replaceAll(RegExp(r'[àáạảãâầấậẩẫăằắặẳẵ]'), 'a');
+    result = result.replaceAll(RegExp(r'[èéẹẻẽêềếệểễ]'), 'e');
+    result = result.replaceAll(RegExp(r'[ìíịỉĩ]'), 'i');
+    result = result.replaceAll(RegExp(r'[òóọỏõôồốộổỗơờớợởỡ]'), 'o');
+    result = result.replaceAll(RegExp(r'[ùúụủũưừứựửữ]'), 'u');
+    result = result.replaceAll(RegExp(r'[ỳýỵỷỹ]'), 'y');
+    result = result.replaceAll(RegExp(r'[đ]'), 'd');
+    result = result.replaceAll(RegExp(r'[ñ]'), 'n');
+    result = result.replaceAll(RegExp(r'[ç]'), 'c');
+
+    result = result.replaceAll(RegExp(r'[^a-zA-Z0-9\s]'), '');
+    result = result.replaceAll(' ', '_');
+
+    return result;
+  }
+
+  void writeCsvFile(List<CardModel> dataList, {String fileName = 'abc'}) async {
+    List<List<dynamic>> rows = [];
+
+    for (var card in dataList) {
+      rows.add([card.term, card.define]);
+    }
+
+    bool permissionGranted = await _requestPermissions();
+    if (!permissionGranted) {
+      toastification.show(
+        context: context,
+        title: CustomText(
+          text: 'Xuất file csv thất bại',
+          type: TextStyleEnum.large,
+        ),
+        style: ToastificationStyle.fillColored,
+        foregroundColor: Colors.white,
+        showProgressBar: false,
+        type: ToastificationType.error,
+        autoCloseDuration: const Duration(seconds: 3),
+      );
+
+      Navigator.pop(context);
+      return;
+    }
+
+    Directory? downloadDir = await _getDownloadDirectory();
+    if (downloadDir == null) {
+      print('Could not get the download directory');
+      toastification.show(
+        context: context,
+        title: CustomText(
+          text: 'Xuất file csv thất bại',
+          type: TextStyleEnum.large,
+        ),
+        style: ToastificationStyle.fillColored,
+        foregroundColor: Colors.white,
+        showProgressBar: false,
+        type: ToastificationType.error,
+        autoCloseDuration: const Duration(seconds: 3),
+      );
+
+      Navigator.pop(context);
+      return;
+    }
+    // Save the CSV file
+    String filePath = '${downloadDir.path}/$fileName.csv';
+    File file = File(filePath);
+    String csv = const ListToCsvConverter().convert(rows);
+    file.writeAsStringSync(csv);
+
+    print('CSV file saved to Download folder: $filePath');
+
+    toastification.show(
+      context: context,
+      title: CustomText(
+        text: 'Xuất file csv thành công',
+        type: TextStyleEnum.large,
+      ),
+      style: ToastificationStyle.fillColored,
+      foregroundColor: Colors.white,
+      showProgressBar: false,
+      type: ToastificationType.success,
+      autoCloseDuration: const Duration(seconds: 3),
+    );
+
+    Navigator.pop(context);
+  }
+
+  Future<bool> _requestPermissions() async {
+    if (await Permission.storage.status.isGranted) {
+      return true;
+    } else {
+      await Permission.storage.request();
+      return false;
+    }
+  }
+
+  Future<Directory?> _getDownloadDirectory() async {
+    Directory? appDocDir = await getDownloadsDirectory();
+    if (appDocDir == null) {
+      return null;
+    }
+    return appDocDir;
   }
 
   Future<void> speak(String textToSpeech) async {
@@ -182,6 +294,31 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                     minVerticalPadding: 20,
                     title: CustomText(
                       text: 'Thêm vào thư mục',
+                      type: TextStyleEnum.large,
+                    ),
+                    leading: const Icon(
+                      Icons.folder_copy_outlined,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Wrap(
+              children: [
+                const Divider(
+                  thickness: 0.5,
+                  height: 1,
+                ),
+                InkWell(
+                  onTap: () async {
+                    writeCsvFile(topic!.listCard,
+                        fileName: removeDiacritics(topic!.title));
+                  },
+                  child: ListTile(
+                    minVerticalPadding: 20,
+                    title: CustomText(
+                      text: 'Xuất file csv',
                       type: TextStyleEnum.large,
                     ),
                     leading: const Icon(

@@ -1,5 +1,10 @@
+import 'dart:io';
+
 import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:csv/csv.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
 import 'package:quizletapp/models/card.dart'; // Changed from 'package:quizletapp/models/card.dart';
@@ -73,46 +78,77 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
     super.dispose();
   }
 
-  void _openFilePicker() async {
+  Future<void> readExcelFile() async {
+    List<CardModel> dataList = [];
+
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ['xlsx', 'xls'],
+      allowedExtensions: ['csv'],
       allowMultiple: false,
     );
 
     if (result != null) {
       String filePath = result.files.first.path!;
-      setState(() {
-        _filePath = filePath;
-      });
+      var file = File(filePath);
+      List<List<dynamic>> csvData = [];
 
-      // Gọi hàm để đọc file Excel và xử lý dữ liệu
-      _readExcelFile(filePath);
+      // Read the CSV file
+      try {
+        csvData = CsvToListConverter().convert(file.readAsStringSync());
+      } catch (e) {
+        print('Error reading CSV file: $e');
+        return;
+      }
+
+      // Process CSV data
+      for (var row in csvData) {
+        String term = row[0].toString();
+        String define = row[1].toString();
+
+        CardModel newCard = CardModel(uuid.v4(), term, define);
+        dataList.add(newCard);
+      }
+    } else {
+      print('No file selected');
+    }
+
+    if (dataList.isNotEmpty) {
+      for (var card in dataList) {
+        print('{ ${card.term} : ${card.define}}');
+        _addNewCardByCsv(card);
+      }
+
+      Future.delayed(Durations.medium3).whenComplete(() {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 1000),
+          curve: Curves.easeInOut,
+        );
+      });
     }
   }
 
-  void _readExcelFile(String filePath) {
-    // Use a library like 'excel' to read data from the Excel file
-    // Example:
-    // Excel excel = Excel.decodeBytes(File(filePath).readAsBytesSync());
-    // for (var table in excel.tables.keys) {
-    //   print(table); //sheet Name
-    //   print(excel.tables[table]!.maxCols);
-    //   print(excel.tables[table]!.maxRows);
-    //   for (var row in excel.tables[table]!.rows) {
-    //     print("$row");
-    //   }
-    // }
-  }
-
   int? getIndexFocus() {
-    int index = 0;
     for (int i = 0; i < listFocus.length; i++) {
       if (listFocus[i].hasFocus) {
         return i;
       }
     }
     return null;
+  }
+
+  void _addNewCardByCsv(CardModel newCard) {
+    if (listFocus.length % 2 == 0) {
+      FocusNode termFocus = FocusNode();
+      FocusNode defineFocus = FocusNode();
+
+      setState(() {
+        listFocus.add(termFocus);
+        listFocus.add(defineFocus);
+
+        listCard.add(newCard);
+      });
+    }
   }
 
   void _addNewCard() {
@@ -130,11 +166,13 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
 
       termFocus.requestFocus();
 
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: Duration(milliseconds: 500),
-        curve: Curves.ease,
-      );
+      Future.delayed(Durations.medium2).whenComplete(() {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.ease,
+        );
+      });
     }
   }
 
@@ -263,13 +301,12 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
                           });
                           print('Tạo topic thành công');
                           context.read<TopicProvider>().reloadListTopic();
-                          if(widget.isPop == true) {
+                          if (widget.isPop == true) {
                             Navigator.pop(context);
-                          }
-                          else {
+                          } else {
                             await Navigator.pushReplacementNamed(
-                              context, '/topic/detail',
-                              arguments: newTopicId);
+                                context, '/topic/detail',
+                                arguments: newTopicId);
                             Navigator.pop(context);
                           }
                         }
@@ -318,13 +355,12 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
             ],
           ),
           body: Container(
-            margin: const EdgeInsets.only(bottom: 60),
             padding: const EdgeInsets.symmetric(
               horizontal: 8,
             ),
             child: ListView.separated(
                 controller: _scrollController,
-                padding: const EdgeInsets.only(bottom: 200),
+                padding: const EdgeInsets.only(bottom: 100),
                 itemBuilder: (context, index) {
                   if (index == 0) {
                     return Container(
@@ -426,7 +462,7 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
                               padding:
                                   MaterialStateProperty.all(EdgeInsets.zero),
                             ),
-                            onPressed: _openFilePicker,
+                            onPressed: readExcelFile,
                             child: Wrap(
                               spacing: 4,
                               children: [
@@ -567,13 +603,8 @@ class _CreateTopicPageState extends State<CreateTopicPage> {
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 8),
               decoration: const BoxDecoration(
-                  color: AppTheme.primaryBackgroundColorAppbar,
-                  border: Border(
-                    top: BorderSide(
-                      width: 0.5,
-                      color: Colors.white,
-                    ),
-                  )),
+                color: AppTheme.primaryBackgroundColorAppbar,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

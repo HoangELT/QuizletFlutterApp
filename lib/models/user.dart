@@ -6,12 +6,10 @@ class UserModel {
 
   UserModel(this.id, this.userId, this.email, this.username);
 
-  // Phương thức tạo danh sách các đối tượng từ danh sách Map
   static List<UserModel> fromListMap(List<Map<String, dynamic>> listMap) {
     return listMap.map((map) => UserModel.fromMap(map)).toList();
   }
 
-  // Phương thức tạo đối tượng từ một Map
   static UserModel fromMap(Map<String, dynamic> map) {
     return UserModel(
       map['id'],
@@ -21,7 +19,6 @@ class UserModel {
     );
   }
 
-  // Phương thức chuyển UserModel sang một Map
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -31,7 +28,6 @@ class UserModel {
     };
   }
 
-  // Phương thức chuyển danh sách UserModel sang danh sách Map
   static List<Map<String, dynamic>> toListMap(List<UserModel> users) {
     return users.map((user) => user.toMap()).toList();
   }

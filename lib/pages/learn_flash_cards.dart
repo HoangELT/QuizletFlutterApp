@@ -958,7 +958,7 @@ class _LearnFlashCardsState extends State<LearnFlashCards> {
                     children: [
                       IconButton(
                         onPressed: () async {
-                          if (appinioSwiperController.cardIndex != 0) {
+                          if (currentCardIndex > 0) {
                             await appinioSwiperController.unswipe();
                           }
                         },

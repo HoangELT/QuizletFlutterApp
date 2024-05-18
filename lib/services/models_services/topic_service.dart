@@ -24,12 +24,12 @@ class TopicService {
     return null;
   }
 
-  Future<List<TopicModel>> getTopicsWithUsers() async {
+  Future<List<TopicModel>> getAllTopicPublic() async {
     List<TopicModel> topics = [];
 
     try {
-      // Lấy danh sách topic từ Firestore
-      var listTopic = await firebaseService.getDocuments('topics');
+      var listTopic = await firebaseService.getDocumentsByField('topics', 'public', true);
+      print('listAllTopicPublic: $listTopic');
 
       for (var topicMap in listTopic) {
         UserModel? user = await userService.getUserByUid(topicMap['userId']);
@@ -39,7 +39,7 @@ class TopicService {
         topics.add(topic);
       }
     } catch (e) {
-      print('Topic service error (method getTopicsWithUsers): $e');
+      print('Topic service error (method getAllTopicPublic): $e');
     }
 
     return topics;
