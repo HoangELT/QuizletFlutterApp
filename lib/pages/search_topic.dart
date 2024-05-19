@@ -195,7 +195,9 @@ class _SearchTopicPageState extends State<SearchTopicPage>
                                 userSnapshot.data!.isEmpty) {
                               if (snapshot.data!.isEmpty) {
                                 return Container(
-                                  padding: EdgeInsets.symmetric(vertical: 200,),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 200,
+                                  ),
                                   alignment: Alignment.center,
                                   child: CustomText(
                                     text: 'Không có kết quả tìm kiếm.',
@@ -203,15 +205,7 @@ class _SearchTopicPageState extends State<SearchTopicPage>
                                   ),
                                 );
                               }
-                              return Container(
-                                alignment: Alignment.center,
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 32),
-                                child: CustomText(
-                                  text: 'Không có kết quả tìm kiếm.',
-                                  type: TextStyleEnum.large,
-                                ),
-                              );
+                              return Container();
                             } else if (userSnapshot.hasData) {
                               return Container(
                                 margin:

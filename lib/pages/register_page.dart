@@ -1,8 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:quizletapp/models/user.dart';
 import 'package:quizletapp/services/firebase.dart';
+import 'package:quizletapp/services/models_services/user_service.dart';
+import 'package:quizletapp/services/providers/current_user_provider.dart';
 import 'package:toastification/toastification.dart';
 import '../enums/text_style_enum.dart';
 import '../services/firebase_auth.dart';
@@ -416,17 +419,34 @@ class _RegisterPageState extends State<RegisterPage> {
       });
       // Đăng nhập với GG
       var result = await auth.signInWithGoogle();
-      print(result);
+
       if (result != null) {
         setState(() {
           isLoading = false;
         });
+
+        UserService userService = UserService();
         //lưu uid vào local sau khi đăng nhập thành công
         SharedPreferencesService().saveUID(result.user!.uid.toString());
-        // Nếu xác thực thành công, thực hiện chuyển hướng đến app page và xóa hết các màn hình khác
-        Navigator.pushNamedAndRemoveUntil(
-            context, '/', (route) => route.settings.name == '/');
+        User newUserTemp = result.user!;
+        var getUser = await userService.getUserByUid(newUserTemp.uid);
+        if (getUser == null) {
+          UserModel newUser = UserModel('', newUserTemp.uid, newUserTemp.email!,
+              UserModel.createUsernameFromEmail(newUserTemp.email!));
+          await firebaseService.addDocument('users', newUser.toMap());
+          context.read<CurrentUserProvider>().setCurrentUser = newUser;
+          Navigator.pushNamedAndRemoveUntil(
+              context, '/', (route) => route.settings.name == '/');
+        } else {
+          context.read<CurrentUserProvider>().setCurrentUser = getUser;
+
+          print(result);
+          Navigator.pushNamedAndRemoveUntil(
+              context, '/', (route) => route.settings.name == '/');
+        }
       }
-    } catch (e) {}
+    } catch (e) {
+      print('Lỗi đăng nhập gg');
+    }
   }
 }

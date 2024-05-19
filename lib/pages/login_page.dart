@@ -1,7 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:quizletapp/services/firebase.dart';
 import 'package:quizletapp/services/models_services/user_service.dart';
 import 'package:quizletapp/services/providers/current_user_provider.dart';
 import 'package:quizletapp/services/providers/index_of_app_provider.dart';
@@ -557,6 +559,8 @@ class _LoginPageState extends State<LoginPage> {
       print(fetchUser);
       if (fetchUser != null) {
         // setCurrentUser trong provider
+        User newUserTemp = fetchUser.user!;
+
         UserService userService = UserService();
         UserModel? currentUser =
             await userService.getUserByUid(fetchUser.user!.uid);
@@ -569,10 +573,19 @@ class _LoginPageState extends State<LoginPage> {
           Navigator.pushNamedAndRemoveUntil(
               context, '/', (route) => route.settings.name == '/');
         } else {
-          print('Lỗi Login_page: Không tìm được user trong firestore');
+          UserModel newUser = UserModel('', newUserTemp.uid, newUserTemp.email!,
+              UserModel.createUsernameFromEmail(newUserTemp.email!));
+          context.read<CurrentUserProvider>().setCurrentUser = newUser;
+          FirebaseService firebaseService = FirebaseService();
+          await firebaseService.addDocument(
+            'users',
+            newUser.toMap(),
+          );
           setState(() {
             isLoading = false;
           });
+          Navigator.pushNamedAndRemoveUntil(
+              context, '/', (route) => route.settings.name == '/');
         }
       }
     } catch (e) {}
