@@ -1,3 +1,4 @@
+import 'package:quizletapp/enums/collection_enum.dart';
 import 'package:quizletapp/models/card.dart';
 import 'package:quizletapp/models/topic.dart';
 import 'package:quizletapp/models/user.dart';
@@ -28,7 +29,8 @@ class TopicService {
     List<TopicModel> topics = [];
 
     try {
-      var listTopic = await firebaseService.getDocumentsByField('topics', 'public', true);
+      var listTopic =
+          await firebaseService.getDocumentsByField('topics', 'public', true);
       print('listAllTopicPublic: $listTopic');
 
       for (var topicMap in listTopic) {
@@ -43,6 +45,20 @@ class TopicService {
     }
 
     return topics;
+  }
+
+  Future<List<TopicModel>> getListTopicByUserId(String userId) async {
+    try {
+      var listTopic =
+          await firebaseService.getDocumentsByField('topics', 'userId', userId);
+
+      List<TopicModel> listResult = TopicModel.fromListMap(listTopic);
+
+      return listResult;
+    } catch (e) {
+      print('Lỗi lấy topics: ${e}');
+      return [];
+    }
   }
 
   Future<List<TopicModel>> getListTopicOfCurrentUser() async {
@@ -147,6 +163,25 @@ class TopicService {
     final year = dateTime.year.toString();
 
     return 'ngày $day tháng $month năm $year';
+  }
+
+  Future<List<TopicModel>> searchTopics(String keyword) async {
+    try {
+      String key = keyword.trim().toLowerCase();
+      var getAllTopic = await getAllTopicPublic();
+
+      var listSearch = getAllTopic
+          .where(
+            (e) =>
+                e.title.toLowerCase().contains(key) ||
+                e.description.toLowerCase().contains(key),
+          )
+          .toList();
+      return sortTopicsByDateDescending(listSearch);
+    } catch (e) {
+      print('Error TopicService ( searchTopics): $e');
+      return [];
+    }
   }
 
   void printListTopics(List<TopicModel> listTopics) {

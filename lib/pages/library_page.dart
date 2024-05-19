@@ -219,173 +219,173 @@ class _LibraryPageState extends State<LibraryPage>
       ),
       child: Column(
         children: [
-          Container(
-            alignment: Alignment.centerLeft,
-            child: TextButton(
-              onPressed: () async {
-                setState(() {
-                  isActiveBtn = true;
-                });
-                await showDialog(
-                  barrierColor: Colors.transparent,
-                  context: context,
-                  builder: (context) {
-                    return SimpleDialog(
-                      contentPadding: EdgeInsets.zero,
-                      backgroundColor: AppTheme.primaryBackgroundColorDiaLog,
-                      title: Container(
-                        padding: const EdgeInsets.only(bottom: 24),
-                        alignment: Alignment.center,
-                        child: CustomText(
-                          text: 'Chọn lựa chọn',
-                          type: TextStyleEnum.large,
-                        ),
-                      ),
-                      children: [
-                        Divider(
-                          height: 0.5,
-                          color: Colors.grey.withOpacity(0.5),
-                        ),
-                        SimpleDialogOption(
-                          onPressed: () {
-                            setState(() {
-                              typeFilter = FilterTopicEnum.all;
-                            });
-                            Navigator.pop(context);
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: Wrap(
-                              spacing: 10,
-                              children: [
-                                SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: (typeFilter == FilterTopicEnum.all)
-                                      ? const Icon(
-                                          Icons.check,
-                                          color: Colors.white,
-                                          size: 24,
-                                        )
-                                      : null,
-                                ),
-                                CustomText(
-                                  text: 'Tất cả',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w400),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Divider(
-                          height: 0.5,
-                          color: Colors.grey.withOpacity(0.5),
-                        ),
-                        SimpleDialogOption(
-                          onPressed: () {
-                            setState(() {
-                              typeFilter = FilterTopicEnum.created;
-                            });
-                            Navigator.pop(context);
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: Wrap(
-                              spacing: 10,
-                              children: [
-                                SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: (typeFilter == FilterTopicEnum.created)
-                                      ? const Icon(
-                                          Icons.check,
-                                          color: Colors.white,
-                                          size: 24,
-                                        )
-                                      : null,
-                                ),
-                                CustomText(
-                                  text: 'Đã tạo',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w400),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Divider(
-                          height: 0.5,
-                          color: Colors.grey.withOpacity(0.5),
-                        ),
-                        SimpleDialogOption(
-                          onPressed: () {
-                            setState(() {
-                              typeFilter = FilterTopicEnum.studied;
-                            });
-                            Navigator.pop(context);
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: Wrap(
-                              spacing: 10,
-                              children: [
-                                SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: (typeFilter == FilterTopicEnum.studied)
-                                      ? const Icon(
-                                          Icons.check,
-                                          color: Colors.white,
-                                          size: 24,
-                                        )
-                                      : null,
-                                ),
-                                CustomText(
-                                  text: 'Đã học',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w400),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                );
-                setState(() {
-                  isActiveBtn = false;
-                });
-              },
-              style: const ButtonStyle(
-                  padding: MaterialStatePropertyAll(EdgeInsets.all(0))),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: (isActiveBtn)
-                      ? Colors.white.withOpacity(0.5)
-                      : Colors.transparent,
-                  border:
-                      Border.all(width: 2, color: Colors.grey.withOpacity(0.8)),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Wrap(
-                  spacing: 4,
-                  children: [
-                    CustomText(text: _getTypeFilter()),
-                    Icon(
-                      (isActiveBtn)
-                          ? Icons.keyboard_arrow_down
-                          : Icons.keyboard_arrow_up,
-                      color: Colors.white,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+          // Container(
+          //   alignment: Alignment.centerLeft,
+          //   child: TextButton(
+          //     onPressed: () async {
+          //       setState(() {
+          //         isActiveBtn = true;
+          //       });
+          //       await showDialog(
+          //         barrierColor: Colors.transparent,
+          //         context: context,
+          //         builder: (context) {
+          //           return SimpleDialog(
+          //             contentPadding: EdgeInsets.zero,
+          //             backgroundColor: AppTheme.primaryBackgroundColorDiaLog,
+          //             title: Container(
+          //               padding: const EdgeInsets.only(bottom: 24),
+          //               alignment: Alignment.center,
+          //               child: CustomText(
+          //                 text: 'Chọn lựa chọn',
+          //                 type: TextStyleEnum.large,
+          //               ),
+          //             ),
+          //             children: [
+          //               Divider(
+          //                 height: 0.5,
+          //                 color: Colors.grey.withOpacity(0.5),
+          //               ),
+          //               SimpleDialogOption(
+          //                 onPressed: () {
+          //                   setState(() {
+          //                     typeFilter = FilterTopicEnum.all;
+          //                   });
+          //                   Navigator.pop(context);
+          //                 },
+          //                 child: Container(
+          //                   padding: const EdgeInsets.symmetric(vertical: 8),
+          //                   child: Wrap(
+          //                     spacing: 10,
+          //                     children: [
+          //                       SizedBox(
+          //                         height: 20,
+          //                         width: 20,
+          //                         child: (typeFilter == FilterTopicEnum.all)
+          //                             ? const Icon(
+          //                                 Icons.check,
+          //                                 color: Colors.white,
+          //                                 size: 24,
+          //                               )
+          //                             : null,
+          //                       ),
+          //                       CustomText(
+          //                         text: 'Tất cả',
+          //                         style: const TextStyle(
+          //                             fontWeight: FontWeight.w400),
+          //                       ),
+          //                     ],
+          //                   ),
+          //                 ),
+          //               ),
+          //               Divider(
+          //                 height: 0.5,
+          //                 color: Colors.grey.withOpacity(0.5),
+          //               ),
+          //               SimpleDialogOption(
+          //                 onPressed: () {
+          //                   setState(() {
+          //                     typeFilter = FilterTopicEnum.created;
+          //                   });
+          //                   Navigator.pop(context);
+          //                 },
+          //                 child: Container(
+          //                   padding: const EdgeInsets.symmetric(vertical: 8),
+          //                   child: Wrap(
+          //                     spacing: 10,
+          //                     children: [
+          //                       SizedBox(
+          //                         height: 20,
+          //                         width: 20,
+          //                         child: (typeFilter == FilterTopicEnum.created)
+          //                             ? const Icon(
+          //                                 Icons.check,
+          //                                 color: Colors.white,
+          //                                 size: 24,
+          //                               )
+          //                             : null,
+          //                       ),
+          //                       CustomText(
+          //                         text: 'Đã tạo',
+          //                         style: const TextStyle(
+          //                             fontWeight: FontWeight.w400),
+          //                       ),
+          //                     ],
+          //                   ),
+          //                 ),
+          //               ),
+          //               Divider(
+          //                 height: 0.5,
+          //                 color: Colors.grey.withOpacity(0.5),
+          //               ),
+          //               SimpleDialogOption(
+          //                 onPressed: () {
+          //                   setState(() {
+          //                     typeFilter = FilterTopicEnum.studied;
+          //                   });
+          //                   Navigator.pop(context);
+          //                 },
+          //                 child: Container(
+          //                   padding: const EdgeInsets.symmetric(vertical: 8),
+          //                   child: Wrap(
+          //                     spacing: 10,
+          //                     children: [
+          //                       SizedBox(
+          //                         height: 20,
+          //                         width: 20,
+          //                         child: (typeFilter == FilterTopicEnum.studied)
+          //                             ? const Icon(
+          //                                 Icons.check,
+          //                                 color: Colors.white,
+          //                                 size: 24,
+          //                               )
+          //                             : null,
+          //                       ),
+          //                       CustomText(
+          //                         text: 'Đã học',
+          //                         style: const TextStyle(
+          //                             fontWeight: FontWeight.w400),
+          //                       ),
+          //                     ],
+          //                   ),
+          //                 ),
+          //               ),
+          //             ],
+          //           );
+          //         },
+          //       );
+          //       setState(() {
+          //         isActiveBtn = false;
+          //       });
+          //     },
+          //     style: const ButtonStyle(
+          //         padding: MaterialStatePropertyAll(EdgeInsets.all(0))),
+          //     child: Container(
+          //       padding:
+          //           const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          //       decoration: BoxDecoration(
+          //         color: (isActiveBtn)
+          //             ? Colors.white.withOpacity(0.5)
+          //             : Colors.transparent,
+          //         border:
+          //             Border.all(width: 2, color: Colors.grey.withOpacity(0.8)),
+          //         borderRadius: BorderRadius.circular(6),
+          //       ),
+          //       child: Wrap(
+          //         spacing: 4,
+          //         children: [
+          //           CustomText(text: _getTypeFilter()),
+          //           Icon(
+          //             (isActiveBtn)
+          //                 ? Icons.keyboard_arrow_down
+          //                 : Icons.keyboard_arrow_up,
+          //             color: Colors.white,
+          //           ),
+          //         ],
+          //       ),
+          //     ),
+          //   ),
+          // ),
           Expanded(
             child: RefreshIndicator(
               onRefresh: _fetchTopics,
@@ -408,7 +408,7 @@ class _LibraryPageState extends State<LibraryPage>
                                 listTopicToday.isNotEmpty)
                               Container(
                                 margin:
-                                    const EdgeInsets.only(top: 24, bottom: 12),
+                                    const EdgeInsets.only(top: 24, bottom: 28),
                                 child: Stack(
                                   children: [
                                     TextFormField(
@@ -465,7 +465,7 @@ class _LibraryPageState extends State<LibraryPage>
                                             color:
                                                 AppTheme.primaryBackgroundColor,
                                             padding: const EdgeInsets.only(
-                                                top: 32, bottom: 16),
+                                                top: 16, bottom: 16),
                                             alignment: Alignment.centerLeft,
                                             child: Skeletonizer(
                                               enabled: isLoading,
@@ -578,7 +578,7 @@ class _LibraryPageState extends State<LibraryPage>
                                           color:
                                               AppTheme.primaryBackgroundColor,
                                           padding: const EdgeInsets.only(
-                                              top: 32, bottom: 16),
+                                              top: 16, bottom: 16),
                                           alignment: Alignment.centerLeft,
                                           child: Skeletonizer(
                                             enabled: isLoading,

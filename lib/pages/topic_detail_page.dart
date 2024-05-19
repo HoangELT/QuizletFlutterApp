@@ -10,10 +10,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:quizletapp/enums/text_style_enum.dart';
 import 'package:quizletapp/models/card.dart';
 import 'package:quizletapp/models/topic.dart';
 import 'package:quizletapp/services/models_services/topic_service.dart';
+import 'package:quizletapp/services/providers/current_user_provider.dart';
 import 'package:quizletapp/utils/app_theme.dart';
 import 'package:quizletapp/widgets/button_listtile.dart';
 import 'package:quizletapp/widgets/text.dart';
@@ -247,34 +249,36 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                   thickness: 0.5,
                   height: 1,
                 ),
-                InkWell(
-                  onTap: () async {
-                    TopicModel topicClone = TopicModel.copy(topic!);
-                    topicClone.listCard = listSort[0];
-                    var result = await Navigator.popAndPushNamed(
-                        context, '/topic/edit',
-                        arguments: topicClone);
-                    if (result == 0) {
-                      //is updated this topic
-                      _fetchTopic();
-                    } else if (result == 1) {
-                      //is deleted this topic
-                      Navigator.pop(context);
-                      return;
-                    }
-                  },
-                  child: ListTile(
-                    minVerticalPadding: 20,
-                    title: CustomText(
-                      text: 'Sửa học phần',
-                      type: TextStyleEnum.large,
-                    ),
-                    leading: const Icon(
-                      Icons.edit,
-                      color: Colors.white,
+                if (topic?.userId ==
+                    context.read<CurrentUserProvider>().currentUser?.userId)
+                  InkWell(
+                    onTap: () async {
+                      TopicModel topicClone = TopicModel.copy(topic!);
+                      topicClone.listCard = listSort[0];
+                      var result = await Navigator.popAndPushNamed(
+                          context, '/topic/edit',
+                          arguments: topicClone);
+                      if (result == 0) {
+                        //is updated this topic
+                        _fetchTopic();
+                      } else if (result == 1) {
+                        //is deleted this topic
+                        Navigator.pop(context);
+                        return;
+                      }
+                    },
+                    child: ListTile(
+                      minVerticalPadding: 20,
+                      title: CustomText(
+                        text: 'Sửa học phần',
+                        type: TextStyleEnum.large,
+                      ),
+                      leading: const Icon(
+                        Icons.edit,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
-                ),
               ],
             ),
             Wrap(
@@ -354,43 +358,45 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                 ),
               ],
             ),
-            Wrap(
-              children: [
-                const Divider(
-                  thickness: 0.5,
-                  height: 1,
-                ),
-                InkWell(
-                  onTap: () async {
-                    Navigator.pop(context);
-                    var chooseResult = await showOkCancelAlertDialog(
-                      context: context,
-                      cancelLabel: 'Hủy',
-                      okLabel: 'Xóa',
-                      isDestructiveAction: true,
-                      style: AdaptiveStyle.iOS,
-                      title: 'Bạn chắc chắn muốn xóa học phần này?',
-                    );
-                    if (chooseResult == OkCancelResult.ok) {
-                      await topicService.deleteTopic(topic!.id);
-                      Navigator.pushNamedAndRemoveUntil(
-                          context, '/', (route) => false);
-                    }
-                  },
-                  child: ListTile(
-                    minVerticalPadding: 20,
-                    title: CustomText(
-                      text: 'Xóa học phần',
-                      type: TextStyleEnum.large,
-                    ),
-                    leading: const Icon(
-                      Icons.delete_outline,
-                      color: Colors.white,
+            if (topic?.userId ==
+                context.read<CurrentUserProvider>().currentUser?.userId)
+              Wrap(
+                children: [
+                  const Divider(
+                    thickness: 0.5,
+                    height: 1,
+                  ),
+                  InkWell(
+                    onTap: () async {
+                      Navigator.pop(context);
+                      var chooseResult = await showOkCancelAlertDialog(
+                        context: context,
+                        cancelLabel: 'Hủy',
+                        okLabel: 'Xóa',
+                        isDestructiveAction: true,
+                        style: AdaptiveStyle.iOS,
+                        title: 'Bạn chắc chắn muốn xóa học phần này?',
+                      );
+                      if (chooseResult == OkCancelResult.ok) {
+                        await topicService.deleteTopic(topic!.id);
+                        Navigator.pushNamedAndRemoveUntil(
+                            context, '/', (route) => false);
+                      }
+                    },
+                    child: ListTile(
+                      minVerticalPadding: 20,
+                      title: CustomText(
+                        text: 'Xóa học phần',
+                        type: TextStyleEnum.large,
+                      ),
+                      leading: const Icon(
+                        Icons.delete_outline,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
             Wrap(
               children: [
                 const Divider(
@@ -1174,6 +1180,9 @@ class _TopicDetailPageState extends State<TopicDetailPage> {
                                 onTap: () {
                                   print('clicked');
                                 },
+                              ),
+                              const SizedBox(
+                                height: 8,
                               ),
                               ButtonListTile(
                                 padding: const EdgeInsets.only(left: 8),

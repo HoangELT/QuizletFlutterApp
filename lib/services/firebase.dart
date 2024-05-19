@@ -142,4 +142,26 @@ class FirebaseService {
       throw error;
     }
   }
+
+  Future<List<Map<String, dynamic>>> searchByField(
+      String collection, String field, String query) async {
+    final firestore = FirebaseFirestore.instance;
+
+    try {
+      QuerySnapshot snapshot = await firestore
+          .collection(collection)
+          .where(field, isGreaterThanOrEqualTo: query)
+          .where(field, isLessThanOrEqualTo: '$query\uf8ff')
+          .get();
+
+      List<Map<String, dynamic>> results = snapshot.docs.map((doc) {
+        return doc.data() as Map<String, dynamic>;
+      }).toList();
+
+      return results;
+    } catch (e) {
+      print('Error searching by field: $e');
+      return [];
+    }
+  }
 }
