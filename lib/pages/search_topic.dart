@@ -193,6 +193,16 @@ class _SearchTopicPageState extends State<SearchTopicPage>
                               );
                             } else if (userSnapshot.hasData &&
                                 userSnapshot.data!.isEmpty) {
+                              if (snapshot.data!.isEmpty) {
+                                return Container(
+                                  padding: EdgeInsets.symmetric(vertical: 200,),
+                                  alignment: Alignment.center,
+                                  child: CustomText(
+                                    text: 'Không có kết quả tìm kiếm.',
+                                    type: TextStyleEnum.large,
+                                  ),
+                                );
+                              }
                               return Container(
                                 alignment: Alignment.center,
                                 padding:

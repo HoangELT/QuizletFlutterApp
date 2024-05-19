@@ -305,7 +305,23 @@ class _ForumPageState extends State<ForumPage> {
           } else if (snapshot.hasError) {
             return Center(child: CustomText(text: 'Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: CustomText(text: 'No data available'));
+            return RefreshIndicator(
+              onRefresh: () async {
+                setState(() {
+                  _futureTopics = fetchAllTopic();
+                });
+              },
+              triggerMode: RefreshIndicatorTriggerMode.anywhere,
+              child: ListView(
+                children: [
+                  Container(
+                      padding: const EdgeInsets.symmetric(vertical: 200),
+                      child: Center(
+                          child: CustomText(
+                              text: 'Chưa có học phần nào được tạo.'))),
+                ],
+              ),
+            );
           } else {
             var listTopicModel = snapshot.data!;
             return RefreshIndicator(
@@ -334,7 +350,9 @@ class _ForumPageState extends State<ForumPage> {
                           text: 'Các học phần mới nhất',
                           type: TextStyleEnum.large,
                         ),
-                        const SizedBox(height: 16,),
+                        const SizedBox(
+                          height: 16,
+                        ),
                         _buildPost(currentTopic),
                       ],
                     );
