@@ -100,13 +100,6 @@ flutter run
 
 ---
 
-## 👥 Contributors
-
-* Developer: \[Tên bạn]
-* Design & Documentation: \[Tên bạn / nhóm]
-
----
-
 ## 📄 License
 
 Ứng dụng được phát triển cho mục đích **học tập và nghiên cứu**, không nhằm mục đích thương mại.
